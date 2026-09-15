@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#fbf9ff" id="themeColorMeta" />
+  <title>CineTale Studio — AI Story Production</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&display=swap" rel="stylesheet">
+  <meta name="description" content="Create story worlds, recurring characters, episodes, storyboards and narrated previews in one AI-native entertainment studio." />
+  <link rel="icon" href="/favicon.svg" />
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <div class="ambient ambient-a"></div><div class="ambient ambient-b"></div><div class="ambient ambient-c"></div>
+  <header class="shell topbar">
+    <a class="brand" href="#" data-view="create" aria-label="CineTale home"><span class="brand-symbol" aria-hidden="true"><span>C</span></span><span class="brand-lockup"><span class="brand-name">CineTale</span><span class="brand-studio">STUDIO</span></span></a>
+    <nav class="nav" aria-label="Primary navigation">
+      <span class="nav-indicator" aria-hidden="true"></span>
+      <button class="nav-item nav-create active" data-view="create"><span class="nav-dot">✦</span><span>Create</span></button>
+      <button class="nav-item nav-projects" data-view="projects"><span class="nav-dot">▦</span><span>Projects</span></button>
+      <button class="nav-item nav-studio" data-view="studio"><span class="nav-dot">◆</span><span>Studio</span></button>
+      <button class="nav-item nav-library" data-view="library"><span class="nav-dot">▣</span><span>Library</span></button>
+    </nav>
+    <div class="top-actions">
+      <button class="icon-btn" id="themeToggle" aria-label="Toggle appearance">☼</button>
+      <button class="avatar-btn" data-view="settings" aria-label="Settings">DS</button>
+    </div>
+  </header>
+
+  <main class="shell app-shell">
+    <section class="view active" id="create">
+      <div class="hero-grid">
+        <div class="hero-copy-card surface hero-art">
+          <div class="hero-badge"><span>✦</span> AI ENTERTAINMENT STUDIO</div>
+          <h1>Make a story.<br><span>Build a universe.</span></h1>
+          <p>From one idea to characters, continuity, visual storyboards, narration and video production — in one creative studio built for original entertainment.</p>
+          <div class="hero-proof">
+            <div><strong>Any genre</strong><span>No narrow theme limits</span></div>
+            <div><strong>Any cast</strong><span>Describe people, creatures or worlds freely</span></div>
+            <div><strong>Any voice</strong><span>Language, accent, mood and narration style</span></div>
+          </div>
+          <div class="hero-poster-stack" aria-hidden="true">
+            <div class="poster p1"><span>SCI-FI</span><b>Signal<br>Below</b></div>
+            <div class="poster p2"><span>FANTASY</span><b>The Last<br>Lantern</b></div>
+            <div class="poster p3"><span>COMEDY</span><b>Apartment<br>404</b></div>
+          </div>
+        </div>
+
+        <div class="surface create-panel">
+          <div id="editSetupBanner" class="edit-setup-banner hidden"><div><b>Editing project setup</b><span>Save settings without changing existing episodes, or rebuild the story from these inputs.</span></div><button type="button" class="ghost" id="cancelEditSetup">Cancel</button></div>
+          <div class="panel-title-row">
+            <div><span class="kicker">START CREATING</span><h2>What do you want to make?</h2></div>
+          </div>
+          <div class="segmented" id="formatTabs">
+            <button class="seg active" data-format="Episode">Episode</button>
+            <button class="seg" data-format="Short">Short</button>
+            <button class="seg" data-format="Story">Story</button>
+            <button class="seg" data-format="Movie">Movie</button>
+          </div>
+          <div class="format-explainer" id="formatExplainer"><b>Episode</b><span>Build an ongoing series. Only Episode mode creates Episode 2, 3 and beyond.</span></div>
+          <form id="createForm">
+            <div class="create-section create-section-basics">
+              <div class="create-section-head"><div><span class="section-step">01</span><div><b>Story basics</b><small>Your idea, audience and runtime.</small></div></div></div>
+              <div class="story-input-card">
+                <div class="story-source-row">
+                  <div><span class="field-label">Story source</span><small>Choose a spark or bring your full story. CineTale keeps your intent while preparing it for production.</small></div>
+                  <div class="segmented compact story-source-tabs" id="storySourceTabs">
+                    <button type="button" class="seg active" data-story-source="idea">Start from an idea</button>
+                    <button type="button" class="seg" data-story-source="full-story">Use my story</button>
+                  </div>
+                </div>
+                <div class="story-entry-row">
+                  <label class="field big story-text-field"><span id="storyInputLabel">Your idea</span><textarea id="idea" placeholder="Describe anything… e.g. A teenage inventor discovers a robot hidden beneath her school." maxlength="12000"></textarea><small id="ideaHint">One sentence is enough. CineTale builds the world, recurring cast and first episode around it.</small></label>
+                  <div class="story-input-tools" aria-label="Story input method">
+                    <span class="field-label">Input</span>
+                    <div class="input-method-toggle"><button type="button" class="input-method active" id="typeStoryBtn">⌨ Type</button><button type="button" class="input-method" id="speakStoryBtn">🎙 Speak</button></div>
+                    <button type="button" class="mic-button" id="storyMicBtn"><span class="mic-icon">●</span><span id="storyMicText">Start speaking</span></button>
+                    <small id="speechStatus">Speak naturally. CineTale transcribes into the same editable story box.</small>
+                  </div>
+                </div>
+              </div>
+              <div class="field-grid three basics-grid">
+                <div class="field"><span>Genre / mix</span><button type="button" class="picker-button" id="genrePickerButton">Choose genres</button><input id="genre" type="hidden" value="Mystery" /><div class="selected-pills" id="genreSelected"></div><small>Mix genres or add your own.</small></div>
+                <label class="field"><span>Audience</span><select id="audience"><option value="Preschool (3–5)">Preschool · 3–5</option><option value="Kids (6–8)">Kids · 6–8</option><option value="Kids (9–12)">Kids · 9–12</option><option value="Teen (13–17)" selected>Teen · 13–17</option><option value="Young Adult">Young Adult</option><option value="Family / All ages">Family / All ages</option><option value="Adult">Adult</option><option value="Custom">Custom</option></select><input id="customAudience" class="hidden inline-custom-input" placeholder="Describe the intended audience" maxlength="120" /><small>Guides language, intensity, romance, humor and pacing.</small></label>
+                <label class="field"><span>Length</span><select id="duration"></select><small id="durationHint">Target episode runtime.</small></label>
+              </div>
+            </div>
+
+            <div class="create-section create-section-direction">
+              <div class="create-section-head"><div><span class="section-step">02</span><div><b>Creative direction</b><small>Style, language and cultural context.</small></div></div></div>
+              <div class="field-grid three">
+                <label class="field"><span>Visual style</span><select id="visualStylePreset"><option value="cinematic-realistic">Cinematic Realistic</option><option value="3d-animated">3D Animated</option><option value="2d-animated">2D Animated</option><option value="anime">Anime</option><option value="storybook">Illustrated / Storybook</option><option value="devotional-art">Devotional Art</option><option value="sacred-cinematic">Sacred Cinematic</option><option value="watercolor">Watercolor</option><option value="graphic-novel">Graphic Novel</option><option value="clay">Clay / Stop-motion Inspired</option><option value="custom">Custom</option></select><small>Project-wide look for cast, storyboards and video.</small></label>
+                <div class="field"><span>Story language</span><button type="button" class="picker-button" id="languagePickerButton">Choose languages</button><input id="language" type="hidden" value="English" /><div class="selected-pills" id="languageSelected"></div><small>Selected languages control output; local context never overrides them.</small></div>
+                <label class="field"><span>Language scope</span><select id="languageScope"><option value="entire-story">Entire story in selected language(s)</option><option value="dialogue-only">Dialogue only</option><option value="narration-dialogue">Narration + dialogue</option><option value="custom-multilingual">Custom multilingual</option></select><small>Choose where language applies.</small></label>
+              </div>
+              <div class="field-grid two">
+                <label class="field"><span>Cultural / sacred treatment</span><select id="culturalTreatment"><option value="auto">Auto · understand from context</option><option value="culturally-faithful">Culturally faithful</option><option value="traditional">Traditional</option><option value="historically-grounded">Historically grounded</option><option value="reverent-devotional">Reverent / Devotional</option><option value="sacred-cinematic">Sacred cinematic</option><option value="inspired">Inspired reinterpretation</option><option value="modern-retelling">Modern retelling</option></select><small>Auto uses story context; override only when needed.</small></label>
+                <label class="field"><span>Language direction (optional)</span><input id="languageDirection" placeholder="e.g. Narration in English; family dialogue in Malayalam; sacred chants in Sanskrit" /><small>Only for intentional multilingual behavior.</small></label>
+              </div>
+              <label class="field visual-custom hidden" id="customStyleWrap"><span>Custom visual style</span><input id="customStyle" placeholder="Describe any look — e.g. hand-painted Rajasthani miniature art with modern cinematic lighting" /><small>Custom style becomes the project-wide visual direction.</small></label>
+            </div>
+
+            <details class="create-section create-section-advanced advanced-details">
+              <summary class="create-section-head"><div><span class="section-step">03</span><div><b>Cast & continuity</b><small>Optional — refine recurring cast and identity consistency.</small></div></div><span class="summary-hint">Optional <i>⌄</i></span></summary>
+              <div class="advanced-body">
+                <div class="field-grid two">
+                  <label class="field"><span>Cast size</span><select id="castSize"><option value="auto">Auto · story decides</option><option value="2">2 recurring characters</option><option value="3">3 recurring characters</option><option value="4">4 recurring characters</option><option value="5">5 recurring characters</option><option value="6">6 recurring characters</option><option value="8">Larger cast · up to 8</option></select><small>Auto creates only recurring characters the plot genuinely needs; incidental/background people do not become permanent cast.</small></label>
+                  <label class="field"><span>Character continuity</span><select id="continuityStrength"><option value="strict" selected>Strict identity lock</option><option value="balanced">Balanced</option><option value="flexible">Flexible</option></select><small>How tightly face, age and defining traits stay consistent.</small></label>
+                </div>
+              </div>
+            </details>
+            <div class="control-row">
+              <div class="control-copy"><span class="field-label">Creative control</span><small>How much CineTale decides for you.</small></div>
+              <div class="segmented compact" id="controlTabs"><button type="button" class="seg" data-control="Auto">Auto</button><button type="button" class="seg active" data-control="Guided">Guided</button><button type="button" class="seg" data-control="Director">Director</button></div>
+            </div>
+            <div id="directorFields" class="director-fields hidden">
+              <label class="field"><span>Character direction</span><input id="characterDirection" placeholder="Any age, culture, race, species, appearance, identity, wardrobe…" /></label>
+              <label class="field"><span>Voice / narration direction</span><input id="voiceDirection" placeholder="Any language, accent, tone, narrator style, pace…" /></label>
+              <label class="field"><span>Sound / music direction</span><input id="soundDirection" placeholder="Cinematic score, ambient, orchestral, folk, electronic, silence…" /></label>
+            </div>
+            <div class="create-footer create-footer-actions"><div class="button-row"><button class="ghost hidden" id="saveSetupOnly" type="button">Save settings only</button><button class="primary large" id="createButton" type="submit"><span>Create universe</span><b>→</b></button></div></div>
+          </form>
+
+        </div>
+      </div>
+
+      <div class="section-intro"><span class="kicker">ONE STUDIO, THE WHOLE WORKFLOW</span><h2>From your idea or your own story to a finished production — without stitching together five different tools.</h2></div>
+      <div class="capability-grid">
+        <article class="cap-card c1"><div class="cap-icon">01</div><h3>Story intelligence</h3><p>Build the premise, structure, world rules and continuity while keeping important story facts organized.</p></article>
+        <article class="cap-card c2"><div class="cap-icon">02</div><h3>Persistent characters</h3><p>Keep identity, appearance, wardrobe, relationships, language and voice direction consistent when characters return.</p></article>
+        <article class="cap-card c3"><div class="cap-icon">03</div><h3>Visual production</h3><p>Create character art and scene storyboards, then generate selected scene videos when enabled.</p></article>
+        <article class="cap-card c4"><div class="cap-icon">04</div><h3>Audio direction</h3><p>Plan narration, dialogue, ambience, music and effects, then preview audio before video rendering.</p></article>
+      </div>
+    </section>
+
+    <section class="view" id="projects">
+      <div class="page-head"><div><span class="kicker">YOUR WORK</span><h1>Projects</h1><p>Every universe, series and one-off creation in one place.</p></div><button class="primary" data-view="create">+ New project</button></div>
+      <div id="projectsGrid" class="project-grid"></div>
+    </section>
+
+    <section class="view" id="characters">
+      <div class="page-head"><div><span class="kicker">CASTING BOARD</span><h1>Characters</h1><p>Build reusable identities with open-ended appearance, background, voice and language direction.</p></div><div class="head-actions"><button class="ghost" data-view="studio">← Back to Studio</button><button class="primary" id="addCharacterBtn">+ Add character</button></div></div>
+      <div class="character-toolbar surface"><div><strong>Creative freedom</strong><span>Presets are shortcuts, not restrictions. Use free text for culture, ethnicity, species, wardrobe, accent, language, age presentation, personality and more.</span></div><button class="ghost" id="generateAllPortraits">Generate all portraits</button></div>
+      <div id="characterGrid" class="character-grid"></div>
+    </section>
+
+    <section class="view" id="episodes">
+      <div class="page-head"><div><span class="kicker">SERIES ROOM</span><h1 id="episodesPageTitle">Episodes</h1><p id="episodesPageCopy">Continue the same world while preserving canon and unresolved story threads.</p></div><div class="head-actions"><button class="ghost" data-view="studio">← Back to Studio</button><button class="primary" id="newEpisodeBtn">+ Create next episode</button></div></div>
+      <div id="episodesList" class="episodes-list"></div>
+    </section>
+
+    <section class="view" id="studio">
+      <div id="studioEmpty" class="empty-state surface"><div class="empty-orb">✦</div><h2>Create a project first</h2><p>Your production workflow will appear here after you create a universe.</p><button class="primary" data-view="create">Start creating</button></div>
+      <div id="studioContent" class="hidden">
+        <div class="studio-hero surface">
+          <div class="studio-breadcrumb" aria-label="Project location"><button data-view="projects">Projects</button><span>›</span><span id="studioCrumbTitle">Current project</span></div>
+          <div class="studio-head">
+            <div class="studio-head-copy"><h1 id="studioTitle">Untitled</h1><p id="studioLogline"></p><div class="studio-meta" aria-label="Project summary"><span id="studioFormatChip">Episode</span><span id="studioAudienceChip">Audience</span><span id="studioStyleChip">Style</span><span id="studioLanguageChip">Language</span></div></div>
+            <div class="head-actions studio-head-actions"><div class="studio-manage-wrap"><button class="ghost contextual" id="studioManageBtn" aria-expanded="false" aria-controls="studioManageMenu">Manage <span aria-hidden="true">⌄</span></button><div class="studio-manage-menu hidden" id="studioManageMenu"><button type="button" data-view="characters">Cast & characters</button><button type="button" id="studioEpisodesBtn" data-view="episodes">Episodes</button><button type="button" id="editStorySetup">Story setup</button><button type="button" id="narratorVoiceBtn">Narrator voice</button><button type="button" id="exportProject">Export project</button></div></div><button class="primary" id="continueEpisode">+ Next episode</button></div>
+          </div>
+        </div>
+        <div class="workflow-block">
+          <div class="workflow surface" id="workflow" aria-label="Production progress">
+            <div class="workflow-step done" data-workflow="script"><span>✓</span><div><b id="wf1Title">Story</b><small id="wf1Sub">Ready</small></div></div>
+            <div class="workflow-step" data-workflow="characters"><span>2</span><div><b id="wf2Title">Cast</b><small id="wf2Sub">Portraits</small></div></div>
+            <div class="workflow-step" data-workflow="storyboard"><span>3</span><div><b id="wf3Title">Storyboard</b><small id="wf3Sub">Scenes</small></div></div>
+            <div class="workflow-step" data-workflow="voice"><span>4</span><div><b id="wf4Title">Audio</b><small id="wf4Sub">Preview</small></div></div>
+            <div class="workflow-step" data-workflow="video"><span>5</span><div><b id="wf5Title">Video</b><small id="wf5Sub">Generate</small></div></div>
+            <div class="workflow-step" data-workflow="render"><span>6</span><div><b id="wf6Title">Final</b><small id="wf6Sub">Assemble</small></div></div>
+          </div>
+          <div class="next-step-card" id="nextStepCard"><span class="next-step-icon">✦</span><div><small>NEXT STEP</small><b id="nextStepTitle">Review your cast</b><span id="nextStepText">Generate or review character portraits before storyboarding.</span></div><button class="primary small" id="nextStepAction">Review characters</button></div>
+        </div>
+        <div class="studio-layout">
+          <aside class="studio-sidebar surface" id="studioSidebar"><div class="side-block" id="studioUnitsBlock"><h3 id="studioUnitsTitle">Episodes</h3><div id="studioEpisodes"></div></div><div class="side-block"><h3 id="studioMemoryTitle">Series memory</h3><div id="canonList"></div></div></aside>
+          <div class="studio-main">
+            <div class="episode-banner"><div><span class="episode-label"><span id="unitLabel">EPISODE</span> <b id="episodeNumber">01</b></span><h2 id="episodeTitle"></h2><p id="episodeSynopsis"></p></div><div class="runtime" title="Estimated from planned scene durations. Final audio/video runtime can differ."><strong id="episodeRuntime">~00:00</strong><span id="runtimeLabel">estimated episode runtime</span></div></div>
+
+            <div class="subhead"><div><h2 id="sceneProductionTitle">Scene production</h2><span id="assetCount">0 assets</span></div><div class="scene-quality-help"><b>Generation quality</b><span>Choose per scene before creating art or video.</span></div></div>
+            <div id="sceneList" class="scene-list"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="view" id="library">
+      <div class="page-head"><div><span class="kicker">ASSET LIBRARY</span><h1>Library</h1><p>Generated character art, storyboards, audio and future video assets.</p></div><button class="ghost danger" id="clearLibraryBtn">Clear local data</button></div>
+      <div id="libraryGrid" class="library-grid"></div>
+    </section>
+
+    <section class="view" id="settings">
+      <div class="page-head"><div><span class="kicker">PREFERENCES</span><h1>Settings</h1><p>Keep the public experience simple while retaining deeper controls behind the scenes.</p></div></div>
+      <div class="settings-grid">
+        <div class="surface setting-card"><h3>Appearance</h3><p>Use the polished light experience by default or switch to dark mode.</p><button class="ghost" id="settingsTheme">Toggle appearance</button></div>
+        <div class="surface setting-card"><h3>Creative defaults</h3><p>CineTale keeps creative inputs open-ended. No fixed race, culture, voice, language, genre or visual-style taxonomy is required.</p><div class="settings-note">Presets accelerate creation; free text always remains available.</div></div>
+        <div class="surface setting-card user-only"><h3>Creator account</h3><p>Your personal projects, characters and generated assets stay inside your creator workspace. Owner diagnostics and supplier details are hidden from normal users.</p><div class="settings-note">A production login/profile layer can replace the current local browser workspace without changing the creative flow.</div></div>
+        <div class="surface setting-card user-only"><h3>Usage & limits</h3><p>Story creation stays generous. Costly media is tracked separately so future plans can meter production without blocking creativity.</p><div class="usage-lines"><span><b>Story planning</b><small id="usageStories">No app-level daily cap</small></span><span><b>Visual generations</b><small id="usageVisuals">0 this session</small></span><span><b>Audio previews</b><small id="usageAudio">0 this session</small></span><span><b>Video requests</b><small id="usageVideo">0 this session</small></span></div><div class="settings-note">Tracking is informational in this build; provider limits can still apply. Plan-based credits can be enabled later without changing the creative workflow.</div></div>
+        <div class="surface setting-card owner-only" style="display:none"><h3>System health</h3><p>Customers never need to see supplier names. This status only reports which generation capabilities are currently configured.</p><button class="ghost" id="healthCheckBtn">Check system</button><div id="healthResult" class="health-result">Not checked yet.</div></div>
+        <div class="surface setting-card owner-card owner-only" style="display:none"><h3>Owner console</h3><p>Operational information is separated from the customer experience.</p><div class="owner-row"><input id="ownerCode" type="password" placeholder="Owner code"/><button class="ghost" id="ownerCheckBtn">Open</button></div><pre id="ownerResult" class="owner-result hidden"></pre></div>
+      </div>
+    </section>
+  </main>
+
+  <div id="toast" class="toast" role="status"></div>
+  <div id="modal" class="modal hidden"><div class="modal-card"><button class="modal-close" id="modalClose">×</button><div id="modalBody"></div></div></div>
+  <script type="module" src="/app.js"></script>
+</body>
+</html>

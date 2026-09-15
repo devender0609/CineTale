@@ -1,0 +1,15 @@
+{
+  "name": "cinetale-studio",
+  "version": "1.5.5",
+  "private": true,
+  "type": "module",
+  "description": "CineTale Studio - polished creator flow, narrator and character Voice Studio, natural ElevenLabs audio, cultural intelligence, premium Studio UI and resilient media workflows",
+  "scripts": {
+    "dev": "npx vercel dev",
+    "check": "node scripts-check.mjs",
+    "smoke": "node scripts-smoke.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
