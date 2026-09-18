@@ -1,0 +1,16 @@
+{
+  "name": "cinetale-studio",
+  "version": "1.9.3",
+  "private": true,
+  "type": "module",
+  "description": "CineTale Studio - full-story approval, creator-controlled portrait setup, safe-framing Veo generation, persistent cast/voices and final rendering",
+  "scripts": {
+    "dev": "npx vercel dev",
+    "check": "node scripts-check.mjs",
+    "smoke": "node scripts-smoke.mjs",
+    "qa:deep": "node scripts-deep-qa.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
