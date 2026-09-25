@@ -704,7 +704,7 @@ function sceneLipSyncRecoveryCompatibility(project={},scene={}){
 function sceneLipSyncAudioProvenanceValid(project={},scene={}){
   const current=sceneLipSyncSignature(project,scene);
   if(scene.lipSyncAudioSignature)return scene.lipSyncAudioSignature===current&&Boolean(scene.lipSyncAudioDigest);
-  // Direct pre-v1.9.77 renders can remain usable when their semantic signature is still exact.
+  // Direct pre-v1.9.78 renders can remain usable when their semantic signature is still exact.
   // A recovered legacy render is trusted only when the recovery explicitly proved compatibility.
   if(scene.lipSyncRecoveredAt)return ['exact','legacy-compatible'].includes(String(scene.lipSyncRecoveryCompatibility||''));
   return String(scene.lipSyncSignature||'')===current;
@@ -776,7 +776,11 @@ function sceneVideoMarkup(scene,art,title='Scene video',index=-1,project=null){
   // Do not let users play the raw provider clip with a second browser-timed voice track: that creates
   // the exact mouth/audio mismatch seen in production. Once synchronized, normal native controls return.
   if(speaking&&!isMountedSynced){
-    return `<video playsinline muted preload="auto"${poster}${sync} data-scene-media-loading="1" data-sync-gated="1" aria-label="${esc(title)} preview" src="${esc(src)}"></video>`;
+    // Keep the source clip visibly playable as a MUTED visual preview while dialogue sync is
+    // pending or must be rebuilt. Hiding native controls made valid source clips look deleted
+    // whenever another scene caused Studio to refresh. Audio stays muted so provider guide
+    // speech can never be mistaken for approved CineTale dialogue.
+    return `<video controls playsinline muted preload="auto"${poster}${sync} data-scene-media-loading="1" data-sync-gated="1" aria-label="${esc(title)} source video preview; dialogue sync pending" src="${esc(src)}"></video>`;
   }
   return `<video controls playsinline preload="auto"${poster}${sync}${exact} data-scene-media-loading="1" aria-label="${esc(title)}" src="${esc(src)}"></video>`;
 }
@@ -1250,9 +1254,12 @@ function bindSceneVideoVoicePlayback(p,ep){
     if(video.readyState>=2)markSceneMediaLoaded();
     if(video.dataset.voiceBound==='1')return;video.dataset.voiceBound='1';const index=Number(video.dataset.sceneVideoPreview);const scene=ep?.scenes?.[index];if(!scene)return;
     if(video.dataset.syncGated==='1'){
+      // The source video remains user-playable for visual inspection, but stays muted until
+      // the approved dialogue-synchronized asset is validated. Never remove its controls:
+      // doing so made unrelated clips appear to vanish after a single-scene regeneration.
       video.muted=true;
-      video.removeAttribute('controls');
       video.dataset.voiceSync='waiting-for-render';
+      video.addEventListener('volumechange',()=>{if(!video.muted)video.muted=true});
       return;
     }
     video.addEventListener('play',()=>{
@@ -1676,6 +1683,17 @@ function downloadFinalVideoFile(){const p=current(),asset=currentFinalVideoAsset
 async function shareFinalVideoFile(){const p=current(),asset=currentFinalVideoAsset();if(!p||!asset?.blob){toast('Render the final video first.');return}const file=new File([asset.blob],asset.filename||finalVideoFilename(p,asset.mime),{type:asset.mime||asset.blob.type});if(navigator.share&&(!navigator.canShare||navigator.canShare({files:[file]}))){try{await navigator.share({title:p.title||'CineTale',text:`${p.title||'CineTale'} — created in CineTale`,files:[file]});return}catch(e){if(e?.name==='AbortError')return}}downloadFinalVideoFile();toast('Your browser cannot share video files directly, so CineTale downloaded the final video instead.')}
 function publishFinalVideo(platform){const p=current(),asset=currentFinalVideoAsset();if(!p||!asset?.blob){toast('Render the final video first.');return}const destinations={youtube:'https://www.youtube.com/upload',instagram:'https://www.instagram.com/',tiktok:'https://www.tiktok.com/upload',facebook:'https://www.facebook.com/'};const url=destinations[platform];if(!url)return;downloadFinalVideoFile();window.open(url,'_blank','noopener,noreferrer');toast(`Final video downloaded. ${platform==='youtube'?'YouTube':platform==='instagram'?'Instagram':platform==='tiktok'?'TikTok':'Facebook'} opened so you can review and publish it.`)}
 function downloadFinalAssemblyManifest(){const p=current(),ep=episodeOf(p);if(!p)return;const manifest=p.finalAssembly||finalAssemblyManifest(p,ep);const blob=new Blob([JSON.stringify(manifest,null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`${(p.title||'cinetale').replace(/[^a-z0-9]+/gi,'-').toLowerCase()}-final-assembly.json`;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
+
+function renderStudioAfterSceneMediaUpdate(){
+  const list=$('#sceneList');
+  if(sceneListPlaybackLocked(list)){
+    list.__cinetaleDeferredRender=true;
+    updateSceneMediaStatuses(current(),episodeOf(current()));
+    return;
+  }
+  renderStudio();
+}
+
 const videoPollers=new Map();
 function videoPollKey(projectId,episodeId,sceneIndex){return `${projectId}:${episodeId||'active'}:${sceneIndex}`}
 function videoElapsedLabel(startedAt){const sec=Math.max(0,Math.floor((Date.now()-Number(startedAt||Date.now()))/1000));return sec<60?`${sec}s`:`${Math.floor(sec/60)}m ${sec%60}s`}
@@ -1696,17 +1714,17 @@ async function pollVideo(i,operation,button,{background=false}={}){
       if(d.status==='ready'){
         confirmedVideoOperations.delete(operation);
         updateProjectById(projectId,x=>{const e=findEpisodeById(x,episodeId);if(!e?.scenes?.[i])return;const target=e.scenes[i];if(target.videoOperation!==operation)return;target.videoUrl=d.videoUrl;target.videoOperation=null;target.videoQueuedAt=null;target.videoError=null;target.videoPlaybackError=null;resetSceneLipSyncForNewSource(target,d.videoUrl);x.videoStatus='ready';x.finalAssembly=null;x.renderStatus=null;x.finalVideoMeta=null},{render:false});
-        if(current()?.id===projectId)renderStudio();toast('Scene video clip is ready.');scheduleSceneLipSyncAfterSourceReady(projectId,episodeId,i);return;
+        if(current()?.id===projectId)renderStudioAfterSceneMediaUpdate();toast('Scene video clip is ready.');scheduleSceneLipSyncAfterSourceReady(projectId,episodeId,i);return;
       }
       if(d.status==='error'){
         confirmedVideoOperations.delete(operation);
         updateProjectById(projectId,x=>{const e=findEpisodeById(x,episodeId),target=e?.scenes?.[i];if(target?.videoOperation===operation){target.videoOperation=null;target.videoQueuedAt=null;target.videoError=d.error||'Video generation failed'}},{render:false});
-        if(current()?.id===projectId)renderStudio();throw new Error(d.error||'Video generation failed');
+        if(current()?.id===projectId)renderStudioAfterSceneMediaUpdate();throw new Error(d.error||'Video generation failed');
       }
     }
     confirmedVideoOperations.delete(operation);
     updateProjectById(projectId,x=>{const e=findEpisodeById(x,episodeId),target=e?.scenes?.[i];if(target&&target.videoOperation===operation){target.videoOperation=null;target.videoQueuedAt=null;target.videoError='Video rendering timed out. Your previous clip was preserved; try Regenerate clip again.'}},{render:false});
-    if(current()?.id===projectId)renderStudio();throw new Error('Video rendering timed out. Your previous clip was preserved; try Regenerate clip again.');
+    if(current()?.id===projectId)renderStudioAfterSceneMediaUpdate();throw new Error('Video rendering timed out. Your previous clip was preserved; try Regenerate clip again.');
   })().finally(()=>videoPollers.delete(key));
   videoPollers.set(key,job);return job;
 }
@@ -1762,7 +1780,10 @@ async function requestVideo(i,button){
     if(d.operation){
       confirmedVideoOperations.add(d.operation);
       bumpUsage('video');
-      updateProject(x=>{const e=episodeOf(x);if(!e?.scenes?.[i])return;Object.assign(e.scenes[i],primaryMeta);e.scenes[i].videoOperation=d.operation;e.scenes[i].videoQueuedAt=Date.now();e.scenes[i].videoError=null;e.scenes[i].videoPlaybackError=null;e.scenes[i].videoModel=d.model||null;e.scenes[i].videoDurationSec=Number(d.durationSeconds)||e.scenes[i].videoDurationSec||0;e.scenes[i].videoRoute=d.fallbackFrom?'efficient-fallback':'requested-quality';e.scenes[i].videoFallbackFrom=d.fallbackFrom||null;e.scenes[i].videoSpeechGuide=Boolean(d.speaking||primaryMeta.videoPrimarySpeaking);});
+      // Single-scene regeneration must not remount every other scene/video in Studio.
+      // Persist only the requested scene state here; the existing DOM stays mounted while the
+      // provider job runs. The completed scene is refreshed once its replacement is actually ready.
+      updateProjectById(p.id,x=>{const e=findEpisodeById(x,ep.id||ep.number)||episodeOf(x);if(!e?.scenes?.[i])return;Object.assign(e.scenes[i],primaryMeta);e.scenes[i].videoOperation=d.operation;e.scenes[i].videoQueuedAt=Date.now();e.scenes[i].videoError=null;e.scenes[i].videoPlaybackError=null;e.scenes[i].videoModel=d.model||null;e.scenes[i].videoDurationSec=Number(d.durationSeconds)||e.scenes[i].videoDurationSec||0;e.scenes[i].videoRoute=d.fallbackFrom?'efficient-fallback':'requested-quality';e.scenes[i].videoFallbackFrom=d.fallbackFrom||null;e.scenes[i].videoSpeechGuide=Boolean(d.speaking||primaryMeta.videoPrimarySpeaking);},{render:false});
       toast('Video rendering started. You can keep working while CineTale finishes it.');
       // Do not lock the interface while Veo renders. Poll in the background.
       pollVideo(i,d.operation,null,{background:true}).catch(e=>toast(e.message||'Video generation failed'));
@@ -1777,7 +1798,13 @@ async function requestVideo(i,button){
       toast(`Google video generation is temporarily limited. CineTale retried safely${normalizedTier(s.tier)!=='premium'?' and tried the efficient Veo route':''}. Your scene is safe; try again in about ${retry} seconds.`);
       setTimeout(()=>{const live=state.projects.find(x=>x.id===p.id),liveEp=findEpisodeById(live,ep.id||ep.number),target=liveEp?.scenes?.[i];if(target&&Number(target.videoRetryAt||0)<=Date.now()){target.videoRetryAt=null;save();if(current()?.id===p.id)renderStudio()}},retry*1000+250);
     }else toast(e.message||'Video generation failed')
-  }finally{button.disabled=false;button.textContent=old;renderStudio()}
+  }finally{
+    button.disabled=false;
+    // Keep this one button accurate without rebuilding the entire Studio. Full scene refresh
+    // happens when the provider returns a new clip (or on the next deliberate navigation).
+    const live=state.projects.find(x=>x.id===p.id),liveEp=findEpisodeById(live,ep.id||ep.number)||episodeOf(live),liveScene=liveEp?.scenes?.[i];
+    button.textContent=liveScene?videoButtonLabel(liveScene):old;
+  }
 }
 
 function autoFinalTier(mode){return mode==='fast'?'draft':mode==='cinematic'?'premium':'standard'}
