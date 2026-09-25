@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 const s=fs.readFileSync('app.js','utf8');
 const must=[
-  "const syncTargets=selectedNow.filter(x=>x.scene?.videoUrl&&sceneHasSpokenContent(x.scene)&&!sceneHasValidatedLipSync(live,x.scene))",
+  "const syncTargets=selectedFinalScenes(integrityEpisode).filter(x=>x.scene?.videoUrl&&sceneHasSpokenContent(x.scene)&&!sceneHasValidatedLipSync(integrityProject,x.scene))",
   "await ensureSceneLipSync(lp,ls,index,{quiet:true,allowSubmit:true})",
   "notProductionReady=selectedFinalScenes(productionEpisode).filter(x=>!sceneProductionReady(productionProject,x.scene))",
   "const notReady=selected.filter(scene=>!sceneProductionReady(p,scene))",

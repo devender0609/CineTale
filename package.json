@@ -1,6 +1,6 @@
 {
   "name": "cinetale-studio",
-  "version": "1.9.75",
+  "version": "1.9.76",
   "private": true,
   "type": "module",
   "description": "CineTale Studio - deterministic no-repeat final assembly, synchronized speaking-media audio, cloud final persistence, stable playback, and production-safe scene reuse",

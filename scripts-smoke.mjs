@@ -460,7 +460,7 @@ assert.ok(appSource.includes('resolveOwnerAccess')&&appSource.includes('/api/own
   const productionLib=fs.readFileSync(new URL('./lib/production.js',import.meta.url),'utf8');
   assert.ok(productionLib.includes('buildCoveragePlan')&&productionLib.includes('coverageTargetCount')&&productionLib.includes('estimatedSpokenSeconds'),'Cinematic scene coverage planner missing');
   assert.ok(productionLib.includes('detectContinuityConflicts')&&appSource.includes('Continuity conflict needs review'),'Episode continuity guard missing');
-  assert.ok(appSource.includes('ensureCinematicCoverage')&&appSource.includes('coverageClips')&&appSource.includes('source-coverage-no-repeat-synced-audio'),'Multi-shot cinematic final production missing');
+  assert.ok(appSource.includes('ensureCinematicCoverage')&&appSource.includes('coverageClips')&&appSource.includes('atomic-synced-scenes-no-silent-padding'),'Multi-shot cinematic final production missing');
   assert.ok(appSource.includes('mediaAspectClass')&&cssSource.includes('.scene-visual.media-landscape')&&cssSource.includes('.scene-visual.media-portrait'),'Adaptive media containers missing');
   assert.ok(videoApi.includes('spokenLine')&&videoApi.includes('visible mouth, jaw and facial articulation'),'Speaking-shot visual performance prompt missing');
   const generateNextSource=fs.readFileSync(new URL('./api/generate-next.js',import.meta.url),'utf8');assert.ok(generateNextSource.includes('RUNTIME DISCIPLINE')&&generateNextSource.includes('90%-115%'),'Strict next-episode runtime guard missing');
@@ -613,7 +613,7 @@ assert.ok(appSource.includes('resolveOwnerAccess')&&appSource.includes('/api/own
   assert.ok(appSource.includes("function safeLocalSet")&&appSource.includes("setView('studio')")&&appSource.includes("queueMicrotask(()=>save())"),'Project opening can still be blocked by localStorage quota or synchronous persistence');
   assert.ok(appSource.includes('class="project-open" type="button" data-project=')&&appSource.includes("projectsGrid.addEventListener('pointerdown'")&&appSource.includes("openProject(opener.dataset.project)"),'Stable project pointerdown wiring is missing');
   assert.ok(appSource.includes('projectNavigation:{locked:false')&&appSource.includes('state.projectNavigation.epoch!==syncEpoch'),'Project navigation race guard is missing');
-  assert.ok(htmlSource.includes('/app.js?v=1.9.75'),'App bundle cache-busting version is missing');
+  assert.ok(htmlSource.includes('/app.js?v=1.9.76'),'App bundle cache-busting version is missing');
   assert.ok(appSource.includes("sceneListEl.addEventListener('pointerdown'"),'Scene video action must use persistent pointer handler');
   assert.ok(appSource.includes("videoOperationConfirmed(scene)?'Rendering…':videoOperationRecovering(scene)?'Checking saved render…'"),'Video operation UX must distinguish verified rendering from unverified saved jobs');
   assert.ok(appSource.includes('Boolean(scene.videoOperation)'),'Video button must disable during an active render job');
@@ -658,7 +658,7 @@ assert.ok(appSource.includes('resolveOwnerAccess')&&appSource.includes('/api/own
   assert.ok(!appSource.includes('<a class="project-open"'),'Projects must not use anchor wrappers that introduce underlines/link styling.');
   assert.ok(cssSource.includes('.project-open{border:0')&&cssSource.includes('text-decoration:none'),'Project open controls must remain underline-free with visible keyboard focus.');
 
-console.log('CineTale v1.9.75 smoke tests passed: strict Story/Short/Movie/Episode integrity, Google account chooser, restored proven project opening, quota-safe navigation, runtime targeting, no-crop media, auth/cloud sync, consent gates, quota-aware video, final assembly, voice filtering, navigation and DOM integrity.');
+console.log('CineTale v1.9.76 smoke tests passed: strict Story/Short/Movie/Episode integrity, Google account chooser, restored proven project opening, quota-safe navigation, runtime targeting, no-crop media, auth/cloud sync, consent gates, quota-aware video, final assembly, voice filtering, navigation and DOM integrity.');
 } finally {
   globalThis.fetch=originalFetch;
   if(originalKey===undefined) delete process.env.GEMINI_API_KEY; else process.env.GEMINI_API_KEY=originalKey;

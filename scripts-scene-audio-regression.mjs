@@ -14,7 +14,7 @@ assert.match(app,/characterId:item\.characterId/);
 assert.match(app,/direction:item\.direction/);
 assert.match(app,/language:p\?\.language/);
 assert.match(app,/async function sceneCachedVoiceUrls\(p,s\)/);
-assert.match(app,/pipelineVersion:9/);
+assert.match(app,/pipelineVersion:10/);
 assert.match(app,/Read-only preview of finished scene assets/);
 assert.doesNotMatch(app.slice(app.indexOf('async function previewFinalSequence()'),app.indexOf('async function prepareFinalSceneAsset')),/startSceneVideoVoicePlayback\(/);
 assert.doesNotMatch(app,/data-scene-audio-badge|Preparing approved voice|Approved voice · source speech muted/);

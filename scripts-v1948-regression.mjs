@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 const app=fs.readFileSync(new URL('./app.js',import.meta.url),'utf8');
 const css=fs.readFileSync(new URL('./styles.css',import.meta.url),'utf8');
 const html=fs.readFileSync(new URL('./index.html',import.meta.url),'utf8');
-assert.ok(app.includes("const APP_VERSION = '1.9.75'"),'app version not advanced');
+assert.ok(app.includes("const APP_VERSION = '1.9.76'"),'app version not advanced');
 assert.ok(app.includes("v1.9.67-scene-semantic-signature"),'production lip-sync render-stage revision is missing');
 assert.ok(app.includes('scheduleStudioLipSyncWarmup(p,ep)'),'Studio does not proactively finalize dialogue');
 assert.ok(app.includes('async function previewFinalSequence()'),'final sequence preview is not async');
@@ -12,5 +12,5 @@ assert.ok(app.includes("sceneHasSpokenContent(s)&&!sceneHasValidatedLipSync(p,s)
 assert.ok(!app.includes("'Source video · lip-sync unavailable'"),'provider/debug lip-sync status leaked into creative player');
 assert.ok(css.includes('.final-scene-strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(132px,1fr));'),'final assembly is not a wrapping grid');
 assert.ok(!css.includes('.final-scene-strip{display:flex;gap:10px;overflow-x:auto'),'final assembly still requires horizontal scrolling');
-assert.ok(html.includes('/app.js?v=1.9.75')&&html.includes('/styles.css?v=1.9.75'),'browser cache busting not advanced');
+assert.ok(html.includes('/app.js?v=1.9.76')&&html.includes('/styles.css?v=1.9.76'),'browser cache busting not advanced');
 console.log('v1.9.51 carries forward proactive lip-sync + no-scroll final assembly regression PASS');
