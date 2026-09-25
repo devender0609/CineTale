@@ -1,5 +1,5 @@
 import {ensureSceneCoverage,coverageTargetCount,coverageSummary} from './lib/production.js';
-const APP_VERSION = '1.9.77';
+const APP_VERSION = '1.9.79';
 const LIP_SYNC_PIPELINE_REV = 'v1.9.67-scene-semantic-signature';
 const $ = s => document.querySelector(s);
 const $$ = s => [...document.querySelectorAll(s)];

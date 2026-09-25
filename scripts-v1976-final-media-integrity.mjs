@@ -2,8 +2,8 @@ import fs from 'node:fs';
 import assert from 'node:assert/strict';
 const app=fs.readFileSync(new URL('./app.js',import.meta.url),'utf8');
 const html=fs.readFileSync(new URL('./index.html',import.meta.url),'utf8');
-assert.ok(app.includes("const APP_VERSION = '1.9.77'"));
-assert.ok(html.includes('/app.js?v=1.9.77')&&html.includes('/styles.css?v=1.9.77'));
+assert.ok(app.includes("const APP_VERSION = '1.9.79'"));
+assert.ok(html.includes('/app.js?v=1.9.79')&&html.includes('/styles.css?v=1.9.79'));
 assert.ok(app.includes('async function duplicateFinalMediaConflicts'),'duplicate-media integrity scanner missing');
 assert.ok(app.includes("check('source-url'"),'source URL duplicate check missing');
 assert.ok(app.includes("check('sync-id'"),'sync generation duplicate check missing');
@@ -15,4 +15,4 @@ assert.ok(app.includes("const sceneDuration=spoken&&synced?primaryDuration"),'sp
 assert.ok(app.includes("durationMode:'atomic-synced-scenes-no-silent-padding',pipelineVersion:10"),'pipeline 10 metadata missing');
 assert.ok(app.includes('const projectId=initial.id,episodeId=initialEp.id||initialEp.number'),'video poller must bind to original project/episode');
 assert.ok(app.includes('updateProjectById(projectId'),'video poller must not write to whichever project is currently open');
-console.log('v1.9.77 duplicate-media + atomic synced-scene + project-bound poller regression PASS');
+console.log('v1.9.79 duplicate-media + atomic synced-scene + project-bound poller regression PASS');

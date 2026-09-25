@@ -2,8 +2,8 @@ import fs from 'node:fs';
 import assert from 'node:assert/strict';
 const app=fs.readFileSync(new URL('./app.js',import.meta.url),'utf8');
 const html=fs.readFileSync(new URL('./index.html',import.meta.url),'utf8');
-assert.ok(app.includes("const APP_VERSION = '1.9.77'"),'app version must be 1.9.77');
-assert.ok(html.includes('/app.js?v=1.9.77')&&html.includes('/styles.css?v=1.9.77'),'cache busting must be 1.9.77');
+assert.ok(app.includes("const APP_VERSION = '1.9.79'"),'app version must be 1.9.79');
+assert.ok(html.includes('/app.js?v=1.9.79')&&html.includes('/styles.css?v=1.9.79'),'cache busting must be 1.9.79');
 assert.ok(app.includes('function sceneLipSyncRecoveryCompatibility'),'safe recovery compatibility gate missing');
 assert.ok(app.includes("if(scene.lipSyncRecoveredAt&&!scene.lipSyncRecoveryCompatibility)return ''"),'legacy recovered synchronized assets must not be silently re-trusted');
 assert.ok(app.includes('function sceneLipSyncAudioProvenanceValid'),'audio provenance validator missing');
@@ -17,4 +17,4 @@ assert.ok(app.includes("function sceneAtIdentity(episode,index,sceneId='')"),'sc
 assert.ok(app.includes('pollSceneLipSync(projectId,episodeId,index,job,signature,sceneId)'),'lip-sync polling must bind to immutable scene identity');
 assert.ok(app.includes('Dialogue sync must be rebuilt'),'unsafe legacy sync must be visible to the creator');
 assert.ok(app.includes("scene.lipSyncRequestDigest='';scene.lipSyncRecoveredFromSignature=''"),'new source reset must clear old request/recovery provenance');
-console.log('v1.9.77 audio provenance + stale recovery + scene identity regression PASS');
+console.log('v1.9.79 audio provenance + stale recovery + scene identity regression PASS');

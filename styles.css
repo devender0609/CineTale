@@ -1149,10 +1149,11 @@ button,select,input,textarea{max-width:100%}
 }
 
 
-/* v1.9.62 — synchronized-render gate.
-   Raw speaking source video remains visible as a quiet visual preview, but cannot be played
-   against a separately timed browser voice. Status lives below the media, never over it. */
-.scene-visual video[data-sync-gated="1"]{pointer-events:none;cursor:default}
+/* v1.9.79 — synchronized-render gate.
+   Raw speaking source video remains a MUTED visual preview until approved dialogue sync is valid.
+   Native controls must remain interactive: do not disable pointer events on a video that advertises
+   controls. Audio is hard-muted by bindSceneVideoAudioHandlers, so provider guide speech stays isolated. */
+.scene-visual video[data-sync-gated="1"]{pointer-events:auto;cursor:pointer}
 .scene-sync-state{display:flex;align-items:center;gap:8px;min-height:34px;padding:8px 10px;border:1px solid var(--line);border-radius:11px;background:color-mix(in srgb,var(--surface-solid) 92%,var(--purple) 8%);font-size:10px;font-weight:750;color:var(--text-2)}
 .scene-sync-dot{width:7px;height:7px;border-radius:50%;background:var(--purple);box-shadow:0 0 0 4px color-mix(in srgb,var(--purple) 14%,transparent);flex:0 0 auto}
 .asset-tag.hidden{display:none!important}

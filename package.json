@@ -1,6 +1,6 @@
 {
   "name": "cinetale-studio",
-  "version": "1.9.77",
+  "version": "1.9.79",
   "private": true,
   "type": "module",
   "description": "CineTale Studio - scene-bound audio provenance, safe lip-sync recovery, atomic synchronized final assembly, duplicate-media integrity, cloud final persistence, and production-safe scene reuse",
@@ -36,7 +36,8 @@
     "qa:v1972": "node scripts-v1972-final-progress-stability.mjs",
     "qa:v1973": "node scripts-v1973-exhaustive-final-ux-regression.mjs",
     "qa:v1975": "node scripts-v1975-final-sync-integrity.mjs",
-    "qa:v1977": "node scripts-v1977-audio-provenance-regression.mjs"
+    "qa:v1977": "node scripts-v1977-audio-provenance-regression.mjs",
+    "qa:v1979": "node scripts-v1979-media-control-interactivity.mjs"
   },
   "engines": {
     "node": ">=20"

@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import handler from './api/lipsync-job.js';
 const app=fs.readFileSync(new URL('./app.js',import.meta.url),'utf8'),job=fs.readFileSync(new URL('./api/lipsync-job.js',import.meta.url),'utf8'),html=fs.readFileSync(new URL('./index.html',import.meta.url),'utf8');
-assert.ok(app.includes("const APP_VERSION = '1.9.77'"));assert.ok(app.includes('v1.9.67-scene-semantic-signature'));assert.ok(html.includes('/app.js?v=1.9.77')&&html.includes('/styles.css?v=1.9.77'));
+assert.ok(app.includes("const APP_VERSION = '1.9.79'"));assert.ok(app.includes('v1.9.67-scene-semantic-signature'));assert.ok(html.includes('/app.js?v=1.9.79')&&html.includes('/styles.css?v=1.9.79'));
 assert.ok(app.includes('allowSubmit=true'));assert.ok(app.includes('allowSubmit:liveScene.lipSyncAutoPending===true')||app.includes('allowSubmit:false'));assert.ok(app.includes("lipSyncProviderStatus='WAITING_FOR_SLOT'"));assert.ok(app.includes("d.status==='busy'"));assert.ok(app.includes("candidate?.lipSyncStatus==='processing'"));
 assert.ok(job.includes("'concurrency_limit_reached'"));assert.ok(job.includes('busyRecovered=await recoverSyncGeneration'));assert.ok(job.includes("status:'busy'"));assert.ok(job.includes('outputFileName=`cinetale_sync_${token}`'));
 const oldFetch=globalThis.fetch,oldEnv={...process.env};Object.assign(process.env,{ENABLE_LIVE_LIPSYNC:'true',LIPSYNC_PROVIDER:'sync-labs',SYNC_API_KEY:'test-sync-key',SYNC_LIPSYNC_MODEL:'lipsync-2-pro',GEMINI_API_KEY:'test-gemini-key'});

@@ -5,6 +5,6 @@ assert.ok(app.includes('data-sync-gated="1"'),'Unsynchronized speaking source is
 assert.match(app,/if\(video\.dataset\.syncGated==='1'\)/,'Playback binder does not stop on gated source');
 assert.ok(!app.includes("return 'Preparing final clip…'"),'Overlay status text still appears on video');
 assert.match(app,/sceneSyncStateUi/,'External scene sync status is missing');
-assert.ok(css.includes('.scene-visual video[data-sync-gated="1"]{pointer-events:none'),'Gated source can still be interacted with');
+assert.ok(css.includes('.scene-visual video[data-sync-gated="1"]{pointer-events:auto;cursor:pointer}'),'Gated source preview must remain clickable while muted');
 assert.match(app,/sceneProductionReady\(project=\{\},scene=\{\}\).*sceneHasValidatedLipSync/s,'Production readiness no longer requires validated sync');
-console.log('v1.9.66 sync-gated playback regression: PASS');
+console.log('v1.9.79 sync-gated muted-preview interactivity regression: PASS');
