@@ -1,9 +1,9 @@
 {
   "name": "cinetale-studio",
-  "version": "1.9.76",
+  "version": "1.9.77",
   "private": true,
   "type": "module",
-  "description": "CineTale Studio - deterministic no-repeat final assembly, synchronized speaking-media audio, cloud final persistence, stable playback, and production-safe scene reuse",
+  "description": "CineTale Studio - scene-bound audio provenance, safe lip-sync recovery, atomic synchronized final assembly, duplicate-media integrity, cloud final persistence, and production-safe scene reuse",
   "scripts": {
     "dev": "npx vercel dev",
     "check": "node scripts-check.mjs",
@@ -35,7 +35,8 @@
     "qa:v1970": "node scripts-v1970-regression.mjs",
     "qa:v1972": "node scripts-v1972-final-progress-stability.mjs",
     "qa:v1973": "node scripts-v1973-exhaustive-final-ux-regression.mjs",
-    "qa:v1975": "node scripts-v1975-final-sync-integrity.mjs"
+    "qa:v1975": "node scripts-v1975-final-sync-integrity.mjs",
+    "qa:v1977": "node scripts-v1977-audio-provenance-regression.mjs"
   },
   "engines": {
     "node": ">=20"

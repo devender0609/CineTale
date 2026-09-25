@@ -14,5 +14,5 @@ assert.ok(legacy.includes('historical.slice(0,7)'),'Legacy recovery must preserv
 const migration=between('function migrateValidatedLipSyncSignatures(project={}){','function normalizedMediaUrl');
 assert.ok(migration.includes('scene.lipSyncSignature=next'),'Compatible validated clips must be migrated instead of regenerated');
 assert.ok(src.includes('normalizeProjectIdentityBindings(p);migrateValidatedLipSyncSignatures(p)'), 'Migration must run after identity bindings stabilize during hydration');
-assert.ok(src.includes("const APP_VERSION = '1.9.76'"),'Expected current app version');
+assert.ok(src.includes("const APP_VERSION = '1.9.77'"),'Expected current app version');
 console.log('CineTale v1.9.67 regression passed: validated paid lip-sync assets survive unrelated cast/binding metadata changes and migrate to scene-semantic signatures.');

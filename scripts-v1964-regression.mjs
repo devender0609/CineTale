@@ -9,5 +9,5 @@ assert.match(preview,/sceneHasSpokenContent\(scene\)\?\(sceneHasValidatedLipSync
 assert.match(preview,/video\.muted=false/,'Validated synchronized preview must use embedded audio');
 const ui=app.slice(app.indexOf('function sceneSyncStateUi'), app.indexOf('function updateSceneMediaStatuses'));
 assert.match(ui,/scene\.lipSyncStatus==='processing'&&Boolean\(scene\.lipSyncOperation\)/,'In-progress label must require a real active job');
-assert.match(ui,/if\(!active&&!waiting&&!failed\)return ''/,'Idle unsynchronized scenes must not show a false in-progress label');
+assert.match(ui,/if\(!active&&!waiting&&!failed&&!unsafeRecovered\)return ''/,'Idle unsynchronized scenes must not show a false in-progress label, while unsafe recovered assets remain visibly blocked');
 console.log('v1.9.66 read-only preview/state regression: PASS');

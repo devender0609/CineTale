@@ -3,8 +3,8 @@ import assert from 'node:assert/strict';
 const app=fs.readFileSync(new URL('./app.js',import.meta.url),'utf8');
 const html=fs.readFileSync(new URL('./index.html',import.meta.url),'utf8');
 const css=fs.readFileSync(new URL('./styles.css',import.meta.url),'utf8');
-assert.ok(app.includes("const APP_VERSION = '1.9.76'"),'version');
-assert.ok(html.includes('/app.js?v=1.9.76')&&html.includes('/styles.css?v=1.9.76'),'cache bust');
+assert.ok(app.includes("const APP_VERSION = '1.9.77'"),'version');
+assert.ok(html.includes('/app.js?v=1.9.77')&&html.includes('/styles.css?v=1.9.77'),'cache bust');
 assert.ok(html.includes('id="finalOutputStage"')&&html.includes('id="finalVideoPlaceholder"')&&html.includes('id="finalOutputActions"'),'clear final output stage');
 assert.ok(html.includes('id="prepareFinalAssembly"')&&html.includes('id="renderFinalVideo"')&&html.includes('id="downloadAssemblyManifest"'),'technical controls retained for compatibility');
 assert.ok(/class="[^"]*hidden[^"]*" id="prepareFinalAssembly"/.test(html),'prepare hidden');
@@ -24,4 +24,4 @@ assert.ok(app.includes("video.addEventListener('loadeddata',markSceneMediaLoaded
 assert.ok(app.includes("Rendering scene ${index+1} of ${total} · ${scene.title||'Untitled'}"),'stable scene-level progress text');
 assert.ok(!app.includes('· shot ${((clipIndex-1)%videos.length)+1}/${videos.length}'),'shot-level flicker text removed');
 assert.ok(css.includes('.final-output-stage')&&css.includes('.final-video-placeholder')&&css.includes('.final-output-actions'),'final output styles');
-console.log('v1.9.76 exhaustive final UX/render stability regression PASS');
+console.log('v1.9.77 exhaustive final UX/render stability regression PASS');

@@ -1,5 +1,5 @@
 import {ensureSceneCoverage,coverageTargetCount,coverageSummary} from './lib/production.js';
-const APP_VERSION = '1.9.76';
+const APP_VERSION = '1.9.77';
 const LIP_SYNC_PIPELINE_REV = 'v1.9.67-scene-semantic-signature';
 const $ = s => document.querySelector(s);
 const $$ = s => [...document.querySelectorAll(s)];
@@ -161,6 +161,7 @@ function ensureCharacterIdentityIds(p){if(!p)return p;p.characters=Array.isArray
 function embeddedDialogueCharacterId(entry){return entry&&typeof entry==='object'?String(entry.characterId||entry.character_id||entry.speakerId||entry.speaker_id||'').trim():''}
 function characterIndexById(p,id=''){const key=String(id||'').trim();return key?(p?.characters||[]).findIndex(c=>String(c?.id||'')===key):-1}
 function sceneDialogueBindingAt(scene,index){const b=Array.isArray(scene?.dialogueBindings)?scene.dialogueBindings[index]:null;return b&&typeof b==='object'?b:null}
+function sceneAtIdentity(episode,index,sceneId=''){const scenes=episode?.scenes||[];const wanted=String(sceneId||'').trim();if(wanted)return scenes.find(x=>String(x?.id||'')===wanted)||null;return scenes[index]||null}
 function resolveDialogueCharacterIndex(p,scene,entry,lineIndex=-1){
   ensureCharacterIdentityIds(p);
   const embeddedId=embeddedDialogueCharacterId(entry),binding=lineIndex>=0?sceneDialogueBindingAt(scene,lineIndex):null;
@@ -689,21 +690,40 @@ function sceneHasRecoverableLipSyncAsset(project={},scene={}){
   }
   return true;
 }
-async function recoverSavedLipSyncAsset(project,scene,index){
+function sceneLipSyncRecoveryCompatibility(project={},scene={}){
   if(!sceneHasRecoverableLipSyncAsset(project,scene))return '';
-  const projectId=project.id,episodeId=episodeOf(project)?.id||episodeOf(project)?.number,url=scene.lipSyncVideoUrl,signature=sceneLipSyncSignature(project,scene);
+  // v1.9.76 and earlier could mark an arbitrary playable saved sync asset as recovered and then
+  // overwrite its semantic signature with the CURRENT scene signature. That destroys the evidence
+  // needed to prove the recovered audio actually belonged to this dialogue. Never re-trust one of
+  // those legacy recovered assets unless a newer build already recorded how compatibility was proved.
+  if(scene.lipSyncRecoveredAt&&!scene.lipSyncRecoveryCompatibility)return '';
+  const current=sceneLipSyncSignature(project,scene),saved=String(scene.lipSyncSignature||'');
+  if(saved===current)return 'exact';
+  return legacyLipSyncSignatureCompatible(project,scene)?'legacy-compatible':'';
+}
+function sceneLipSyncAudioProvenanceValid(project={},scene={}){
+  const current=sceneLipSyncSignature(project,scene);
+  if(scene.lipSyncAudioSignature)return scene.lipSyncAudioSignature===current&&Boolean(scene.lipSyncAudioDigest);
+  // Direct pre-v1.9.77 renders can remain usable when their semantic signature is still exact.
+  // A recovered legacy render is trusted only when the recovery explicitly proved compatibility.
+  if(scene.lipSyncRecoveredAt)return ['exact','legacy-compatible'].includes(String(scene.lipSyncRecoveryCompatibility||''));
+  return String(scene.lipSyncSignature||'')===current;
+}
+async function recoverSavedLipSyncAsset(project,scene,index){
+  const compatibility=sceneLipSyncRecoveryCompatibility(project,scene);if(!compatibility)return '';
+  const projectId=project.id,episodeId=episodeOf(project)?.id||episodeOf(project)?.number,sceneId=scene.id||'',url=scene.lipSyncVideoUrl,signature=sceneLipSyncSignature(project,scene),savedSignature=String(scene.lipSyncSignature||'');
   try{
     await waitForVideoAsset(url);
-    updateProjectById(projectId,x=>{const e=findEpisodeById(x,episodeId),t=e?.scenes?.[index];if(!t||!sceneHasRecoverableLipSyncAsset(x,t)||normalizedMediaUrl(t.lipSyncVideoUrl||'')!==normalizedMediaUrl(url))return;t.lipSyncSignature=sceneLipSyncSignature(x,t);t.lipSyncValidated=true;t.lipSyncStatus='ready';t.lipSyncOperation=null;t.lipSyncStatusUrl='';t.lipSyncResponseUrl='';t.lipSyncPlaybackFailedAt=null;t.lipSyncSubmissionFailedAt=null;t.lipSyncError=null;t.lipSyncErrorCode='';t.lipSyncProviderStatus='COMPLETED';t.lipSyncRecoveredAt=new Date().toISOString()},{render:false});
-    const live=state.projects.find(x=>x.id===projectId),liveScene=findEpisodeById(live,episodeId)?.scenes?.[index];
+    updateProjectById(projectId,x=>{const e=findEpisodeById(x,episodeId),t=sceneAtIdentity(e,index,sceneId);if(!t||sceneLipSyncRecoveryCompatibility(x,t)!==compatibility||normalizedMediaUrl(t.lipSyncVideoUrl||'')!==normalizedMediaUrl(url))return;t.lipSyncRecoveredFromSignature=savedSignature;t.lipSyncRecoveryCompatibility=compatibility;t.lipSyncSignature=sceneLipSyncSignature(x,t);t.lipSyncValidated=true;t.lipSyncStatus='ready';t.lipSyncOperation=null;t.lipSyncStatusUrl='';t.lipSyncResponseUrl='';t.lipSyncPlaybackFailedAt=null;t.lipSyncSubmissionFailedAt=null;t.lipSyncError=null;t.lipSyncErrorCode='';t.lipSyncProviderStatus='COMPLETED';t.lipSyncRecoveredAt=new Date().toISOString()},{render:false});
+    const live=state.projects.find(x=>x.id===projectId),liveScene=sceneAtIdentity(findEpisodeById(live,episodeId),index,sceneId);
     return live&&liveScene&&sceneHasValidatedLipSync(live,liveScene)?liveScene.lipSyncVideoUrl:'';
   }catch(e){console.warn('[CineTale lipsync] Saved synchronized asset could not be recovered',e);return ''}
 }
-function sceneHasCurrentLipSync(project={},scene={}){return Boolean(['sync-labs','fal-sync'].includes(scene.lipSyncProvider)&&scene.lipSyncStatus!=='error'&&!scene.lipSyncPlaybackFailedAt&&sceneLipSyncResultLooksDistinct(scene)&&scene.lipSyncSignature===sceneLipSyncSignature(project,scene))}
+function sceneHasCurrentLipSync(project={},scene={}){return Boolean(['sync-labs','fal-sync'].includes(scene.lipSyncProvider)&&scene.lipSyncStatus!=='error'&&!scene.lipSyncPlaybackFailedAt&&sceneLipSyncResultLooksDistinct(scene)&&scene.lipSyncSignature===sceneLipSyncSignature(project,scene)&&sceneLipSyncAudioProvenanceValid(project,scene))}
 function sceneHasValidatedLipSync(project={},scene={}){return Boolean(sceneHasCurrentLipSync(project,scene)&&scene.lipSyncValidated===true)}
 function sceneProductionReady(project={},scene={}){return Boolean(scene?.videoUrl&&(!sceneHasSpokenContent(scene)||sceneHasValidatedLipSync(project,scene)))}
 function resetSceneLipSyncForNewSource(scene={},videoUrl=''){
-  scene.lipSyncVideoUrl='';scene.lipSyncRemoteVideoUrl='';scene.lipSyncProvider='';scene.lipSyncGenerationId='';scene.lipSyncSourceVideoUrl=videoUrl||scene.videoUrl||'';scene.lipSyncGeneratedAt=null;scene.lipSyncSignature='';scene.lipSyncOperation=null;scene.lipSyncStatusUrl='';scene.lipSyncResponseUrl='';scene.lipSyncModel='';scene.lipSyncStatus='idle';scene.lipSyncValidated=false;scene.lipSyncRetryCount=0;scene.lipSyncError=null;scene.lipSyncErrorCode='';scene.lipSyncProviderStatus='';scene.lipSyncPlaybackFailedAt=null;scene.lipSyncSubmissionFailedAt=null;scene.lipSyncStartedAt=null;
+  scene.lipSyncVideoUrl='';scene.lipSyncRemoteVideoUrl='';scene.lipSyncProvider='';scene.lipSyncGenerationId='';scene.lipSyncSourceVideoUrl=videoUrl||scene.videoUrl||'';scene.lipSyncGeneratedAt=null;scene.lipSyncSignature='';scene.lipSyncAudioSignature='';scene.lipSyncAudioDigest='';scene.lipSyncRequestDigest='';scene.lipSyncRecoveredFromSignature='';scene.lipSyncRecoveryCompatibility='';scene.lipSyncRecoveredAt=null;scene.lipSyncOperation=null;scene.lipSyncStatusUrl='';scene.lipSyncResponseUrl='';scene.lipSyncModel='';scene.lipSyncStatus='idle';scene.lipSyncValidated=false;scene.lipSyncRetryCount=0;scene.lipSyncError=null;scene.lipSyncErrorCode='';scene.lipSyncProviderStatus='';scene.lipSyncPlaybackFailedAt=null;scene.lipSyncSubmissionFailedAt=null;scene.lipSyncStartedAt=null;
 }
 function scenePrimaryVideoUrl(scene={},project=null){const p=project||current()||{};return sceneHasValidatedLipSync(p,scene)?scene.lipSyncVideoUrl:(scene.videoUrl||'')}
 function sceneStudioVideoUrl(scene={},project=null){const p=project||current()||{},ep=episodeOf(p),key=`${p.id||''}:${ep?.id||ep?.number||''}:${scene.id||scene.number||''}`,signature=sceneLipSyncSignature(p,scene),source=scene.videoUrl||'',synced=sceneHasValidatedLipSync(p,scene)?scene.lipSyncVideoUrl:'',desired=synced||source;const pin=studioVideoSourcePins.get(key);if(pin&&pin.signature===signature&&pin.source===source&&normalizedMediaUrl(pin.url)===normalizedMediaUrl(desired))return pin.url;if(desired)studioVideoSourcePins.set(key,{signature,source,url:desired});return desired}
@@ -781,11 +801,12 @@ function sceneMediaStatusText(project,scene,video=null){
 function sceneSyncStateUi(project={},scene={}){
   if(!scene?.videoUrl||!sceneHasSpokenContent(scene)||sceneHasValidatedLipSync(project,scene))return '';
   const signature=sceneLipSyncSignature(project,scene);
+  const unsafeRecovered=Boolean(scene.lipSyncRecoveredAt&&!scene.lipSyncRecoveryCompatibility);
   const active=scene.lipSyncStatus==='processing'&&Boolean(scene.lipSyncOperation)&&scene.lipSyncSignature===signature;
   const waiting=scene.lipSyncProviderStatus==='WAITING_FOR_SLOT'&&scene.lipSyncAutoPending===true;
   const failed=scene.lipSyncStatus==='error'&&scene.lipSyncSignature===signature;
-  if(!active&&!waiting&&!failed)return '';
-  const text=failed?'Dialogue sync needs attention':waiting?'Dialogue sync queued':'Dialogue sync in progress';
+  if(!active&&!waiting&&!failed&&!unsafeRecovered)return '';
+  const text=unsafeRecovered?'Dialogue sync must be rebuilt':failed?'Dialogue sync needs attention':waiting?'Dialogue sync queued':'Dialogue sync in progress';
   return `<div class="scene-sync-state" role="status"><span class="scene-sync-dot"></span><span>${text}</span></div>`;
 }
 function updateSceneMediaStatuses(project=null,episode=null){
@@ -888,6 +909,7 @@ const scenePreparedAudioTracks=new Map();
 const sceneAudioWarmups=new Set();
 let sceneVideoAudioContext=null;
 function stableAudioHash(value=''){let h=2166136261;const s=String(value);for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)}return `${(h>>>0).toString(16)}-${s.length}`}
+async function strongStringDigest(value=''){const text=String(value||'');try{if(globalThis.crypto?.subtle&&globalThis.TextEncoder){const bytes=new TextEncoder().encode(text),digest=await crypto.subtle.digest('SHA-256',bytes);return [...new Uint8Array(digest)].map(x=>x.toString(16).padStart(2,'0')).join('')}}catch(e){console.warn('[CineTale integrity] SHA-256 text digest unavailable; using deterministic fallback',e)}return stableAudioHash(text)}
 function openSceneAudioDb(){return new Promise((resolve,reject)=>{if(!('indexedDB' in window)){resolve(null);return}const req=indexedDB.open(sceneAudioDbName,1);req.onupgradeneeded=()=>{const db=req.result;if(!db.objectStoreNames.contains('audio'))db.createObjectStore('audio',{keyPath:'key'})};req.onsuccess=()=>resolve(req.result);req.onerror=()=>reject(req.error||new Error('Scene audio storage unavailable.'))})}
 async function loadSceneAudioBlob(key){if(sceneAudioBlobMemory.has(key))return sceneAudioBlobMemory.get(key);try{const db=await openSceneAudioDb();if(!db)return null;const row=await new Promise((resolve,reject)=>{const tx=db.transaction('audio','readonly'),req=tx.objectStore('audio').get(key);req.onsuccess=()=>resolve(req.result||null);req.onerror=()=>reject(req.error)});db.close();if(row?.blob){sceneAudioBlobMemory.set(key,row.blob);return row.blob}}catch(e){console.warn('[CineTale scene audio] Local cache read unavailable',e)}return null}
 async function saveSceneAudioBlob(key,blob,meta={}){sceneAudioBlobMemory.set(key,blob);try{const db=await openSceneAudioDb();if(!db)return;await new Promise((resolve,reject)=>{const tx=db.transaction('audio','readwrite');tx.objectStore('audio').put({key,blob,meta,updatedAt:new Date().toISOString()});tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error)});db.close()}catch(e){console.warn('[CineTale scene audio] Local cache write unavailable',e)}}
@@ -912,8 +934,8 @@ function resumableSceneLipSyncJob(scene={},signature=''){
   if(sceneLipSyncJobAgeMs(scene)>LIP_SYNC_JOB_STALE_MS)return null;
   return {requestId:String(scene.lipSyncOperation),provider:String(scene.lipSyncProvider||''),model:String(scene.lipSyncModel||''),statusUrl:String(scene.lipSyncStatusUrl||''),responseUrl:String(scene.lipSyncResponseUrl||'')};
 }
-async function submitSceneLipSyncRequest(videoUrl,audioDataUrl,signature){
-  const submissionKey=`${hashString(signature).toString(36)}_${stableAudioHash(audioDataUrl).split('-')[0]}`;
+async function submitSceneLipSyncRequest(videoUrl,audioDataUrl,signature,requestDigest=''){
+  const submissionKey=String(requestDigest||'').replace(/[^a-f0-9]/gi,'').slice(0,64)||`${hashString(signature).toString(36)}_${stableAudioHash(audioDataUrl).split('-')[0]}`;
   let last=null;
   for(let attempt=0;attempt<3;attempt++){
     const d=await apiPost('/api/lipsync-job',{videoUrl,audioDataUrl,submissionKey});
@@ -924,13 +946,13 @@ async function submitSceneLipSyncRequest(videoUrl,audioDataUrl,signature){
   }
   const err=new Error(last?.error||'Lip-sync provider could not accept the scene after safe retries.');err.code=last?.errorCode||'sync_submit_retry_exhausted';err.details=last||null;throw err;
 }
-async function pollSceneLipSync(projectId,episodeId,index,job,signature){
+async function pollSceneLipSync(projectId,episodeId,index,job,signature,sceneId=''){
   for(let attempt=0;attempt<180;attempt++){
     await sleep(attempt<6?2500:5000);
-    const live=state.projects.find(x=>x.id===projectId),liveScene=findEpisodeById(live,episodeId)?.scenes?.[index];
+    const live=state.projects.find(x=>x.id===projectId),liveScene=sceneAtIdentity(findEpisodeById(live,episodeId),index,sceneId);
     const d=await apiPost('/api/lipsync-status',{requestId:job.requestId,provider:job.provider||'',model:job.model||'',statusUrl:job.statusUrl||'',responseUrl:job.responseUrl||'',sourceVideoUrl:liveScene?.videoUrl||''});
     if(d.status==='ready'){
-      updateProjectById(projectId,x=>{const e=findEpisodeById(x,episodeId),t=e?.scenes?.[index];if(!t||sceneLipSyncSignature(x,t)!==signature)return;t.lipSyncVideoUrl=d.videoUrl;t.lipSyncRemoteVideoUrl=d.remoteVideoUrl||'';t.lipSyncProvider=d.provider||job.provider||'sync-labs';t.lipSyncGenerationId=d.generationId||job.requestId||'';t.lipSyncSourceVideoUrl=t.videoUrl||'';t.lipSyncGeneratedAt=new Date().toISOString();t.lipSyncSignature=signature;t.lipSyncOperation=null;t.lipSyncStatusUrl='';t.lipSyncResponseUrl='';t.lipSyncModel=d.model||t.lipSyncModel||job.model||'';t.lipSyncStatus='ready';t.lipSyncValidated=false;t.lipSyncRetryCount=0;t.lipSyncError=null;t.lipSyncProviderStatus='COMPLETED';x.finalAssembly=null;x.renderStatus=null;x.finalVideoMeta=null},{render:false});
+      updateProjectById(projectId,x=>{const e=findEpisodeById(x,episodeId),t=sceneAtIdentity(e,index,sceneId);if(!t||sceneLipSyncSignature(x,t)!==signature)return;t.lipSyncVideoUrl=d.videoUrl;t.lipSyncRemoteVideoUrl=d.remoteVideoUrl||'';t.lipSyncProvider=d.provider||job.provider||'sync-labs';t.lipSyncGenerationId=d.generationId||job.requestId||'';t.lipSyncSourceVideoUrl=t.videoUrl||'';t.lipSyncGeneratedAt=new Date().toISOString();t.lipSyncSignature=signature;t.lipSyncOperation=null;t.lipSyncStatusUrl='';t.lipSyncResponseUrl='';t.lipSyncModel=d.model||t.lipSyncModel||job.model||'';t.lipSyncStatus='ready';t.lipSyncValidated=false;t.lipSyncRetryCount=0;t.lipSyncError=null;t.lipSyncProviderStatus='COMPLETED';x.finalAssembly=null;x.renderStatus=null;x.finalVideoMeta=null},{render:false});
       return d.videoUrl;
     }
     if(d.queueStatus){updateProjectById(projectId,x=>{const e=findEpisodeById(x,episodeId),t=e?.scenes?.[index];if(t&&t.lipSyncSignature===signature)t.lipSyncProviderStatus=d.queueStatus},{render:false})}
@@ -942,20 +964,20 @@ async function pollSceneLipSync(projectId,episodeId,index,job,signature){
 }
 async function ensureSceneLipSync(p,s,index,{quiet=false,allowSubmit=true}={}){
   if(!p||!s?.videoUrl||!sceneHasSpokenContent(s))return '';
-  const signature=sceneLipSyncSignature(p,s);
+  const signature=sceneLipSyncSignature(p,s),sceneId=s.id||'';
   if(sceneHasValidatedLipSync(p,s))return s.lipSyncVideoUrl;
   // Recover an already-paid synchronized render even when an older build left its
   // validation flag/signature stale. This performs a read-only asset check and never submits a job.
   if(sceneHasRecoverableLipSyncAsset(p,s)&&s.lipSyncVideoUrl){
     const recovered=await recoverSavedLipSyncAsset(p,s,index);
-    if(recovered){const live=state.projects.find(x=>x.id===p.id),liveScene=findEpisodeById(live,episodeOf(p)?.id||episodeOf(p)?.number)?.scenes?.[index];if(live&&liveScene){updateSceneMediaStatuses(live,episodeOf(live));return recovered}}
+    if(recovered){const live=state.projects.find(x=>x.id===p.id),liveScene=sceneAtIdentity(findEpisodeById(live,episodeOf(p)?.id||episodeOf(p)?.number),index,s.id||'');if(live&&liveScene){updateSceneMediaStatuses(live,episodeOf(live));return recovered}}
   }
   if(sceneHasCurrentLipSync(p,s)&&s.lipSyncVideoUrl){
     try{
       await waitForVideoAsset(s.lipSyncVideoUrl);
       const projectId=p.id,episodeId=episodeOf(p)?.id||episodeOf(p)?.number;
-      updateProjectById(projectId,x=>{const e=findEpisodeById(x,episodeId),t=e?.scenes?.[index];if(t&&t.lipSyncSignature===signature&&sceneLipSyncResultLooksDistinct(t)){t.lipSyncValidated=true;t.lipSyncStatus='ready';t.lipSyncPlaybackFailedAt=null;t.lipSyncError=null}},{render:false});
-      const live=state.projects.find(x=>x.id===projectId),liveScene=findEpisodeById(live,episodeId)?.scenes?.[index];
+      updateProjectById(projectId,x=>{const e=findEpisodeById(x,episodeId),t=sceneAtIdentity(e,index,sceneId);if(t&&t.lipSyncSignature===signature&&sceneLipSyncResultLooksDistinct(t)){t.lipSyncValidated=true;t.lipSyncStatus='ready';t.lipSyncPlaybackFailedAt=null;t.lipSyncError=null}},{render:false});
+      const live=state.projects.find(x=>x.id===projectId),liveScene=sceneAtIdentity(findEpisodeById(live,episodeId),index,sceneId);
       if(live&&liveScene&&sceneHasValidatedLipSync(live,liveScene)){updateSceneMediaStatuses(live,findEpisodeById(live,episodeId));return liveScene.lipSyncVideoUrl}
     }catch(e){console.warn('[CineTale lipsync] Saved synchronized asset failed validation; preserving the source scene.',e);markSceneLipSyncPlaybackError(p.id,index,e?.message||String(e))}
   }
@@ -965,13 +987,13 @@ async function ensureSceneLipSync(p,s,index,{quiet=false,allowSubmit=true}={}){
     const projectId=p.id,episodeId=episodeOf(p)?.id||episodeOf(p)?.number;
     try{
       // Resume a saved synchronization request before considering a new billable submission.
-      let liveProject=state.projects.find(x=>x.id===projectId)||p,liveScene=findEpisodeById(liveProject,episodeId)?.scenes?.[index]||s;
+      let liveProject=state.projects.find(x=>x.id===projectId)||p,liveScene=sceneAtIdentity(findEpisodeById(liveProject,episodeId),index,sceneId)||s;
       let job=resumableSceneLipSyncJob(liveScene,signature);
       if(!job&&liveScene?.lipSyncStatus==='processing'&&liveScene?.lipSyncSignature===signature&&liveScene?.lipSyncOperation&&sceneLipSyncJobAgeMs(liveScene)>LIP_SYNC_JOB_STALE_MS){
         const retryCount=Math.max(0,Number(liveScene.lipSyncRetryCount)||0);
         if(retryCount>=1)throw new Error('Lip-sync provider did not finish the saved request. Change the scene voice or regenerate the source clip before retrying again.');
-        updateProjectById(projectId,x=>{const e=findEpisodeById(x,episodeId),t=e?.scenes?.[index];if(!t)return;t.lipSyncOperation=null;t.lipSyncStatusUrl='';t.lipSyncResponseUrl='';t.lipSyncStatus='idle';t.lipSyncRetryCount=retryCount+1;t.lipSyncError='Previous lip-sync request expired before producing a usable result; retrying once.'},{render:false});
-        liveProject=state.projects.find(x=>x.id===projectId)||p;liveScene=findEpisodeById(liveProject,episodeId)?.scenes?.[index]||s;
+        updateProjectById(projectId,x=>{const e=findEpisodeById(x,episodeId),t=sceneAtIdentity(e,index,sceneId);if(!t)return;t.lipSyncOperation=null;t.lipSyncStatusUrl='';t.lipSyncResponseUrl='';t.lipSyncStatus='idle';t.lipSyncRetryCount=retryCount+1;t.lipSyncError='Previous lip-sync request expired before producing a usable result; retrying once.'},{render:false});
+        liveProject=state.projects.find(x=>x.id===projectId)||p;liveScene=sceneAtIdentity(findEpisodeById(liveProject,episodeId),index,sceneId)||s;
       }
       if(!job){
         // Studio background warmup may resume/poll an existing paid job, but must never
@@ -979,28 +1001,31 @@ async function ensureSceneLipSync(p,s,index,{quiet=false,allowSubmit=true}={}){
         if(!allowSubmit)return '';
         const activeScene=(findEpisodeById(liveProject,episodeId)?.scenes||[]).find((candidate,candidateIndex)=>candidateIndex!==index&&candidate?.lipSyncStatus==='processing'&&candidate?.lipSyncOperation&&candidate?.lipSyncSignature===sceneLipSyncSignature(liveProject,candidate));
         if(activeScene){
-          updateProjectById(projectId,x=>{const e=findEpisodeById(x,episodeId),t=e?.scenes?.[index];if(t){t.lipSyncProviderStatus='WAITING_FOR_SLOT';t.lipSyncError=null}},{render:false});
+          updateProjectById(projectId,x=>{const e=findEpisodeById(x,episodeId),t=sceneAtIdentity(e,index,sceneId);if(t){t.lipSyncProviderStatus='WAITING_FOR_SLOT';t.lipSyncError=null}},{render:false});
           if(!quiet)toast('Another scene is finishing dialogue synchronization. This scene will stay on its safe source clip for now.');
           return '';
         }
         const audioDataUrl=await sceneLipSyncAudioDataUrl(liveProject,liveScene);if(!audioDataUrl)return '';
+        const audioDigest=await strongStringDigest(audioDataUrl),audioSignature=sceneLipSyncSignature(liveProject,liveScene);
+        if(audioSignature!==signature)throw new Error('Scene dialogue changed while synchronization audio was being prepared. CineTale stopped the stale sync request.');
+        const requestDigest=await strongStringDigest(`${signature}\n${audioDataUrl}`);
         const videoUrl=new URL(liveScene.videoUrl,location.origin).href;
-        const d=await submitSceneLipSyncRequest(videoUrl,audioDataUrl,signature);
+        const d=await submitSceneLipSyncRequest(videoUrl,audioDataUrl,signature,requestDigest);
         if(d.status==='not_configured'){if(!quiet)console.info('[CineTale lipsync] Dedicated lip-sync is not configured.');return ''}
         if(d.status==='busy'){
-          updateProjectById(projectId,x=>{const e=findEpisodeById(x,episodeId),t=e?.scenes?.[index];if(t){t.lipSyncStatus='idle';t.lipSyncProviderStatus='WAITING_FOR_SLOT';t.lipSyncError=null;t.lipSyncErrorCode=''}},{render:false});
+          updateProjectById(projectId,x=>{const e=findEpisodeById(x,episodeId),t=sceneAtIdentity(e,index,sceneId);if(t){t.lipSyncStatus='idle';t.lipSyncProviderStatus='WAITING_FOR_SLOT';t.lipSyncError=null;t.lipSyncErrorCode=''}},{render:false});
           if(!quiet)toast('Dialogue synchronization is busy with another scene. CineTale will not submit a duplicate job.');
           return '';
         }
         if(!d.requestId)throw new Error('Lip-sync provider did not return a queue request ID.');
         job={requestId:d.requestId,provider:d.provider||'',model:d.model||'',statusUrl:d.statusUrl||'',responseUrl:d.responseUrl||''};
-        updateProjectById(projectId,x=>{const e=findEpisodeById(x,episodeId),t=e?.scenes?.[index];if(!t)return;t.lipSyncOperation=d.requestId;t.lipSyncGenerationId=d.provider==='sync-labs'?d.requestId:(t.lipSyncGenerationId||'');t.lipSyncStatusUrl=d.statusUrl||'';t.lipSyncResponseUrl=d.responseUrl||'';t.lipSyncModel=d.model||'';t.lipSyncStartedAt=new Date().toISOString();t.lipSyncStatus='processing';t.lipSyncProviderStatus='PENDING';t.lipSyncSignature=signature;t.lipSyncProvider=d.provider||'sync-labs';t.lipSyncSourceVideoUrl=t.videoUrl||'';t.lipSyncValidated=false;t.lipSyncPlaybackFailedAt=null;t.lipSyncSubmissionFailedAt=null;t.lipSyncErrorCode='';t.lipSyncError=null;t.lipSyncAutoPending=false},{render:false});
+        updateProjectById(projectId,x=>{const e=findEpisodeById(x,episodeId),t=sceneAtIdentity(e,index,sceneId);if(!t)return;t.lipSyncOperation=d.requestId;t.lipSyncGenerationId=d.provider==='sync-labs'?d.requestId:(t.lipSyncGenerationId||'');t.lipSyncStatusUrl=d.statusUrl||'';t.lipSyncResponseUrl=d.responseUrl||'';t.lipSyncModel=d.model||'';t.lipSyncStartedAt=new Date().toISOString();t.lipSyncStatus='processing';t.lipSyncProviderStatus='PENDING';t.lipSyncSignature=signature;t.lipSyncAudioSignature=audioSignature;t.lipSyncAudioDigest=audioDigest;t.lipSyncRequestDigest=requestDigest;t.lipSyncRecoveryCompatibility='';t.lipSyncRecoveredAt=null;t.lipSyncProvider=d.provider||'sync-labs';t.lipSyncSourceVideoUrl=t.videoUrl||'';t.lipSyncValidated=false;t.lipSyncPlaybackFailedAt=null;t.lipSyncSubmissionFailedAt=null;t.lipSyncErrorCode='';t.lipSyncError=null;t.lipSyncAutoPending=false},{render:false});
       }
-      const url=await pollSceneLipSync(projectId,episodeId,index,job,signature);
+      const url=await pollSceneLipSync(projectId,episodeId,index,job,signature,sceneId);
       if(!url)return '';
       await waitForVideoAsset(url);
-      updateProjectById(projectId,x=>{const e=findEpisodeById(x,episodeId),t=e?.scenes?.[index];if(!t||t.lipSyncSignature!==signature||!sceneLipSyncResultLooksDistinct(t))return;t.lipSyncValidated=true;t.lipSyncStatus='ready';t.lipSyncPlaybackFailedAt=null;t.lipSyncError=null},{render:false});
-      liveProject=state.projects.find(x=>x.id===projectId);liveScene=findEpisodeById(liveProject,episodeId)?.scenes?.[index];
+      updateProjectById(projectId,x=>{const e=findEpisodeById(x,episodeId),t=sceneAtIdentity(e,index,sceneId);if(!t||t.lipSyncSignature!==signature||!sceneLipSyncResultLooksDistinct(t))return;t.lipSyncValidated=true;t.lipSyncStatus='ready';t.lipSyncPlaybackFailedAt=null;t.lipSyncError=null},{render:false});
+      liveProject=state.projects.find(x=>x.id===projectId);liveScene=sceneAtIdentity(findEpisodeById(liveProject,episodeId),index,sceneId);
       if(!liveProject||!liveScene||!sceneHasValidatedLipSync(liveProject,liveScene))throw new Error('Lip-sync result could not be validated as a distinct playable synchronized asset.');
       // The render lock prevents active playback from being destroyed. Once safe, the next
       // render/player mount must prefer this validated synchronized asset over the old source pin.
@@ -1009,7 +1034,7 @@ async function ensureSceneLipSync(p,s,index,{quiet=false,allowSubmit=true}={}){
       return url;
     }catch(e){
       console.warn('[CineTale lipsync]',e);
-      updateProjectById(projectId,x=>{const ep=findEpisodeById(x,episodeId),t=ep?.scenes?.[index];if(t){const hadJob=Boolean(t.lipSyncOperation);t.lipSyncOperation=null;t.lipSyncStatusUrl='';t.lipSyncResponseUrl='';t.lipSyncStatus='error';t.lipSyncError=e?.message||String(e);t.lipSyncErrorCode=e?.code||e?.details?.errorCode||'';if(!hadJob)t.lipSyncSubmissionFailedAt=new Date().toISOString()}},{render:false});
+      updateProjectById(projectId,x=>{const ep=findEpisodeById(x,episodeId),t=sceneAtIdentity(ep,index,sceneId);if(t){const hadJob=Boolean(t.lipSyncOperation);t.lipSyncOperation=null;t.lipSyncStatusUrl='';t.lipSyncResponseUrl='';t.lipSyncStatus='error';t.lipSyncError=e?.message||String(e);t.lipSyncErrorCode=e?.code||e?.details?.errorCode||'';if(!hadJob)t.lipSyncSubmissionFailedAt=new Date().toISOString()}},{render:false});
       if(!quiet)toast('Dialogue synchronization could not be completed.');
       return '';
     }finally{lipSyncJobsInFlight.delete(key)}
