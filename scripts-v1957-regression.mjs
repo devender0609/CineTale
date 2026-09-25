@@ -1,0 +1,17 @@
+import fs from 'node:fs';
+import assert from 'node:assert/strict';
+const app=fs.readFileSync(new URL('./app.js',import.meta.url),'utf8');
+const css=fs.readFileSync(new URL('./styles.css',import.meta.url),'utf8');
+const html=fs.readFileSync(new URL('./index.html',import.meta.url),'utf8');
+assert.ok(app.includes("const APP_VERSION = '1.9.75'"),'app version not advanced');
+assert.ok(html.includes('/app.js?v=1.9.75')&&html.includes('/styles.css?v=1.9.75'),'cache busting not advanced');
+assert.ok(app.includes("const LIP_SYNC_PIPELINE_REV = 'v1.9.67-scene-semantic-signature'"),'lip-sync pipeline revision changed; existing paid synced assets would be invalidated');
+assert.ok(app.includes('function fitSceneVideoToSurface(video)'),'intrinsic media fit helper missing');
+assert.ok(app.includes("surface.style.setProperty('--scene-media-ratio',`${w} / ${h}`)"),'intrinsic aspect ratio not applied');
+assert.ok(app.includes("video.addEventListener('loadedmetadata',markSceneMediaLoaded)")&&app.includes("video.addEventListener('loadeddata',markSceneMediaLoaded)"),'metadata/data-driven refit missing');
+assert.ok(css.includes('.scene-visual[data-media-fitted="1"]'),'fitted surface selector missing');
+assert.ok(css.includes('aspect-ratio:var(--scene-media-ratio)!important'),'video surface does not follow intrinsic ratio');
+assert.ok(css.includes('.scene-visual.media-landscape>video')&&css.includes('position:absolute!important')&&css.includes('inset:0!important'),'video is not pinned to full allocated surface');
+assert.ok(css.includes('object-fit:contain!important'),'no-crop object fit missing');
+assert.ok(css.includes('.sequence-player video')&&css.includes('.final-render-preview')&&css.includes('.preview-image'),'other playback surfaces not covered');
+console.log('v1.9.66 exact-fit scene media regression: PASS');

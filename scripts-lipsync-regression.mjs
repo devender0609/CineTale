@@ -1,0 +1,46 @@
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+const app=fs.readFileSync('app.js','utf8');
+const env=fs.readFileSync('.env.example','utf8');
+assert.match(app,/async function ensureSceneLipSync/);
+assert.match(app,/async function sceneLipSyncAudioDataUrl/);
+assert.match(app,/fal-ai\/sync-lipsync\/v3|\/api\/lipsync-job/);
+assert.match(app,/sceneHasCurrentLipSync/);
+assert.match(app,/scene\.lipSyncStatus!==['"]error['"]/,'A failed lip-sync result must not remain the primary scene video after rerender');
+assert.match(app,/!scene\.lipSyncPlaybackFailedAt/,'A lip-sync asset with a recorded playback failure must fall back to the source video');
+assert.match(app,/s\.lipSyncStatus===['"]error['"]&&s\.lipSyncSignature===signature&&\(s\.lipSyncPlaybackFailedAt\|\|s\.lipSyncSubmissionFailedAt\)/,'Unchanged failed lip-sync assets must not trigger repeated paid retries on every play');
+assert.match(app,/scenePrimaryVideoUrl/);
+assert.match(app,/\['sync-labs','fal-sync'\]\.includes\(scene\.lipSyncProvider\)/,'Persisted lip-sync results must be provider-verified');
+assert.match(app,/sceneLipSyncResultLooksDistinct/,'Stale source-video URLs must not be accepted as lip-sync output');
+assert.match(app,/function waitForVideoAsset/,'Lip-sync result must be preflighted before replacing the source clip');
+assert.match(app,/async function adoptSceneLipSyncVideo/,'Completed lip-sync output is not explicitly adopted by the scene video element');
+assert.match(app,/await waitForVideoAsset\(desired\)/,'Synchronized result is not verified before handoff');
+assert.match(app,/oldRawSrc=video\.currentSrc\|\|video\.getAttribute\('src'\)/,'Working source clip is not preserved for rollback');
+assert.match(app,/video\.src=oldRawSrc;video\.load\(\)/,'Failed synchronized handoff does not restore the original clip');
+assert.match(app,/ensureSceneLipSync\(liveProject,liveScene,index,\{quiet:true\}\)/,'Dedicated lip-sync should run in the background after approved audio is scheduled');
+assert.doesNotMatch(app,/video\.pause\(\);startSceneVideoVoicePlayback/,'Scene playback must not blank/pause the working source clip while waiting for lip sync');
+assert.match(app,/Synchronized version could not load\. The original scene was restored\./,'Runtime playback failure needs a visible safe fallback');
+assert.match(app,/sceneLipSyncAudioDataUrl/,'Approved audio must be used to create the synchronized speaking asset');
+assert.match(app,/useEmbeddedSyncedAudio:spoken&&synced/,'Final rendering must use the validated synchronized asset as the speaking audio source');
+assert.doesNotMatch(app.slice(app.indexOf('async function prepareFinalSceneAsset'),app.indexOf('async function renderFinalVideoFile')),/sceneCachedVoiceUrls\(/,'Final rendering must not replay detached cached TTS over synchronized media');
+assert.doesNotMatch(app,/Preparing approved voice|Approved voice · source speech muted|Approved voice plays with scene/);
+assert.match(env,/ENABLE_LIVE_LIPSYNC=false/);
+assert.match(env,/FAL_KEY=/);
+assert.match(env,/LIPSYNC_MODEL=fal-ai\/sync-lipsync\/v3/);
+
+const {default:job}=await import('./api/lipsync-job.js');
+const {default:status}=await import('./api/lipsync-status.js');
+const {default:videoFile}=await import('./api/video-file.js');
+const prior={...process.env};
+process.env.ENABLE_LIVE_LIPSYNC='true';process.env.FAL_KEY='test-fal-key';
+let calls=[];
+globalThis.fetch=async (url,opts={})=>{calls.push({url:String(url),opts});return new Response(JSON.stringify({request_id:'req-123456',status_url:'https://queue.fal.run/fal-ai/sync-lipsync/v3/requests/req-123456/status',response_url:'https://queue.fal.run/fal-ai/sync-lipsync/v3/requests/req-123456'}),{status:200,headers:{'content-type':'application/json'}})};
+function resObj(){return {code:0,body:null,headers:{},status(n){this.code=n;return this},json(v){this.body=v;return v},setHeader(k,v){this.headers[String(k).toLowerCase()]=String(v)},send(v){this.body=v;return v},end(v=''){this.body=v;return v}}}
+let r=resObj();await job({method:'POST',body:{videoUrl:'https://example.com/video.mp4',audioDataUrl:'data:audio/wav;base64,UklGRg=='}},r);assert.equal(r.code,200);assert.equal(r.body.status,'queued');assert.equal(r.body.requestId,'req-123456');assert.ok(calls[0].url.includes('queue.fal.run/fal-ai/sync-lipsync/v3'));
+let step=0;globalThis.fetch=async()=>{step++;return step===1?new Response(JSON.stringify({status:'COMPLETED'}),{status:200,headers:{'content-type':'application/json'}}):new Response(JSON.stringify({video:{url:'https://v3b.fal.media/files/b/test/output.mp4'}}),{status:200,headers:{'content-type':'application/json'}})};
+r=resObj();await status({method:'POST',body:{requestId:'req-123456',model:'fal-ai/sync-lipsync/v3',statusUrl:'https://queue.fal.run/fal-ai/sync-lipsync/v3/requests/req-123456/status',responseUrl:'https://queue.fal.run/fal-ai/sync-lipsync/v3/requests/req-123456'}},r);assert.equal(r.code,200);assert.equal(r.body.status,'ready');assert.match(r.body.videoUrl,/^\/api\/video-file\?uri=/);
+
+delete process.env.GEMINI_API_KEY;globalThis.fetch=async()=>new Response(Buffer.concat([Buffer.from('0000'),Buffer.from('ftyp'),Buffer.from('isom'),Buffer.from('DATA')]),{status:200,headers:{'content-type':'video/mp4','content-length':'16'}});
+r=resObj();await videoFile({method:'GET',query:{uri:'https://v3b.fal.media/files/b/test/output.mp4'},headers:{}},r);assert.equal(r.code,200);assert.equal(r.headers['content-type'],'video/mp4');
+for(const [k,v] of Object.entries(prior))process.env[k]=v;for(const k of Object.keys(process.env))if(!(k in prior))delete process.env[k];
+console.log('dedicated lip-sync + fallback hardening regression PASS');

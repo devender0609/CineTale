@@ -1,0 +1,13 @@
+import fs from 'node:fs';import assert from 'node:assert/strict';
+const app=fs.readFileSync('app.js','utf8'),html=fs.readFileSync('index.html','utf8'),plan=fs.readFileSync('api/generate-plan.js','utf8');
+assert.ok(app.includes("const APP_VERSION = '1.9.75'"));
+assert.ok(html.includes('/app.js?v=1.9.75')&&html.includes('/styles.css?v=1.9.75'));
+assert.ok(app.includes('previewSequenceLocks.add(previewKey)'));
+assert.ok(app.includes('if(previewSequenceLocks.has(previewSequenceKey(project,episode)))return;'));
+assert.ok(app.includes('previewSequenceLocks.delete(previewKey);closeModal()'));
+assert.ok(!app.includes('previewSequenceLocks.delete(previewKey);closeModal();if(current()?.id===p.id)renderStudio()'));
+assert.ok(html.includes('id="culturalContext"'));
+assert.ok(app.includes('Fula / Fulani')&&app.includes('Tibetan')&&app.includes('Quechua'));
+assert.ok(plan.includes('Never reject a project merely because its language is not in a preset list'));
+assert.ok(plan.includes('CREATOR CONTEXT:'));
+console.log('v1.9.66 multilingual/cultural intelligence + preview clickability regression: PASS');

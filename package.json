@@ -1,0 +1,43 @@
+{
+  "name": "cinetale-studio",
+  "version": "1.9.75",
+  "private": true,
+  "type": "module",
+  "description": "CineTale Studio - deterministic no-repeat final assembly, synchronized speaking-media audio, cloud final persistence, stable playback, and production-safe scene reuse",
+  "scripts": {
+    "dev": "npx vercel dev",
+    "check": "node scripts-check.mjs",
+    "smoke": "node scripts-smoke.mjs",
+    "qa:deep": "node scripts-deep-qa.mjs",
+    "qa:scene-audio": "node scripts-scene-audio-regression.mjs",
+    "qa:voice-mix": "node scripts-voice-mix-regression.mjs",
+    "qa:lipsync": "node scripts-lipsync-regression.mjs",
+    "qa:player-lifecycle": "node scripts-player-lifecycle-regression.mjs",
+    "qa:lipsync-status": "node scripts-lipsync-status-resilience.mjs",
+    "qa:lipsync-adoption": "node scripts-lipsync-adoption-regression.mjs && node scripts-lipsync-v1947-regression.mjs",
+    "qa:v1948": "node scripts-v1948-regression.mjs",
+    "qa:v1950": "node scripts-v1950-regression.mjs",
+    "qa:v1951": "node scripts-v1951-regression.mjs",
+    "qa:v1952": "node scripts-v1952-regression.mjs",
+    "qa:v1953": "node scripts-v1953-regression.mjs",
+    "qa:v1954": "node scripts-v1954-regression.mjs",
+    "qa:v1955": "node scripts-v1955-regression.mjs",
+    "qa:v1956": "node scripts-v1956-regression.mjs",
+    "qa:v1957": "node scripts-v1957-regression.mjs",
+    "qa:v1958": "node scripts-v1958-regression.mjs",
+    "qa:v1959": "node scripts-v1959-regression.mjs",
+    "qa:v1960": "node scripts-v1960-regression.mjs",
+    "qa:v1961": "node scripts-v1961-regression.mjs",
+    "qa:v1962": "node scripts-v1962-regression.mjs",
+    "qa:v1963": "node scripts-v1963-preview-sequence-regression.mjs",
+    "qa:v1964": "node scripts-v1964-regression.mjs",
+    "qa:v1969": "node scripts-v1969-regression.mjs",
+    "qa:v1970": "node scripts-v1970-regression.mjs",
+    "qa:v1972": "node scripts-v1972-final-progress-stability.mjs",
+    "qa:v1973": "node scripts-v1973-exhaustive-final-ux-regression.mjs",
+    "qa:v1975": "node scripts-v1975-final-sync-integrity.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

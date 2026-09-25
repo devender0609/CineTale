@@ -1,0 +1,11 @@
+import fs from 'node:fs';
+import assert from 'node:assert/strict';
+const app=fs.readFileSync('app.js','utf8');
+const css=fs.readFileSync('styles.css','utf8');
+assert.ok(app.includes('finalRenderRunning:false'),'final render runtime lock missing');
+assert.ok(app.includes('state.finalRenderRunning=true'),'final render lock not acquired');
+assert.ok(app.includes('state.finalRenderRunning=false'),'final render lock not released');
+assert.ok(app.includes('if(!state.finalRenderRunning){')&&app.includes('state.finalRenderProjectId=p.id'),'final assembly can overwrite live render progress');
+assert.ok(!css.includes('.final-render-progress{position:sticky;bottom:8px'),'final progress must not be sticky');
+assert.ok(css.includes('.final-render-progress{position:relative;z-index:1;min-height:42px'),'stable progress layout missing');
+console.log('v1.9.75 final progress stability regression PASS');

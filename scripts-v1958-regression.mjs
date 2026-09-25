@@ -1,0 +1,16 @@
+import fs from 'node:fs';
+import assert from 'node:assert/strict';
+const css=fs.readFileSync('styles.css','utf8');
+const html=fs.readFileSync('index.html','utf8');
+const app=fs.readFileSync('app.js','utf8');
+const pkg=JSON.parse(fs.readFileSync('package.json','utf8'));
+assert.equal(pkg.version,'1.9.75');
+assert.match(html,/styles\.css\?v=1\.9\.75/);
+assert.match(html,/app\.js\?v=1\.9\.75/);
+assert.match(app,/APP_VERSION = '1\.9\.75'/);
+assert.match(css,/@media \(max-width:1050px\)[\s\S]*?\.scene-card\{[\s\S]*?grid-template-columns:1fr!important/);
+assert.match(css,/\.scene-card>\.scene-visual\{[\s\S]*?width:100%!important[\s\S]*?justify-self:stretch!important/);
+assert.match(css,/\.scene-card>\.scene-visual\.media-landscape\{[\s\S]*?aspect-ratio:16\/9!important/);
+assert.match(css,/@media \(min-width:1051px\) and \(max-width:1280px\)[\s\S]*?minmax\(320px,46%\)/);
+assert.ok(!css.includes('object-fit:cover'),'No-crop guarantee regressed');
+console.log('v1.9.66 responsive scene-player sizing regression PASS');

@@ -1,0 +1,16 @@
+import fs from 'node:fs';
+import assert from 'node:assert/strict';
+const src=fs.readFileSync(new URL('./app.js',import.meta.url),'utf8');
+const html=fs.readFileSync(new URL('./index.html',import.meta.url),'utf8');
+assert.ok(src.includes("const APP_VERSION = '1.9.75'"),'app version');
+assert.ok(html.includes('/app.js?v=1.9.75')&&html.includes('/styles.css?v=1.9.75'),'cache busting');
+assert.ok(src.includes('function sceneHasRecoverableLipSyncAsset'),'saved synced-asset recovery helper missing');
+assert.ok(src.includes('await waitForVideoAsset(url);'),'recovery must verify the saved MP4 before restoring ready state');
+assert.ok(src.includes("t.lipSyncValidated=true;t.lipSyncStatus='ready'"),'recovery must restore validated ready state');
+assert.ok(src.includes("t.lipSyncProviderStatus='COMPLETED'"),'recovery must restore provider-complete state');
+assert.ok(src.includes('const recovered=await recoverSavedLipSyncAsset(p,s,index);'),'ensureSceneLipSync must recover saved output before job logic');
+const preview=src.slice(src.indexOf('async function previewFinalSequence()'),src.indexOf('async function prepareFinalSceneAsset'));
+assert.equal((preview.match(/await playVideoElement\(video\)/g)||[]).length,1,'preview must wait for each clip exactly once');
+assert.ok(!preview.includes("await new Promise((resolve,reject)=>{const done=()=>{cleanup();resolve()}"),'preview must not attach a second ended waiter after playback has already ended');
+assert.ok(!preview.includes('ensureSceneLipSync('),'preview must remain read-only');
+console.log('CineTale v1.9.68 regression passed: stale saved Sync Labs assets are revalidated without resubmission and Preview advances after one ended wait per clip.');

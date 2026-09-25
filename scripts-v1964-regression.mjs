@@ -1,0 +1,13 @@
+import fs from 'node:fs';
+import assert from 'node:assert/strict';
+const app=fs.readFileSync(new URL('./app.js', import.meta.url),'utf8');
+const preview=app.slice(app.indexOf('async function previewFinalSequence()'), app.indexOf('async function prepareFinalSceneAsset'));
+assert.ok(preview.includes('Read-only preview of finished scene assets.'),'Preview must explicitly be read-only');
+assert.ok(!preview.includes('ensureSceneLipSync('),'Preview must never create, resume, or retry lip-sync jobs');
+assert.ok(!preview.includes('startSceneVideoVoicePlayback('),'Preview must not use browser-timed voice overlay');
+assert.match(preview,/sceneHasSpokenContent\(scene\)\?\(sceneHasValidatedLipSync\(liveProject,scene\)\?scene\.lipSyncVideoUrl:''\)/,'Speaking scenes must preview only validated synchronized assets');
+assert.match(preview,/video\.muted=false/,'Validated synchronized preview must use embedded audio');
+const ui=app.slice(app.indexOf('function sceneSyncStateUi'), app.indexOf('function updateSceneMediaStatuses'));
+assert.match(ui,/scene\.lipSyncStatus==='processing'&&Boolean\(scene\.lipSyncOperation\)/,'In-progress label must require a real active job');
+assert.match(ui,/if\(!active&&!waiting&&!failed\)return ''/,'Idle unsynchronized scenes must not show a false in-progress label');
+console.log('v1.9.66 read-only preview/state regression: PASS');

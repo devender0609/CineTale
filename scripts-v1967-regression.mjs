@@ -1,0 +1,18 @@
+import fs from 'node:fs';
+import assert from 'node:assert/strict';
+const src=fs.readFileSync(new URL('./app.js',import.meta.url),'utf8');
+const between=(a,b)=>{const i=src.indexOf(a),j=src.indexOf(b,i);assert.ok(i>=0&&j>i,`Missing block ${a}`);return src.slice(i,j)};
+const sig=between('function sceneLipSyncSignature(project={},scene={}){','function legacyLipSyncSignatureCompatible');
+assert.ok(sig.includes('sceneRelevantCharacterIds(project,scene)'),'Lip-sync signature must be scoped to characters actually speaking in the scene');
+assert.ok(!sig.includes('(project.characters||[]).map'),'Lip-sync signature must not depend on every project character');
+assert.ok(sig.includes('semanticDialogueBindings(scene)'),'Lip-sync signature must use semantic dialogue bindings');
+const bindings=between('function semanticDialogueBindings(scene={}){','function sceneLipSyncSignature');
+assert.ok(!bindings.includes('boundAt'),'Binding timestamps must never invalidate a paid synchronized clip');
+const legacy=between('function legacyLipSyncSignatureCompatible(project={},scene={}){','function migrateValidatedLipSyncSignatures');
+assert.ok(legacy.includes('sceneRelevantCharacterIds(project,scene)'),'Legacy recovery must compare only voices used by this scene');
+assert.ok(legacy.includes('historical.slice(0,7)'),'Legacy recovery must preserve relevant historical voice settings');
+const migration=between('function migrateValidatedLipSyncSignatures(project={}){','function normalizedMediaUrl');
+assert.ok(migration.includes('scene.lipSyncSignature=next'),'Compatible validated clips must be migrated instead of regenerated');
+assert.ok(src.includes('normalizeProjectIdentityBindings(p);migrateValidatedLipSyncSignatures(p)'), 'Migration must run after identity bindings stabilize during hydration');
+assert.ok(src.includes("const APP_VERSION = '1.9.75'"),'Expected current app version');
+console.log('CineTale v1.9.67 regression passed: validated paid lip-sync assets survive unrelated cast/binding metadata changes and migrate to scene-semantic signatures.');
