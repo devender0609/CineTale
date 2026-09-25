@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 const src=fs.readFileSync(new URL('./app.js',import.meta.url),'utf8');
 const status=fs.readFileSync(new URL('./api/lipsync-status.js',import.meta.url),'utf8');
 const checks=[
-  [src.includes("const APP_VERSION = '1.9.79'"),'app version advanced'],
+  [src.includes("const APP_VERSION = '1.9.80'"),'app version advanced'],
   [src.includes("normalizedMediaUrl(pin.url)===normalizedMediaUrl(desired)"),'studio source pin follows the newly validated desired asset instead of pinning Veo forever'],
   [src.includes("sceneHasValidatedLipSync(liveProject,liveScene)&&liveScene.lipSyncValidated===true")||src.includes("sceneHasCurrentLipSync(liveProject,liveScene)&&liveScene.lipSyncValidated===true"),'playback only treats a validated synchronized URL as authoritative'],
   [src.includes('function resumableSceneLipSyncJob'),'saved queue jobs can resume'],

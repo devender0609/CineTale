@@ -613,7 +613,7 @@ assert.ok(appSource.includes('resolveOwnerAccess')&&appSource.includes('/api/own
   assert.ok(appSource.includes("function safeLocalSet")&&appSource.includes("setView('studio')")&&appSource.includes("queueMicrotask(()=>save())"),'Project opening can still be blocked by localStorage quota or synchronous persistence');
   assert.ok(appSource.includes('class="project-open" type="button" data-project=')&&appSource.includes("projectsGrid.addEventListener('pointerdown'")&&appSource.includes("openProject(opener.dataset.project)"),'Stable project pointerdown wiring is missing');
   assert.ok(appSource.includes('projectNavigation:{locked:false')&&appSource.includes('state.projectNavigation.epoch!==syncEpoch'),'Project navigation race guard is missing');
-  assert.ok(htmlSource.includes('/app.js?v=1.9.79'),'App bundle cache-busting version is missing');
+  assert.ok(htmlSource.includes('/app.js?v=1.9.80'),'App bundle cache-busting version is missing');
   assert.ok(appSource.includes("sceneListEl.addEventListener('pointerdown'"),'Scene video action must use persistent pointer handler');
   assert.ok(appSource.includes("videoOperationConfirmed(scene)?'Rendering…':videoOperationRecovering(scene)?'Checking saved render…'"),'Video operation UX must distinguish verified rendering from unverified saved jobs');
   assert.ok(appSource.includes('Boolean(scene.videoOperation)'),'Video button must disable during an active render job');
@@ -658,7 +658,7 @@ assert.ok(appSource.includes('resolveOwnerAccess')&&appSource.includes('/api/own
   assert.ok(!appSource.includes('<a class="project-open"'),'Projects must not use anchor wrappers that introduce underlines/link styling.');
   assert.ok(cssSource.includes('.project-open{border:0')&&cssSource.includes('text-decoration:none'),'Project open controls must remain underline-free with visible keyboard focus.');
 
-console.log('CineTale v1.9.79 smoke tests passed: strict Story/Short/Movie/Episode integrity, Google account chooser, restored proven project opening, quota-safe navigation, runtime targeting, no-crop media, auth/cloud sync, consent gates, quota-aware video, final assembly, voice filtering, navigation and DOM integrity.');
+console.log('CineTale v1.9.80 smoke tests passed: strict Story/Short/Movie/Episode integrity, Google account chooser, restored proven project opening, quota-safe navigation, runtime targeting, no-crop media, auth/cloud sync, consent gates, quota-aware video, final assembly, voice filtering, navigation and DOM integrity.');
 } finally {
   globalThis.fetch=originalFetch;
   if(originalKey===undefined) delete process.env.GEMINI_API_KEY; else process.env.GEMINI_API_KEY=originalKey;

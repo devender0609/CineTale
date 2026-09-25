@@ -1,5 +1,5 @@
 import {ensureSceneCoverage,coverageTargetCount,coverageSummary} from './lib/production.js';
-const APP_VERSION = '1.9.79';
+const APP_VERSION = '1.9.80';
 const LIP_SYNC_PIPELINE_REV = 'v1.9.67-scene-semantic-signature';
 const $ = s => document.querySelector(s);
 const $$ = s => [...document.querySelectorAll(s)];
@@ -726,7 +726,8 @@ function resetSceneLipSyncForNewSource(scene={},videoUrl=''){
   scene.lipSyncVideoUrl='';scene.lipSyncRemoteVideoUrl='';scene.lipSyncProvider='';scene.lipSyncGenerationId='';scene.lipSyncSourceVideoUrl=videoUrl||scene.videoUrl||'';scene.lipSyncGeneratedAt=null;scene.lipSyncSignature='';scene.lipSyncAudioSignature='';scene.lipSyncAudioDigest='';scene.lipSyncRequestDigest='';scene.lipSyncRecoveredFromSignature='';scene.lipSyncRecoveryCompatibility='';scene.lipSyncRecoveredAt=null;scene.lipSyncOperation=null;scene.lipSyncStatusUrl='';scene.lipSyncResponseUrl='';scene.lipSyncModel='';scene.lipSyncStatus='idle';scene.lipSyncValidated=false;scene.lipSyncRetryCount=0;scene.lipSyncError=null;scene.lipSyncErrorCode='';scene.lipSyncProviderStatus='';scene.lipSyncPlaybackFailedAt=null;scene.lipSyncSubmissionFailedAt=null;scene.lipSyncStartedAt=null;
 }
 function scenePrimaryVideoUrl(scene={},project=null){const p=project||current()||{};return sceneHasValidatedLipSync(p,scene)?scene.lipSyncVideoUrl:(scene.videoUrl||'')}
-function sceneStudioVideoUrl(scene={},project=null){const p=project||current()||{},ep=episodeOf(p),key=`${p.id||''}:${ep?.id||ep?.number||''}:${scene.id||scene.number||''}`,signature=sceneLipSyncSignature(p,scene),source=scene.videoUrl||'',synced=sceneHasValidatedLipSync(p,scene)?scene.lipSyncVideoUrl:'',desired=synced||source;const pin=studioVideoSourcePins.get(key);if(pin&&pin.signature===signature&&pin.source===source&&normalizedMediaUrl(pin.url)===normalizedMediaUrl(desired))return pin.url;if(desired)studioVideoSourcePins.set(key,{signature,source,url:desired});return desired}
+function sceneStudioCandidateUrls(scene={},project=null){const p=project||current()||{},urls=[];if(sceneHasValidatedLipSync(p,scene)&&scene.lipSyncVideoUrl)urls.push(scene.lipSyncVideoUrl);if(scene.videoUrl&&!urls.some(x=>normalizedMediaUrl(x)===normalizedMediaUrl(scene.videoUrl)))urls.push(scene.videoUrl);for(const c of coverageClips(scene)){if(c?.videoUrl&&!urls.some(x=>normalizedMediaUrl(x)===normalizedMediaUrl(c.videoUrl)))urls.push(c.videoUrl)}return urls}
+function sceneStudioVideoUrl(scene={},project=null){const p=project||current()||{},key=studioSceneMediaKey(p,scene),signature=sceneLipSyncSignature(p,scene),source=scene.videoUrl||'',synced=sceneHasValidatedLipSync(p,scene)?scene.lipSyncVideoUrl:'',desired=synced||source;const fallback=studioVideoFallbacks.get(key);if(fallback&&fallback.signature===signature&&fallback.source===source&&sceneStudioCandidateUrls(scene,p).some(x=>normalizedMediaUrl(x)===normalizedMediaUrl(fallback.url)))return fallback.url;const pin=studioVideoSourcePins.get(key);if(pin&&pin.signature===signature&&pin.source===source&&normalizedMediaUrl(pin.url)===normalizedMediaUrl(desired))return pin.url;if(desired)studioVideoSourcePins.set(key,{signature,source,url:desired});return desired}
 function sceneVideoSources(scene={},project=null){const urls=[];const primary=scenePrimaryVideoUrl(scene,project);if(primary)urls.push(primary);for(const c of coverageClips(scene)){if(c?.videoUrl&&!urls.includes(c.videoUrl))urls.push(c.videoUrl)}return urls}
 function coverageUi(scene={}){const summary=coverageSummary(scene,'balanced'),ready=Math.max(0,sceneVideoSources(scene).length);return `<div class="scene-coverage-note"><b>Cinematic coverage</b><span>${summary.planned} shots planned · ${summary.speaking} speaking shot${summary.speaking===1?'':'s'} · ${ready} video shot${ready===1?'':'s'} ready</span></div>`}
 function sceneFinalToggleUi(scene={},index=-1){return `<label class="scene-final-toggle"><input type="checkbox" data-scene-final-include="${index}" ${scene.finalIncluded===false?'':'checked'}><span><b>Include in final</b><small>${scene.finalIncluded===false?'Skipped — no video generation required':'Selected for final production'}</small></span></label>`}
@@ -797,9 +798,8 @@ function fitSceneVideoToSurface(video){
 function sceneListPlaybackLocked(list){return Boolean(list&&[...list.querySelectorAll('video[data-scene-video-preview]')].some(v=>v.dataset.playerSession==='1'&&!v.ended))}
 function sceneMediaStatusText(project,scene,video=null){
   if(!scene?.videoUrl)return 'Not generated';
-  // Never place synchronization/debug wording over the picture. Unsynchronized speaking clips
-  // are visually gated and their state is shown below the media instead.
-  if(sceneHasSpokenContent(scene)&&!sceneHasValidatedLipSync(project||{},scene))return '';
+  if(video?.dataset?.voiceSync==='media-unavailable'||scene.videoPlaybackError)return 'Video needs repair';
+  if(sceneHasSpokenContent(scene)&&!sceneHasValidatedLipSync(project||{},scene))return 'Source preview + approved voice';
   return 'Video ready';
 }
 function sceneSyncStateUi(project={},scene={}){
@@ -930,6 +930,8 @@ async function sceneLipSyncAudioDataUrl(p,s){const assets=await sceneVoiceAssets
 const lipSyncJobsInFlight=new Map();
 const validatedLipSyncUrls=new Set();
 const studioVideoSourcePins=new Map();
+const studioVideoFallbacks=new Map();
+function studioSceneMediaKey(project={},scene={}){const ep=episodeOf(project);return `${project?.id||''}:${ep?.id||ep?.number||''}:${scene?.id||scene?.number||''}`}
 function sceneLipSyncJobKey(p,s){return `${p.id||''}:${s.id||s.number||''}:${sceneLipSyncSignature(p,s)}`}
 const LIP_SYNC_JOB_STALE_MS=15*60*1000;
 function sceneLipSyncJobAgeMs(scene={}){const t=Date.parse(scene.lipSyncStartedAt||'');return Number.isFinite(t)?Math.max(0,Date.now()-t):Infinity}
@@ -1140,10 +1142,10 @@ async function startSceneVideoVoicePlayback(video,p,s,index,{resumeVideo=false}=
     if(syncedSrc&&mountedSrc===syncedSrc){restoreProviderGuideAudio(video,ctl);video.muted=false;video.dataset.voiceSync='provider';video.dataset.lipSyncReady='1';return}
     video.dataset.voiceSync='preparing';
     const ctx=await ensureSceneVideoAudioContext();
-    if(!ctx){restoreProviderGuideAudio(video,ctl);video.muted=false;video.dataset.voiceSync='source-fallback';return}
+    if(!ctx){muteProviderGuideAudio(video,ctl);video.muted=true;video.dataset.voiceSync='approved-unavailable';throw new Error('Approved CineTale dialogue cannot play because the browser audio engine is unavailable.')}
     try{if(ctx.state==='suspended')await ctx.resume()}catch{}
     ctl.track=await prepareSceneApprovedAudio(liveProject,liveScene);if(token!==ctl.token)return;
-    if(!ctl.track?.tracks?.length){video.dataset.voiceSync='none';restoreProviderGuideAudio(video,ctl);video.muted=false;return}
+    if(!ctl.track?.tracks?.length){video.dataset.voiceSync='approved-unavailable';muteProviderGuideAudio(video,ctl);video.muted=true;throw new Error('Approved CineTale dialogue is unavailable for this scene.')}
     if(token!==ctl.token||!ctl.requestedPlay)return;
     muteProviderGuideAudio(video,ctl);
     for(const src of ctl.sources||[]){try{src.stop()}catch{}}ctl.sources=[];
@@ -1160,7 +1162,7 @@ async function startSceneVideoVoicePlayback(video,p,s,index,{resumeVideo=false}=
     if(sceneHasSpokenContent(liveScene)&&liveScene.videoUrl){
       ensureSceneLipSync(liveProject,liveScene,index,{quiet:true}).then(async url=>{if(!url||token!==ctl.token)return;const desiredSrc=normalizedMediaUrl(url);validatedLipSyncUrls.add(desiredSrc);const liveNow=liveSceneAt(index);if(liveNow.project&&liveNow.scene&&sceneHasValidatedLipSync(liveNow.project,liveNow.scene)){video.dataset.lipSyncReadyNextLoad='1';updateSceneMediaStatuses(liveNow.project,episodeOf(liveNow.project));if(video.ended){await adoptSceneLipSyncVideo(video,index,{resumeVideo:false,preserveTime:false});try{video.currentTime=0}catch{}updateSceneMediaStatuses(liveNow.project,episodeOf(liveNow.project))}}}).catch(e=>console.warn('[CineTale lipsync] Background synchronization failed',e));
     }
-  }catch(e){restoreProviderGuideAudio(video,ctl);video.muted=false;console.warn('[CineTale scene audio] Approved-voice playback unavailable; source audio restored',e);video.dataset.voiceSync='source-fallback'}finally{ctl.preparing=false}
+  }catch(e){muteProviderGuideAudio(video,ctl);video.muted=true;console.warn('[CineTale scene audio] Approved-voice playback unavailable; provider/source speech remains suppressed',e);video.dataset.voiceSync='approved-unavailable';if(video.dataset.audioWarningShown!=='1'){video.dataset.audioWarningShown='1';toast('Approved CineTale dialogue could not be prepared for this scene. Source/provider speech remains muted.')}}finally{ctl.preparing=false}
 }
 
 function scheduleStudioSceneAudioWarmup(project,episode){
@@ -1253,14 +1255,13 @@ function bindSceneVideoVoicePlayback(p,ep){
     video.addEventListener('canplay',markSceneMediaLoaded);
     if(video.readyState>=2)markSceneMediaLoaded();
     if(video.dataset.voiceBound==='1')return;video.dataset.voiceBound='1';const index=Number(video.dataset.sceneVideoPreview);const scene=ep?.scenes?.[index];if(!scene)return;
-    if(video.dataset.syncGated==='1'){
-      // The source video remains user-playable for visual inspection, but stays muted until
-      // the approved dialogue-synchronized asset is validated. Never remove its controls:
-      // doing so made unrelated clips appear to vanish after a single-scene regeneration.
+    const syncGated=video.dataset.syncGated==='1';
+    if(syncGated){
+      // Keep provider/source speech permanently muted, but DO NOT make the creator review a silent clip.
+      // The approved CineTale voice is rendered through WebAudio and aligned to this source preview.
       video.muted=true;
-      video.dataset.voiceSync='waiting-for-render';
-      video.addEventListener('volumechange',()=>{if(!video.muted)video.muted=true});
-      return;
+      video.dataset.voiceSync='approved-preview';
+      video.addEventListener('volumechange',()=>{if(video.dataset.syncGated==='1'&&!video.muted)video.muted=true});
     }
     video.addEventListener('play',()=>{
       video.dataset.playerSession='1';
@@ -1279,9 +1280,22 @@ function bindSceneVideoVoicePlayback(p,ep){
     video.addEventListener('pause',()=>{const ctl=sceneVideoAudioControllers.get(video);if(ctl?.adopting)return;stopSceneVideoVoicePlayback(video,{keepIntent:false,restoreProviderAudio:true})});
     video.addEventListener('seeking',()=>{const ctl=sceneVideoAudioControllers.get(video);if(!ctl||ctl.adopting)return;const live=liveSceneAt(index),liveProject=live.project||p,liveScene=live.scene||scene;const desired=sceneHasValidatedLipSync(liveProject,liveScene)?normalizedMediaUrl(liveScene.lipSyncVideoUrl||''):'';if(desired&&normalizedMediaUrl(video.currentSrc||video.getAttribute('src')||'')===desired)return;const shouldResume=!video.paused||ctl.requestedPlay;stopSceneVideoVoicePlayback(video,{keepIntent:shouldResume,restoreProviderAudio:!shouldResume});if(shouldResume){muteProviderGuideAudio(video,ctl);startSceneVideoVoicePlayback(video,liveProject,liveScene,index,{resumeVideo:true}).catch(()=>{})}});
     video.addEventListener('error',()=>{
-      const live=liveSceneAt(index),liveProject=live.project||p,liveScene=live.scene||scene;if(!liveProject||!liveScene?.videoUrl)return;
+      const live=liveSceneAt(index),liveProject=live.project||p,liveScene=live.scene||scene;if(!liveProject||!liveScene)return;
       const failed=normalizedMediaUrl(video.currentSrc||video.getAttribute('src')||''),sync=normalizedMediaUrl(liveScene.lipSyncVideoUrl||''),source=normalizedMediaUrl(liveScene.videoUrl||'');
-      if(sync&&failed===sync&&source&&source!==sync){markSceneLipSyncPlaybackError(liveProject.id,index,'Synchronized video failed to load; original scene restored.');video.src=liveScene.videoUrl;video.load();toast('Synchronized version could not load. The original scene was restored.')}
+      const candidates=sceneStudioCandidateUrls(liveScene,liveProject).filter(url=>normalizedMediaUrl(url)!==failed);
+      if(sync&&failed===sync&&source&&source!==sync)markSceneLipSyncPlaybackError(liveProject.id,index,'Synchronized video failed to load; original scene restored.');
+      if(candidates.length){
+        const next=candidates[0],key=studioSceneMediaKey(liveProject,liveScene);
+        studioVideoFallbacks.set(key,{signature:sceneLipSyncSignature(liveProject,liveScene),source:liveScene.videoUrl||'',url:next,failed});
+        stopSceneVideoVoicePlayback(video,{keepIntent:false,restoreProviderAudio:false});
+        video.muted=sceneHasSpokenContent(liveScene)&&!sceneHasValidatedLipSync(liveProject,liveScene);
+        video.src=next;video.load();
+        toast(failed===sync?'Synchronized version could not load. CineTale restored another saved scene source.':'That saved scene file could not load. CineTale restored another available scene source.');
+        return;
+      }
+      updateProjectById(liveProject.id,x=>{const e=episodeOf(x),t=e?.scenes?.[index];if(t)t.videoPlaybackError='Saved scene video is unavailable in this browser.'},{render:false});
+      video.closest?.('.scene-visual')?.classList.add('media-error');
+      video.dataset.voiceSync='media-unavailable';
     });
     video.addEventListener('ended',async()=>{
       stopSceneVideoVoicePlayback(video,{restoreProviderAudio:true});

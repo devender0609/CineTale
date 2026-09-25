@@ -1,4 +1,4 @@
-# CineTale v1.9.79 — Scene-audio provenance + safe synchronized media
+# CineTale v1.9.80 — Approved-audio review + resilient scene media
 
 This build simplifies the creator-facing final workflow and hardens Firefox/media behavior.
 
@@ -25,7 +25,7 @@ If the bucket is not installed, final rendering still completes and the app keep
 
 Final rendering now treats each validated synchronized speaking clip as an atomic picture+audio unit, does not pad it with silent coverage, detects duplicate source/synchronized media across different scenes (including content fingerprints when accessible), repairs only the later duplicate scene during one-click production, and binds background video polling to the project/episode that started the job. Existing valid synchronized assets keep the same lip-sync semantic revision.
 
-## v1.9.79 scene-audio provenance and safe recovery
+## v1.9.80 scene-audio provenance and safe recovery
 
 - A synchronized scene is no longer trusted merely because its saved MP4 is playable. CineTale now preserves the exact scene semantic signature and a SHA-256 fingerprint of the approved audio submitted for lip-sync.
 - Legacy synchronized assets that an older build marked as “recovered” without proving dialogue compatibility are intentionally blocked from READY and rebuilt only when final production actually needs them. This prevents stale dialogue from being silently attached to the current scene.
@@ -34,3 +34,10 @@ Final rendering now treats each validated synchronized speaking clip as an atomi
 - Provider submission recovery now uses a SHA-256 scene+audio request digest where supported, reducing the chance of a stale/ambiguous provider generation being recovered for another request.
 - The Studio explicitly shows “Dialogue sync must be rebuilt” for unsafe legacy recovered assets instead of displaying a false READY state.
 - v1.9.76 duplicate-media detection, atomic synchronized final assembly, no-repeat final coverage, and account final-video persistence are retained.
+
+## v1.9.80 approved-audio review and resilient scene media
+- Unsynchronized speaking previews stay clickable and use approved CineTale dialogue while raw provider/source audio stays muted.
+- Broken saved primary/sync media can fall back to another saved coverage clip for the same scene.
+- Unavailable media is surfaced as needing repair instead of being presented as healthy.
+- Speaking scenes still require validated lip-sync before final assembly.
+

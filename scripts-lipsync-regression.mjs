@@ -19,7 +19,7 @@ assert.match(app,/oldRawSrc=video\.currentSrc\|\|video\.getAttribute\('src'\)/,'
 assert.match(app,/video\.src=oldRawSrc;video\.load\(\)/,'Failed synchronized handoff does not restore the original clip');
 assert.match(app,/ensureSceneLipSync\(liveProject,liveScene,index,\{quiet:true\}\)/,'Dedicated lip-sync should run in the background after approved audio is scheduled');
 assert.doesNotMatch(app,/video\.pause\(\);startSceneVideoVoicePlayback/,'Scene playback must not blank/pause the working source clip while waiting for lip sync');
-assert.match(app,/Synchronized version could not load\. The original scene was restored\./,'Runtime playback failure needs a visible safe fallback');
+assert.match(app,/Synchronized version could not load\. CineTale restored another saved scene source\./,'Runtime playback failure needs a visible safe fallback');
 assert.match(app,/sceneLipSyncAudioDataUrl/,'Approved audio must be used to create the synchronized speaking asset');
 assert.match(app,/useEmbeddedSyncedAudio:spoken&&synced/,'Final rendering must use the validated synchronized asset as the speaking audio source');
 assert.doesNotMatch(app.slice(app.indexOf('async function prepareFinalSceneAsset'),app.indexOf('async function renderFinalVideoFile')),/sceneCachedVoiceUrls\(/,'Final rendering must not replay detached cached TTS over synchronized media');

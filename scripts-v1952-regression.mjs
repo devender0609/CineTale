@@ -5,9 +5,9 @@ const status=fs.readFileSync(new URL('./api/lipsync-status.js',import.meta.url),
 const video=fs.readFileSync(new URL('./api/lipsync-video.js',import.meta.url),'utf8');
 const job=fs.readFileSync(new URL('./api/lipsync-job.js',import.meta.url),'utf8');
 const html=fs.readFileSync(new URL('./index.html',import.meta.url),'utf8');
-assert.ok(app.includes("const APP_VERSION = '1.9.79'"),'version advanced');
+assert.ok(app.includes("const APP_VERSION = '1.9.80'"),'version advanced');
 assert.ok(app.includes("v1.9.67-scene-semantic-signature"),'pipeline revision advanced');
-assert.ok(html.includes('/app.js?v=1.9.79')&&html.includes('/styles.css?v=1.9.79'),'cache busting advanced');
+assert.ok(html.includes('/app.js?v=1.9.80')&&html.includes('/styles.css?v=1.9.80'),'cache busting advanced');
 assert.ok(status.includes('?wait=true&timeout=10'),'Sync Labs status uses bounded long-polling');
 assert.ok(status.includes('/api/lipsync-video?provider=sync-labs&id='),'completed Sync generations return canonical generation-backed playback URL');
 assert.ok(status.includes('sync_output_matches_source'),'server rejects source URL masquerading as synchronized output');

@@ -1,7 +1,7 @@
 import fs from 'node:fs';import assert from 'node:assert/strict';
 const app=fs.readFileSync('app.js','utf8'),html=fs.readFileSync('index.html','utf8'),plan=fs.readFileSync('api/generate-plan.js','utf8');
-assert.ok(app.includes("const APP_VERSION = '1.9.79'"));
-assert.ok(html.includes('/app.js?v=1.9.79')&&html.includes('/styles.css?v=1.9.79'));
+assert.ok(app.includes("const APP_VERSION = '1.9.80'"));
+assert.ok(html.includes('/app.js?v=1.9.80')&&html.includes('/styles.css?v=1.9.80'));
 assert.ok(app.includes('previewSequenceLocks.add(previewKey)'));
 assert.ok(app.includes('if(previewSequenceLocks.has(previewSequenceKey(project,episode)))return;'));
 assert.ok(app.includes('previewSequenceLocks.delete(previewKey);closeModal()'));

@@ -1,4 +1,4 @@
-# CineTale v1.9.79 — Media Controls Interactivity Release Gate
+# CineTale v1.9.80 — Media Controls Interactivity Release Gate
 
 ## Release-blocking defect reproduced
 v1.9.78 rendered native `<video controls>` for unsynchronized speaking-source previews while CSS still set `pointer-events:none` on the same `video[data-sync-gated="1"]` elements. The controls therefore looked present but could not receive mouse/pointer interaction. This directly matches the user report that every scene video appeared non-clickable.
@@ -9,7 +9,7 @@ v1.9.78 rendered native `<video controls>` for unsynchronized speaking-source pr
 - Provider/source audio remains hard-muted while dialogue sync is untrusted, including a volume-change guard that immediately re-mutes the preview.
 - Validated synchronized clips continue to use their normal audible native controls.
 - No scene-video code removes the `controls` attribute.
-- Current runtime/package/cache-busting version advanced to 1.9.79 so browsers do not retain the broken v1.9.78 CSS.
+- Current runtime/package/cache-busting version advanced to 1.9.80 so browsers do not retain the broken v1.9.78 CSS.
 
 ## New regression coverage
 `scripts-v1979-media-control-interactivity.mjs` verifies the complete contract rather than checking markup alone:

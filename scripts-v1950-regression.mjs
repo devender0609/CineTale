@@ -7,8 +7,8 @@ if(!app.includes('function prepareSceneApprovedAudio')) fail('approved-audio pre
 const playBlock=app.slice(app.indexOf("video.addEventListener('play'"), app.indexOf("video.addEventListener('pause'"));
 if(/video\.pause\(\)/.test(playBlock)) fail('play handler still cancels native user play gesture'); else pass('play handler never pauses native user play gesture');
 if(!playBlock.includes('startSceneVideoVoicePlayback')) fail('play handler no longer starts approved audio'); else pass('play handler starts approved audio');
-if(!app.includes("video.dataset.voiceSync='source-fallback'")) fail('source-audio failure fallback missing'); else pass('source-audio failure fallback present');
-if(!app.includes("video.muted=false;console.warn('[CineTale scene audio] Approved-voice playback unavailable; source audio restored'")) fail('audio failure does not restore audible source'); else pass('audio failure restores audible source');
+if(!app.includes("video.dataset.voiceSync='approved-unavailable'")) fail('approved-audio unavailable state missing'); else pass('approved-audio unavailable state present');
+if(!app.includes("provider/source speech remains suppressed")||!app.includes('video.muted=true')) fail('audio failure can expose provider/source speech'); else pass('audio failure keeps provider/source speech muted');
 if(!app.includes("video.dataset.voiceSyncRewound!=='1'")) fail('late approved-audio rewind guard missing'); else pass('late approved-audio rewind guard present');
 if(!app.includes('scheduleStudioSceneAudioWarmup(p,ep);scheduleStudioLipSyncWarmup(p,ep)')) fail('audio warmup is not prioritized before lip-sync warmup'); else pass('audio warmup prioritized before lip-sync warmup');
 if(process.exitCode) process.exit(process.exitCode);
