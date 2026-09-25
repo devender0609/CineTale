@@ -6,20 +6,18 @@ function languageCode(value=''){
 }
 function performanceTags(direction='',kind='dialogue'){
   const d=String(direction||'').toLowerCase();
-  const tags=[];
-  const add=t=>{if(!tags.includes(t)&&tags.length<2)tags.push(t)};
-  if(/whisper/.test(d))add('whispers');
-  else if(/quiet|soft|hushed|gentle/.test(d))add('softly');
-  if(/nervous|anxious|uneasy|afraid|fear|fright/.test(d))add('nervous');
-  else if(/curious|wonder|question/.test(d))add('curious');
-  else if(/sad|grief|somber|sombre|melanchol/.test(d))add('sad');
-  else if(/excited|delighted|joy|happy/.test(d))add('excited');
-  else if(/urgent|panic|rushed|breathless/.test(d))add('urgent');
-  else if(/reflective|nostalg|memory|wistful/.test(d))add('reflective');
-  else if(/tense|suspense|wary/.test(d))add('tense');
-  else if(/warm|comfort|reassur/.test(d))add('warmly');
-  if(!tags.length) add(kind==='narration'?'natural storyteller':'conversational');
-  return tags;
+  // Eleven v3 audio tags are powerful, so use at most ONE only when the creator/story
+  // direction clearly asks for it. Generic 'natural/conversational' delivery should remain
+  // untagged; repeatedly injecting tags can make adjacent lines sound over-directed.
+  if(/whisper/.test(d))return ['whispers'];
+  if(/urgent|panic|rushed|breathless/.test(d))return ['urgent'];
+  if(/nervous|anxious|uneasy|afraid|fear|fright/.test(d))return ['nervous'];
+  if(/sad|grief|somber|sombre|melanchol/.test(d))return ['sad'];
+  if(/excited|delighted|joy|happy/.test(d))return ['excited'];
+  if(/reflective|nostalg|memory|wistful/.test(d))return ['reflective'];
+  if(/tense|suspense|wary/.test(d))return ['tense'];
+  if(/quiet|soft|hushed|gentle/.test(d))return ['softly'];
+  return [];
 }
 function expressiveText(text,direction,kind){const tags=performanceTags(direction,kind).map(t=>`[${t}]`).join(' ');return `${tags} ${text}`.trim()}
 function speedFor(direction='',kind='dialogue'){

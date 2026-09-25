@@ -7,12 +7,12 @@ assert.match(app,/video\.muted=true/,'Scene preview does not mute provider guide
 assert.doesNotMatch(app,/Preparing approved voice|Approved voice · source speech muted|Approved voice plays with scene/,'Voice preparation text must never overlay scene video');
 assert.match(app,/sceneLipSyncAudioDataUrl/,'Approved voice audio is not used to create synchronized scene media');
 assert.match(app,/useEmbeddedSyncedAudio:spoken&&synced/,'Final render does not use validated synchronized media as the authoritative speech track');
-assert.match(app,/videos\[i\]\.muted=!\(useEmbeddedSyncedAudio&&i===0\)/,'Final renderer may mute the synchronized primary before WebAudio capture');
-assert.match(app,/videoGains\[i\]\.gain\.value=useEmbeddedSyncedAudio&&i===0&&clipIndex===0\?1:0/,'Final render must admit synchronized audio only on the first primary pass');
+assert.match(app,/const allowAudio=Boolean\(useEmbeddedSyncedAudio&&item\.entry\?\.synchronized\)/,'Final renderer must identify the validated synchronized timeline entry');
+assert.match(app,/videoGains\[i\]\.gain\.value=\(useEmbeddedSyncedAudio&&videos\[i\]\?\.entry\?\.synchronized&&i===clipIndex\)\?1:0/,'Final render must admit audio only from the synchronized timeline entry while it is active');
 assert.match(app,/function sceneVoiceLeadInSec\(\)\{return 0\}/,'Scene voice playback should not add an artificial pre-speech delay');
 assert.match(app,/function audioLeadingSilenceSec\(/,'Leading-silence trimming helper missing');
 assert.match(app,/t\.trim\|\|0/,'Preview voice playback does not account for trimmed leading silence');
-assert.match(app,/prepareSceneApprovedAudio\(liveProject,liveScene\)/,'Preview voice track does not use the prepared approved-audio path');
+assert.match(app,/prepareSceneApprovedAudio\(liveProject,liveScene\)/,'Approved-audio preparation path is missing for Listen/lip-sync workflows');
 assert.doesNotMatch(app.slice(app.indexOf('async function prepareFinalSceneAsset'),app.indexOf('async function renderFinalVideoFile')),/voiceEls/,'Final render must not maintain a detached voice timeline that can drift from synchronized picture');
 assert.match(videoApi,/temporary facial-performance guide/,'Speaking-shot prompt does not mark provider speech as a temporary guide');
 assert.match(videoApi,/CineTale will mute this guide speech/,'Video prompt does not establish authoritative creator voice');

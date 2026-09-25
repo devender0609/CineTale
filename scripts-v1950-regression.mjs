@@ -6,7 +6,7 @@ if(!app.includes('function scheduleStudioSceneAudioWarmup')) fail('approved-audi
 if(!app.includes('function prepareSceneApprovedAudio')) fail('approved-audio preparation cache missing'); else pass('approved-audio preparation cache present');
 const playBlock=app.slice(app.indexOf("video.addEventListener('play'"), app.indexOf("video.addEventListener('pause'"));
 if(/video\.pause\(\)/.test(playBlock)) fail('play handler still cancels native user play gesture'); else pass('play handler never pauses native user play gesture');
-if(!playBlock.includes('startSceneVideoVoicePlayback')) fail('play handler no longer starts approved audio'); else pass('play handler starts approved audio');
+if(playBlock.includes('startSceneVideoVoicePlayback')) fail('play handler still starts detached approved audio over source video'); else pass('play handler keeps unsynchronized video visual-only');
 if(!app.includes("video.dataset.voiceSync='approved-unavailable'")) fail('approved-audio unavailable state missing'); else pass('approved-audio unavailable state present');
 if(!app.includes("provider/source speech remains suppressed")||!app.includes('video.muted=true')) fail('audio failure can expose provider/source speech'); else pass('audio failure keeps provider/source speech muted');
 if(!app.includes("video.dataset.voiceSyncRewound!=='1'")) fail('late approved-audio rewind guard missing'); else pass('late approved-audio rewind guard present');

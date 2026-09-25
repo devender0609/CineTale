@@ -50,6 +50,6 @@ assert.ok(app.includes('cinetale-scene-audio-v1')&&app.includes('indexedDB.open(
 assert.ok(app.includes('sceneVoiceAssets(p,s)')&&app.includes('sceneLipSyncAudioDataUrl'),'Approved scene voices are not feeding the synchronized-media pipeline');
 assert.ok(app.includes('pipelineVersion:10'),'Final render pipeline version was not advanced for synchronized no-repeat rendering');
 assert.ok(app.includes('muteProviderGuideAudio')&&app.includes('restoreProviderGuideAudio'),'Provider guide-speech isolation missing from scene playback');
-assert.ok(app.includes('videos[i].muted=!(useEmbeddedSyncedAudio&&i===0)')&&app.includes('useEmbeddedSyncedAudio&&i===0&&clipIndex===0?1:0')&&!app.includes('clipIndex%videos.length'),'Final render must use the synchronized primary audio exactly once and never loop generated clips');
+assert.ok(app.includes('const allowAudio=Boolean(useEmbeddedSyncedAudio&&item.entry?.synchronized)')&&app.includes('videos[i]?.entry?.synchronized&&i===clipIndex')&&!app.includes('clipIndex%videos.length'),'Final render must route audio only from the validated synchronized timeline entry and never loop generated clips');
 
 console.log(`CineTale deep QA passed: ${ids.length} static IDs, ${dollarRefs.length} DOM refs, ${apiRefs.length} API routes, ${localRefs.length} local assets, ${files.length} files checked.`);

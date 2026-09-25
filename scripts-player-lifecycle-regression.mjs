@@ -12,14 +12,14 @@ const checks=[
   ['active player session prevents scene DOM replacement', /if\(sceneListPlaybackLocked\(sceneList\)\)\{sceneList\.__cinetaleDeferredRender=true/],
   ['player session lock begins on play', /video\.dataset\.playerSession='1'/],
   ['pause never adopts a new source', /video\.addEventListener\('pause',[^\n]*stopSceneVideoVoicePlayback/],
-  ['ended may adopt only a validated synced asset', /video\.addEventListener\('ended',async\(\)=>[\s\S]*sceneHasValidatedLipSync[\s\S]*adoptSceneLipSyncVideo/],
-  ['background completion adopts only when playback is already ended', /ensureSceneLipSync\(liveProject,liveScene,index,\{quiet:true\}\)\.then[\s\S]{0,1200}if\(video\.ended\)\{await adoptSceneLipSyncVideo/],
+  ['ended never hot-swaps a new source', /video\.addEventListener\('ended',\(\)=>[\s\S]{0,500}Playback completion must be visually inert/],
+  ['background sync does not require a Studio remount', /scheduleStudioLipSyncWarmup[\s\S]*updateSceneMediaStatuses/],
   ['adoption function itself rejects active playback', /if\(!video\.paused&&!video\.ended\)\{video\.dataset\.lipSyncPendingAdoption='1';return false\}/],
   ['failed synchronized playback restores source', /Synchronized video failed to load; original scene restored/],
-  ['deferred scene render runs after ended', /__cinetaleDeferredRender[\s\S]*queueMicrotask\(\(\)=>renderStudio\(\)\)/]
+  ['ended does not remount Studio', !/video\.addEventListener\('ended',[\s\S]{0,900}renderStudio\(\)/.test(app)]
 ];
 let failed=0;
-for(const [name,re] of checks){const ok=re.test(app);console.log(`${ok?'PASS':'FAIL'} ${name}`);if(!ok)failed++}
+for(const [name,rule] of checks){const ok=typeof rule==='boolean'?rule:rule.test(app);console.log(`${ok?'PASS':'FAIL'} ${name}`);if(!ok)failed++}
 if(/video\.addEventListener\('play',[\s\S]{0,1400}adoptSceneLipSyncVideo/.test(app)){console.log('FAIL play handler may hot-swap source');failed++}
 if(/video\.addEventListener\('pause',[^\n]*adoptSceneLipSyncVideo/.test(app)){console.log('FAIL pause handler may hot-swap source');failed++}
 if(failed)process.exit(1);

@@ -1,9 +1,9 @@
 {
   "name": "cinetale-studio",
-  "version": "1.9.80",
+  "version": "1.9.81",
   "private": true,
   "type": "module",
-  "description": "CineTale Studio - scene-bound approved audio review, resilient source-video fallback, validated lip-sync provenance, atomic final assembly, and cloud final persistence",
+  "description": "CineTale Studio - timed shot planning, clean scene playback, validated lip-sync provenance, stable scene media, atomic final assembly, and cloud final persistence",
   "scripts": {
     "dev": "npx vercel dev",
     "check": "node scripts-check.mjs",
@@ -38,7 +38,8 @@
     "qa:v1975": "node scripts-v1975-final-sync-integrity.mjs",
     "qa:v1977": "node scripts-v1977-audio-provenance-regression.mjs",
     "qa:v1979": "node scripts-v1979-media-control-interactivity.mjs",
-    "qa:v1980": "node scripts-v1980-media-state-regression.mjs"
+    "qa:v1980": "node scripts-v1980-media-state-regression.mjs",
+    "qa:v1981": "node scripts-v1981-professional-timeline-regression.mjs"
   },
   "engines": {
     "node": ">=20"

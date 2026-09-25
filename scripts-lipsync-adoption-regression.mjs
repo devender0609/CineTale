@@ -9,9 +9,9 @@ const checks=[
   [src.includes('Lip-sync result could not be validated as a distinct playable synchronized asset'),'invalid provider result is rejected'],
   [src.includes("sceneListPlaybackLocked(sceneList)"),'scene DOM replacement is deferred during player session'],
   [src.includes("video.dataset.playerSession='1'"),'player session lock begins on play'],
-  [src.includes("video.addEventListener('ended',async()=>"),'sync adoption occurs only after playback ends'],
-  [src.includes("await adoptSceneLipSyncVideo(video,index,{resumeVideo:false,preserveTime:false})"),'ended playback adopts verified sync asset'],
-  [src.includes("return 'Video ready';")&&!src.includes('Source video · lip-sync unavailable'),'provider lip-sync diagnostics are removed from the video overlay'],
+  [src.includes("video.addEventListener('ended',()=>"),'playback completion handler is stable and synchronous'],
+  [!src.slice(src.indexOf("video.addEventListener('ended',()=>"),src.indexOf('function playAudioUrl')).includes('adoptSceneLipSyncVideo'),'ended playback never hot-swaps the media source'],
+  [src.includes("if(scene?.videoUrl)return '';")&&!src.includes('Source preview + approved voice'),'technical media state is removed from the video overlay'],
   [status.includes("provider:'sync-labs'")&&status.includes('remoteVideoUrl:remote'),'status API preserves Sync Labs provenance'],
   [status.includes("host==='assets.sync.so'")&&status.includes("host==='fal.media'||host.endsWith('.fal.media')"),'status API only proxies supported synchronized-media hosts']
 ];

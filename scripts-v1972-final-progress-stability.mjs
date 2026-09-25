@@ -8,4 +8,4 @@ assert.ok(app.includes('state.finalRenderRunning=false'),'final render lock not 
 assert.ok(app.includes('if(!state.finalRenderRunning){')&&app.includes('state.finalRenderProjectId=p.id'),'final assembly can overwrite live render progress');
 assert.ok(!css.includes('.final-render-progress{position:sticky;bottom:8px'),'final progress must not be sticky');
 assert.ok(css.includes('.final-render-progress{position:relative;z-index:1;min-height:42px'),'stable progress layout missing');
-console.log('v1.9.80 final progress stability regression PASS');
+console.log('v1.9.81 final progress stability regression PASS');

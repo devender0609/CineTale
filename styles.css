@@ -1149,7 +1149,7 @@ button,select,input,textarea{max-width:100%}
 }
 
 
-/* v1.9.80 — synchronized-render gate.
+/* v1.9.81 — synchronized-render gate.
    Raw speaking source video remains a MUTED visual preview until approved dialogue sync is valid.
    Native controls must remain interactive: do not disable pointer events on a video that advertises
    controls. Audio is hard-muted by bindSceneVideoAudioHandlers, so provider guide speech stays isolated. */
@@ -1181,7 +1181,7 @@ button,select,input,textarea{max-width:100%}
 .scene-visual video{will-change:auto}
 @media(max-width:620px){.final-output-actions{display:grid;grid-template-columns:1fr 1fr}.final-output-actions button{width:100%;min-width:0}.final-video-placeholder{min-height:180px}}
 
-/* v1.9.80 — reviewable source media without provider speech.
+/* v1.9.81 — reviewable source media without provider speech.
    Unsynchronized speaking scenes stay visually playable while approved CineTale dialogue
    is rendered separately. Broken primary URLs can fail over to another saved coverage clip. */
 .scene-visual video[data-sync-gated="1"]{pointer-events:auto;cursor:pointer}

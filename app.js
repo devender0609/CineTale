@@ -1,5 +1,5 @@
 import {ensureSceneCoverage,coverageTargetCount,coverageSummary} from './lib/production.js';
-const APP_VERSION = '1.9.80';
+const APP_VERSION = '1.9.81';
 const LIP_SYNC_PIPELINE_REV = 'v1.9.67-scene-semantic-signature';
 const $ = s => document.querySelector(s);
 const $$ = s => [...document.querySelectorAll(s)];
@@ -729,6 +729,13 @@ function scenePrimaryVideoUrl(scene={},project=null){const p=project||current()|
 function sceneStudioCandidateUrls(scene={},project=null){const p=project||current()||{},urls=[];if(sceneHasValidatedLipSync(p,scene)&&scene.lipSyncVideoUrl)urls.push(scene.lipSyncVideoUrl);if(scene.videoUrl&&!urls.some(x=>normalizedMediaUrl(x)===normalizedMediaUrl(scene.videoUrl)))urls.push(scene.videoUrl);for(const c of coverageClips(scene)){if(c?.videoUrl&&!urls.some(x=>normalizedMediaUrl(x)===normalizedMediaUrl(c.videoUrl)))urls.push(c.videoUrl)}return urls}
 function sceneStudioVideoUrl(scene={},project=null){const p=project||current()||{},key=studioSceneMediaKey(p,scene),signature=sceneLipSyncSignature(p,scene),source=scene.videoUrl||'',synced=sceneHasValidatedLipSync(p,scene)?scene.lipSyncVideoUrl:'',desired=synced||source;const fallback=studioVideoFallbacks.get(key);if(fallback&&fallback.signature===signature&&fallback.source===source&&sceneStudioCandidateUrls(scene,p).some(x=>normalizedMediaUrl(x)===normalizedMediaUrl(fallback.url)))return fallback.url;const pin=studioVideoSourcePins.get(key);if(pin&&pin.signature===signature&&pin.source===source&&normalizedMediaUrl(pin.url)===normalizedMediaUrl(desired))return pin.url;if(desired)studioVideoSourcePins.set(key,{signature,source,url:desired});return desired}
 function sceneVideoSources(scene={},project=null){const urls=[];const primary=scenePrimaryVideoUrl(scene,project);if(primary)urls.push(primary);for(const c of coverageClips(scene)){if(c?.videoUrl&&!urls.includes(c.videoUrl))urls.push(c.videoUrl)}return urls}
+function sceneFinalVideoEntries(scene={},project=null){
+  const p=project||current()||{},plan=sceneCoveragePlan(scene,'balanced'),byId=new Map(plan.map(shot=>[String(shot?.id||''),shot])),entries=[];
+  const primaryUrl=scenePrimaryVideoUrl(scene,p),primaryId=String(scene.videoPrimaryShotId||primaryCoverageShot(scene,'balanced')?.id||'');
+  if(primaryUrl){const shot=byId.get(primaryId)||plan[0]||null;entries.push({url:primaryUrl,shotId:primaryId||shot?.id||'primary',order:Number(shot?.order)||1,startSec:Number(shot?.startSec)||0,endSec:Number(shot?.endSec)||0,plannedDurationSec:Number(shot?.durationSec)||Number(scene.videoDurationSec)||0,speaking:Boolean(shot?.speaking||scene.videoPrimarySpeaking),synchronized:sceneHasValidatedLipSync(p,scene)});}
+  for(const c of coverageClips(scene)){if(!c?.videoUrl)continue;const shot=byId.get(String(c.shotId||''))||null;entries.push({url:c.videoUrl,shotId:String(c.shotId||''),order:Number(shot?.order||c.order)||999,startSec:Number(shot?.startSec)||0,endSec:Number(shot?.endSec)||0,plannedDurationSec:Number(shot?.durationSec)||Number(c.durationSec)||0,speaking:Boolean(shot?.speaking||c.speaking),synchronized:false});}
+  const seen=new Set();return entries.filter(entry=>{const key=normalizedMediaUrl(entry.url);if(!key||seen.has(key))return false;seen.add(key);return true}).sort((a,b)=>(a.startSec-b.startSec)||(a.order-b.order));
+}
 function coverageUi(scene={}){const summary=coverageSummary(scene,'balanced'),ready=Math.max(0,sceneVideoSources(scene).length);return `<div class="scene-coverage-note"><b>Cinematic coverage</b><span>${summary.planned} shots planned · ${summary.speaking} speaking shot${summary.speaking===1?'':'s'} · ${ready} video shot${ready===1?'':'s'} ready</span></div>`}
 function sceneFinalToggleUi(scene={},index=-1){return `<label class="scene-final-toggle"><input type="checkbox" data-scene-final-include="${index}" ${scene.finalIncluded===false?'':'checked'}><span><b>Include in final</b><small>${scene.finalIncluded===false?'Skipped — no video generation required':'Selected for final production'}</small></span></label>`}
 function mediaAspectClass(project={}){return String(project.format||'Episode')==='Short'?'media-portrait':'media-landscape'}
@@ -754,8 +761,11 @@ function speakingVideoMeta(shot=null){
     videoPrimaryShotId:shot.id||null,
     videoPrimarySpeaking:Boolean(shot.speaking),
     videoPrimarySpeaker:shot.speaker||'',
-    videoPrimarySpokenLine:shot.spokenLine||''
-  }:{videoPrimaryShotId:null,videoPrimarySpeaking:false,videoPrimarySpeaker:'',videoPrimarySpokenLine:''};
+    videoPrimarySpokenLine:shot.spokenLine||'',
+    videoPrimaryStartSec:Number(shot.startSec)||0,
+    videoPrimaryEndSec:Number(shot.endSec)||0,
+    videoPrimaryPlannedDurationSec:Number(shot.durationSec)||0
+  }:{videoPrimaryShotId:null,videoPrimarySpeaking:false,videoPrimarySpeaker:'',videoPrimarySpokenLine:'',videoPrimaryStartSec:0,videoPrimaryEndSec:0,videoPrimaryPlannedDurationSec:0};
 }
 
 const confirmedVideoOperations=new Set();
@@ -797,10 +807,10 @@ function fitSceneVideoToSurface(video){
 }
 function sceneListPlaybackLocked(list){return Boolean(list&&[...list.querySelectorAll('video[data-scene-video-preview]')].some(v=>v.dataset.playerSession==='1'&&!v.ended))}
 function sceneMediaStatusText(project,scene,video=null){
-  if(!scene?.videoUrl)return 'Not generated';
-  if(video?.dataset?.voiceSync==='media-unavailable'||scene.videoPlaybackError)return 'Video needs repair';
-  if(sceneHasSpokenContent(scene)&&!sceneHasValidatedLipSync(project||{},scene))return 'Source preview + approved voice';
-  return 'Video ready';
+  // Keep playable video surfaces visually clean. Technical/sync state belongs below the player
+  // or in owner diagnostics, never as a badge floating over the movie frame.
+  if(scene?.videoUrl)return '';
+  return 'Not generated';
 }
 function sceneSyncStateUi(project={},scene={}){
   if(!scene?.videoUrl||!sceneHasSpokenContent(scene)||sceneHasValidatedLipSync(project,scene))return '';
@@ -829,7 +839,7 @@ function renderStudio(){const p=current();
   $('#canonList').innerHTML=(p.worldBible?.canon||[]).map(x=>`<div class="canon-chip">${esc(x)}</div>`).join('')||`<div class="canon-chip">${episodic?'Canon will build as the series grows.':'Project continuity notes will appear here.'}</div>`;
   renderStoryReview(p,ep);
   const sceneList=$('#sceneList');
-  const sceneMarkup=scenes.map((s,i)=>{const art=visualSrc(s);return `<article class="scene-card surface"><div class="scene-media-column"><div class="scene-visual ${mediaAspectClass(p)}">${videoOperationConfirmed(s)?(art?`<img src="${art}" alt="${esc(s.title)}">`:`<div class="scene-placeholder scene-video-rendering"><b>Rendering…</b><span>CineTale is creating the replacement clip.</span></div>`):videoOperationRecovering(s)?(s.videoUrl?sceneVideoMarkup(s,art,s.title||`Scene ${i+1}`,i,p):(art?`<img src="${art}" alt="${esc(s.title)}">`:`<div class="scene-placeholder scene-video-rendering"><b>Checking saved render…</b><span>CineTale is verifying whether the previous video job is still active.</span></div>`)):s.videoUrl?sceneVideoMarkup(s,art,s.title||`Scene ${i+1}`,i,p):art?`<img src="${art}" alt="${esc(s.title)}">`:`<div class="scene-placeholder"><b>${String(s.number||i+1).padStart(2,'0')}</b><span>Storyboard pending</span></div>`}<div class="asset-tag" data-scene-media-status="${i}">${videoOperationConfirmed(s)?(s.videoUrl?'Rendering replacement':'Rendering video'):videoOperationRecovering(s)?'Checking saved render':s.videoUrl?(sceneHasSpokenContent(s)&&!sceneHasValidatedLipSync(p,s)?'':'Video ready'):art?(s._visualPersisting?'Saving safely…':(s.imageMode==='ai'?'Generated art':'Preview art')):'Not generated'}</div></div><div class="scene-media-support">${sceneSyncStateUi(p,s)}${coverageUi(s)}${sceneFinalToggleUi(s,i)}</div></div><div class="scene-copy"><div class="scene-kicker">${p.format==='Movie'&&s.act?`${esc(s.act)} · `:''}SCENE ${String(s.number||i+1).padStart(2,'0')} · ${Number(s.durationSec)||0}s story beat</div><h3>${esc(s.title)}</h3><p>${esc(s.visual||s.purpose||'')}</p><div class="dialogue scene-dialogue-box"><span>${esc(dialogueList(s.dialogue)[0]||dialogueText(s.narration)||'')}</span><button class="dialogue-edit-btn" data-scene-edit="${i}" type="button">Edit performance</button></div><button class="scene-voice-chip" data-scene-voice="${i}" type="button"><span class="scene-voice-icon">🎙</span><span class="scene-voice-copy"><small>Character voice</small><b>${esc(sceneVoiceSummary(p,s))}</b></span><span class="scene-voice-edit">Edit</span></button><div class="scene-meta"><span>🎵 ${esc(s.music||'Open music direction')}</span><span>🔊 ${esc(s.sfx||'Open SFX direction')}</span><span>🎥 ${esc(s.camera||'Open camera direction')}</span></div></div><div class="scene-actions"><div class="scene-action-buttons"><button class="primary small" data-scene-art="${i}" ${(productionLocked||visualGenerationBlocked())?`disabled title="${productionLocked?'Approve the story first':esc(visualBlockedMessage())}"`:''}>${visualGenerationBlocked()?'Visuals paused':hasVisual(s)?'Regenerate art':'Generate art'}</button><button class="ghost" data-scene-listen="${i}" ${productionLocked?'disabled title="Approve the story first"':''}>▶ Listen</button><button class="ghost" data-scene-video="${i}" ${videoButtonDisabled(s,productionLocked)?`disabled title="${productionLocked?'Approve the story first':'Google video generation is temporarily limited. Try again shortly.'}"`:''}>${videoButtonLabel(s)}</button></div><div class="scene-production-controls"><label class="scene-quality-control" title="${esc(tierHint(s.tier))}"><span>Video quality</span><select data-scene-tier="${i}"><option value="draft" ${normalizedTier(s.tier)==='draft'?'selected':''}>Draft preview</option><option value="standard" ${normalizedTier(s.tier)==='standard'?'selected':''}>Standard</option><option value="premium" ${normalizedTier(s.tier)==='premium'?'selected':''}>Premium / Cinematic</option></select></label><label class="scene-quality-control" title="Controls camera composition for video generation. Safe framing is recommended for normal scenes."><span>Framing</span><select data-scene-framing="${i}"><option value="safe" ${normalizedFraming(s.framing)==='safe'?'selected':''}>Safe framing</option><option value="auto" ${normalizedFraming(s.framing)==='auto'?'selected':''}>Auto</option><option value="medium" ${normalizedFraming(s.framing)==='medium'?'selected':''}>Medium shot</option><option value="close" ${normalizedFraming(s.framing)==='close'?'selected':''}>Close-up</option><option value="wide" ${normalizedFraming(s.framing)==='wide'?'selected':''}>Wide shot</option></select></label></div></div></article>`}).join('');
+  const sceneMarkup=scenes.map((s,i)=>{const art=visualSrc(s);return `<article class="scene-card surface" data-scene-card-index="${i}"><div class="scene-media-column"><div class="scene-visual ${mediaAspectClass(p)}">${videoOperationConfirmed(s)?(art?`<img src="${art}" alt="${esc(s.title)}">`:`<div class="scene-placeholder scene-video-rendering"><b>Rendering…</b><span>CineTale is creating the replacement clip.</span></div>`):videoOperationRecovering(s)?(s.videoUrl?sceneVideoMarkup(s,art,s.title||`Scene ${i+1}`,i,p):(art?`<img src="${art}" alt="${esc(s.title)}">`:`<div class="scene-placeholder scene-video-rendering"><b>Checking saved render…</b><span>CineTale is verifying whether the previous video job is still active.</span></div>`)):s.videoUrl?sceneVideoMarkup(s,art,s.title||`Scene ${i+1}`,i,p):art?`<img src="${art}" alt="${esc(s.title)}">`:`<div class="scene-placeholder"><b>${String(s.number||i+1).padStart(2,'0')}</b><span>Storyboard pending</span></div>`}<div class="asset-tag ${s.videoUrl?'hidden':''}" data-scene-media-status="${i}">${s.videoUrl?'':videoOperationConfirmed(s)?'Rendering video':videoOperationRecovering(s)?'Checking saved render':art?(s._visualPersisting?'Saving safely…':(s.imageMode==='ai'?'Generated art':'Preview art')):'Not generated'}</div></div><div class="scene-media-support">${sceneSyncStateUi(p,s)}${coverageUi(s)}${sceneFinalToggleUi(s,i)}</div></div><div class="scene-copy"><div class="scene-kicker">${p.format==='Movie'&&s.act?`${esc(s.act)} · `:''}SCENE ${String(s.number||i+1).padStart(2,'0')} · ${Number(s.durationSec)||0}s story beat</div><h3>${esc(s.title)}</h3><p>${esc(s.visual||s.purpose||'')}</p><div class="dialogue scene-dialogue-box"><span>${esc(dialogueList(s.dialogue)[0]||dialogueText(s.narration)||'')}</span><button class="dialogue-edit-btn" data-scene-edit="${i}" type="button">Edit performance</button></div><button class="scene-voice-chip" data-scene-voice="${i}" type="button"><span class="scene-voice-icon">🎙</span><span class="scene-voice-copy"><small>Character voice</small><b>${esc(sceneVoiceSummary(p,s))}</b></span><span class="scene-voice-edit">Edit</span></button><div class="scene-meta"><span>🎵 ${esc(s.music||'Open music direction')}</span><span>🔊 ${esc(s.sfx||'Open SFX direction')}</span><span>🎥 ${esc(s.camera||'Open camera direction')}</span></div></div><div class="scene-actions"><div class="scene-action-buttons"><button class="primary small" data-scene-art="${i}" ${(productionLocked||visualGenerationBlocked())?`disabled title="${productionLocked?'Approve the story first':esc(visualBlockedMessage())}"`:''}>${visualGenerationBlocked()?'Visuals paused':hasVisual(s)?'Regenerate art':'Generate art'}</button><button class="ghost" data-scene-listen="${i}" ${productionLocked?'disabled title="Approve the story first"':''}>▶ Listen</button><button class="ghost" data-scene-video="${i}" ${videoButtonDisabled(s,productionLocked)?`disabled title="${productionLocked?'Approve the story first':'Google video generation is temporarily limited. Try again shortly.'}"`:''}>${videoButtonLabel(s)}</button></div><div class="scene-production-controls"><label class="scene-quality-control" title="${esc(tierHint(s.tier))}"><span>Video quality</span><select data-scene-tier="${i}"><option value="draft" ${normalizedTier(s.tier)==='draft'?'selected':''}>Draft preview</option><option value="standard" ${normalizedTier(s.tier)==='standard'?'selected':''}>Standard</option><option value="premium" ${normalizedTier(s.tier)==='premium'?'selected':''}>Premium / Cinematic</option></select></label><label class="scene-quality-control" title="Controls camera composition for video generation. Safe framing is recommended for normal scenes."><span>Framing</span><select data-scene-framing="${i}"><option value="safe" ${normalizedFraming(s.framing)==='safe'?'selected':''}>Safe framing</option><option value="auto" ${normalizedFraming(s.framing)==='auto'?'selected':''}>Auto</option><option value="medium" ${normalizedFraming(s.framing)==='medium'?'selected':''}>Medium shot</option><option value="close" ${normalizedFraming(s.framing)==='close'?'selected':''}>Close-up</option><option value="wide" ${normalizedFraming(s.framing)==='wide'?'selected':''}>Wide shot</option></select></label></div></div></article>`}).join('');
   const sceneContextKey=`${p.id}|${ep?.id||ep?.number||''}`;
   const sceneDomUnchanged=sceneList&&sceneList.__cinetaleContextKey===sceneContextKey&&sceneList.__cinetaleMarkup===sceneMarkup;
   if(sceneList&&!sceneDomUnchanged){
@@ -1231,8 +1241,8 @@ function scheduleStudioLipSyncWarmup(project,episode){
     finally{
       studioLipSyncWarmups.delete(key);
       const liveProject=state.projects.find(x=>x.id===project.id),liveEpisode=findEpisodeById(liveProject,episodeId),list=$('#sceneList');
-      if(current()?.id===project.id&&liveProject&&liveEpisode&&!sceneListPlaybackLocked(list))renderStudio();
-      else if(liveProject&&liveEpisode)setTimeout(()=>scheduleStudioLipSyncWarmup(liveProject,liveEpisode),800);
+      if(current()?.id===project.id&&liveProject&&liveEpisode)updateSceneMediaStatuses(liveProject,liveEpisode);
+      if(liveProject&&liveEpisode)setTimeout(()=>scheduleStudioLipSyncWarmup(liveProject,liveEpisode),800);
     }
   },350);
 }
@@ -1257,10 +1267,11 @@ function bindSceneVideoVoicePlayback(p,ep){
     if(video.dataset.voiceBound==='1')return;video.dataset.voiceBound='1';const index=Number(video.dataset.sceneVideoPreview);const scene=ep?.scenes?.[index];if(!scene)return;
     const syncGated=video.dataset.syncGated==='1';
     if(syncGated){
-      // Keep provider/source speech permanently muted, but DO NOT make the creator review a silent clip.
-      // The approved CineTale voice is rendered through WebAudio and aligned to this source preview.
+      // An unsynchronized source is a VISUAL preview only. Never fake finished dialogue by
+      // layering a separately-timed TTS track over unrelated mouth motion. The Listen button
+      // is the authoritative voice preview until a validated synchronized clip exists.
       video.muted=true;
-      video.dataset.voiceSync='approved-preview';
+      video.dataset.voiceSync='visual-only';
       video.addEventListener('volumechange',()=>{if(video.dataset.syncGated==='1'&&!video.muted)video.muted=true});
     }
     video.addEventListener('play',()=>{
@@ -1270,15 +1281,15 @@ function bindSceneVideoVoicePlayback(p,ep){
       const currentSrc=normalizedMediaUrl(video.currentSrc||video.getAttribute('src')||''),desired=sceneHasValidatedLipSync(liveProject,liveScene)?normalizedMediaUrl(liveScene.lipSyncVideoUrl||''):'';
       if(desired&&currentSrc===desired){restoreProviderGuideAudio(video,ctl);video.muted=false;video.dataset.voiceSync='provider';video.dataset.lipSyncReady='1';return}
       if(sceneHasSpokenContent(liveScene)){
-        // Never pause a native user-initiated play event to wait for async TTS. Firefox can
-        // reject a later programmatic resume after transient user activation has expired.
-        // Keep picture playback alive, prepare approved audio, and align it to currentTime.
+        // Until lip-sync is validated, source playback is visual-only. Approved dialogue is
+        // reviewed via Listen; finished speaking playback comes from one synchronized media file.
         muteProviderGuideAudio(video,ctl);
-        if(!ctl.preparing)startSceneVideoVoicePlayback(video,liveProject,liveScene,index,{resumeVideo:false}).catch(()=>{});
+        video.muted=true;
+        video.dataset.voiceSync='visual-only';
       }
     });
     video.addEventListener('pause',()=>{const ctl=sceneVideoAudioControllers.get(video);if(ctl?.adopting)return;stopSceneVideoVoicePlayback(video,{keepIntent:false,restoreProviderAudio:true})});
-    video.addEventListener('seeking',()=>{const ctl=sceneVideoAudioControllers.get(video);if(!ctl||ctl.adopting)return;const live=liveSceneAt(index),liveProject=live.project||p,liveScene=live.scene||scene;const desired=sceneHasValidatedLipSync(liveProject,liveScene)?normalizedMediaUrl(liveScene.lipSyncVideoUrl||''):'';if(desired&&normalizedMediaUrl(video.currentSrc||video.getAttribute('src')||'')===desired)return;const shouldResume=!video.paused||ctl.requestedPlay;stopSceneVideoVoicePlayback(video,{keepIntent:shouldResume,restoreProviderAudio:!shouldResume});if(shouldResume){muteProviderGuideAudio(video,ctl);startSceneVideoVoicePlayback(video,liveProject,liveScene,index,{resumeVideo:true}).catch(()=>{})}});
+    video.addEventListener('seeking',()=>{const ctl=sceneVideoAudioControllers.get(video);if(!ctl||ctl.adopting)return;const live=liveSceneAt(index),liveProject=live.project||p,liveScene=live.scene||scene;const desired=sceneHasValidatedLipSync(liveProject,liveScene)?normalizedMediaUrl(liveScene.lipSyncVideoUrl||''):'';if(desired&&normalizedMediaUrl(video.currentSrc||video.getAttribute('src')||'')===desired)return;stopSceneVideoVoicePlayback(video,{keepIntent:!video.paused,restoreProviderAudio:false});muteProviderGuideAudio(video,ctl);video.muted=true;video.dataset.voiceSync='visual-only'});
     video.addEventListener('error',()=>{
       const live=liveSceneAt(index),liveProject=live.project||p,liveScene=live.scene||scene;if(!liveProject||!liveScene)return;
       const failed=normalizedMediaUrl(video.currentSrc||video.getAttribute('src')||''),sync=normalizedMediaUrl(liveScene.lipSyncVideoUrl||''),source=normalizedMediaUrl(liveScene.videoUrl||'');
@@ -1297,12 +1308,12 @@ function bindSceneVideoVoicePlayback(p,ep){
       video.closest?.('.scene-visual')?.classList.add('media-error');
       video.dataset.voiceSync='media-unavailable';
     });
-    video.addEventListener('ended',async()=>{
-      stopSceneVideoVoicePlayback(video,{restoreProviderAudio:true});
-      const live=liveSceneAt(index);
-      if(live.project&&live.scene&&sceneHasValidatedLipSync(live.project,live.scene)){await adoptSceneLipSyncVideo(video,index,{resumeVideo:false,preserveTime:false}).catch(()=>false);try{video.currentTime=0}catch{}}
-      delete video.dataset.playerSession;updateSceneMediaStatuses(live.project||p,episodeOf(live.project||p));
-      const list=$('#sceneList');if(list?.__cinetaleDeferredRender){list.__cinetaleDeferredRender=false;queueMicrotask(()=>renderStudio())}
+    video.addEventListener('ended',()=>{
+      // Playback completion must be visually inert: no source swap, no Studio remount, no
+      // card re-render. A validated synchronized clip is adopted on the next normal mount.
+      stopSceneVideoVoicePlayback(video,{restoreProviderAudio:false});
+      const live=liveSceneAt(index);delete video.dataset.playerSession;
+      updateSceneMediaStatuses(live.project||p,episodeOf(live.project||p));
     });
   })
 }
@@ -1572,10 +1583,10 @@ async function prepareFinalSceneAsset(project,scene,index,total){
     setFinalRenderProgress(3+Math.round((index/Math.max(1,total))*12),`Finishing dialogue sync for scene ${index+1} of ${total}`);
     await ensureSceneLipSync(project,scene,sceneIndex,{quiet:true});
   }
-  const synced=sceneHasValidatedLipSync(project,scene),spoken=sceneHasSpokenContent(scene),sources=sceneVideoSources(scene,project),videos=[],failedSources=[];
-  for(let sourceIndex=0;sourceIndex<sources.length;sourceIndex++){
-    const url=sources[sourceIndex],v=document.createElement('video');v.preload='auto';v.playsInline=true;v.crossOrigin='anonymous';v.muted=true;
-    try{await loadMediaWithRetry(v,url,{attempts:3,timeout:22000,label:`${sceneName} video`});videos.push(v)}
+  const synced=sceneHasValidatedLipSync(project,scene),spoken=sceneHasSpokenContent(scene),entries=sceneFinalVideoEntries(scene,project),videos=[],failedSources=[];
+  for(let sourceIndex=0;sourceIndex<entries.length;sourceIndex++){
+    const entry=entries[sourceIndex],url=entry.url,v=document.createElement('video');v.preload='auto';v.playsInline=true;v.crossOrigin='anonymous';v.muted=true;
+    try{await loadMediaWithRetry(v,url,{attempts:3,timeout:22000,label:`${sceneName} video`});videos.push({video:v,entry})}
     catch(e){failedSources.push({url,error:e});console.warn('[CineTale final render] Skipping unavailable coverage source',{scene:sceneName,sourceIndex,error:e?.message||String(e)})}
   }
   if(!videos.length)throw new Error(`${sceneName} is marked ready, but its saved video file cannot be opened. The scene was not regenerated. Reload once; if it remains unavailable, regenerate only this scene.`);
@@ -1583,11 +1594,12 @@ async function prepareFinalSceneAsset(project,scene,index,total){
   // synchronized file already contains the approved CineTale voice used to create lip sync.
   // Replaying cached TTS on top of that file can drift by hundreds of milliseconds, so the
   // synchronized file is the single source of truth for BOTH picture and speech in the final.
-  if(spoken&&synced&&sources[0]&&failedSources.some(x=>normalizedMediaUrl(x.url)===normalizedMediaUrl(sources[0]))){
+  const syncedEntry=videos.find(x=>x.entry?.synchronized);
+  if(spoken&&synced&&!syncedEntry){
     throw new Error(`${sceneName}'s synchronized speaking clip is unavailable. CineTale stopped before creating an incorrect final video.`);
   }
   if(spoken&&!synced)throw new Error(`${sceneName} contains speech but does not have a validated synchronized clip. CineTale stopped before creating an out-of-sync final video.`);
-  const primaryDuration=Math.max(.25,Number(videos[0]?.duration)||0),visualDuration=videos.reduce((sum,v)=>sum+Math.max(.25,Number(v.duration)||0),0),targetDuration=finalSceneTargetDuration(project,scene);
+  const primaryDuration=Math.max(.25,Number((syncedEntry||videos[0])?.video?.duration)||0),visualDuration=videos.reduce((sum,item)=>sum+Math.max(.25,Number(item.video?.duration)||0),0),targetDuration=finalSceneTargetDuration(project,scene);
   // Never loop a generated clip merely to hit a requested runtime. A repeated 6–10 second
   // source was the cause of the visibly duplicated final video. Render each saved source at
   // most once. If there is less real coverage than the requested beat, the final runs shorter
@@ -1596,7 +1608,10 @@ async function prepareFinalSceneAsset(project,scene,index,total){
   // A synchronized speaking clip is an atomic audio+picture unit. Do not continue into silent
   // coverage after its approved dialogue ends merely to pad the requested runtime. This was
   // the direct cause of 18–28 second silent holes in uploaded v1.9.75 final files.
-  const sceneDuration=spoken&&synced?primaryDuration:Math.max(primaryDuration,Math.min(Math.max(primaryDuration,requested),visualDuration));
+  // With a timed shot plan, speaking scenes may legitimately include visual coverage before
+  // and after the synchronized performance. Use each unique source once, in planned order,
+  // and never loop to manufacture runtime.
+  const sceneDuration=Math.max(primaryDuration,Math.min(Math.max(primaryDuration,requested),visualDuration));
   return {scene,videos,visualDuration,targetDuration,sceneDuration,syncedAudio:spoken&&synced,useEmbeddedSyncedAudio:spoken&&synced};
 }
 function clearSceneLipSyncForIntegrityRepair(scene={},reason=''){
@@ -1643,26 +1658,25 @@ async function playPreparedFinalScene({asset,index,total,canvas,ctx,audioContext
   const {scene,videos,sceneDuration,useEmbeddedSyncedAudio}=asset;
   const videoGains=[];
   for(let i=0;i<videos.length;i++){
+    const item=videos[i],video=item.video||item;
     try{
-      const src=audioContext.createMediaElementSource(videos[i]),gain=audioContext.createGain();
-      // Only the validated synchronized primary may contribute source audio. Coverage/raw
-      // provider clips are always silent in the final. Do not leave the synchronized element
-      // HTML-muted: some browsers apply that mute before MediaElementAudioSourceNode capture.
-      videos[i].muted=!(useEmbeddedSyncedAudio&&i===0);
-      gain.gain.value=0;
-      src.connect(gain);gain.connect(audioDestination);videoGains.push(gain);
+      const src=audioContext.createMediaElementSource(video),gain=audioContext.createGain();
+      const allowAudio=Boolean(useEmbeddedSyncedAudio&&item.entry?.synchronized);
+      // Only the validated synchronized performance contributes dialogue audio. All raw
+      // provider/coverage footage remains silent in the master so guide speech cannot leak in.
+      video.muted=!allowAudio;gain.gain.value=0;src.connect(gain);gain.connect(audioDestination);videoGains.push(gain);
     }catch(e){console.warn('[CineTale final render] Video audio routing could not be connected',e);videoGains.push(null)}
   }
-  const started=performance.now();let raf=0,activeVideo=videos[0];
+  const started=performance.now();let raf=0,activeVideo=(videos[0]?.video||videos[0]);
   const paint=()=>{try{drawVideoFrame(ctx,activeVideo,canvas.width,canvas.height)}catch{}const elapsed=(performance.now()-started)/1000,remaining=sceneDuration-elapsed;if(remaining<.28){ctx.fillStyle=`rgba(8,6,20,${Math.max(0,Math.min(1,(.28-remaining)/.28))})`;ctx.fillRect(0,0,canvas.width,canvas.height)}raf=requestAnimationFrame(paint)};paint();
   let elapsed=0;
   for(let clipIndex=0;clipIndex<videos.length&&elapsed<sceneDuration-.02;clipIndex++){
-    const remaining=Math.max(0,sceneDuration-elapsed),active=videos[clipIndex];activeVideo=active;
-    for(let i=0;i<videoGains.length;i++)if(videoGains[i])videoGains[i].gain.value=useEmbeddedSyncedAudio&&i===0&&clipIndex===0?1:0;
+    const item=videos[clipIndex],active=item.video||item,remaining=Math.max(0,sceneDuration-elapsed);activeVideo=active;
+    for(let i=0;i<videoGains.length;i++)if(videoGains[i])videoGains[i].gain.value=(useEmbeddedSyncedAudio&&videos[i]?.entry?.synchronized&&i===clipIndex)?1:0;
     try{
       active.currentTime=0;
       await active.play();
-      const playFor=Math.min(remaining,Math.max(.25,Number(active.duration)||0));
+      const planned=Math.max(.25,Number(item.entry?.plannedDurationSec)||0),media=Math.max(.25,Number(active.duration)||0),playFor=Math.min(remaining,planned||media,media);
       await Promise.race([
         new Promise(resolve=>{const done=()=>{active.removeEventListener('ended',done);resolve()};active.addEventListener('ended',done,{once:true})}),
         sleep(playFor*1000)
@@ -1672,9 +1686,9 @@ async function playPreparedFinalScene({asset,index,total,canvas,ctx,audioContext
     }catch(e){console.warn('[CineTale final render] Coverage clip playback skipped',e);await sleep(Math.min(remaining,1)*1000);elapsed=(performance.now()-started)/1000}
     setFinalRenderProgress(16+Math.round(((index+Math.min(1,elapsed/Math.max(.01,sceneDuration)))/total)*82),`Rendering scene ${index+1} of ${total} · ${scene.title||'Untitled'}`)
   }
-  // If browser scheduling leaves a tiny tail, hold the LAST frame instead of replaying a clip.
+  // Hold the final frame for only a tiny scheduling tail. Never replay a clip to fill runtime.
   const tail=Math.max(0,sceneDuration-(performance.now()-started)/1000);if(tail>0)await sleep(tail*1000);
-  cancelAnimationFrame(raf);videos.forEach(v=>v.pause());videoGains.forEach(g=>{try{if(g)g.gain.value=0}catch{}});ctx.fillStyle='#080614';ctx.fillRect(0,0,canvas.width,canvas.height);await sleep(80)
+  cancelAnimationFrame(raf);videos.forEach(item=>(item.video||item).pause());videoGains.forEach(g=>{try{if(g)g.gain.value=0}catch{}});ctx.fillStyle='#080614';ctx.fillRect(0,0,canvas.width,canvas.height);await sleep(80)
 }
 
 async function createFinalVideo(){
@@ -1698,13 +1712,30 @@ async function shareFinalVideoFile(){const p=current(),asset=currentFinalVideoAs
 function publishFinalVideo(platform){const p=current(),asset=currentFinalVideoAsset();if(!p||!asset?.blob){toast('Render the final video first.');return}const destinations={youtube:'https://www.youtube.com/upload',instagram:'https://www.instagram.com/',tiktok:'https://www.tiktok.com/upload',facebook:'https://www.facebook.com/'};const url=destinations[platform];if(!url)return;downloadFinalVideoFile();window.open(url,'_blank','noopener,noreferrer');toast(`Final video downloaded. ${platform==='youtube'?'YouTube':platform==='instagram'?'Instagram':platform==='tiktok'?'TikTok':'Facebook'} opened so you can review and publish it.`)}
 function downloadFinalAssemblyManifest(){const p=current(),ep=episodeOf(p);if(!p)return;const manifest=p.finalAssembly||finalAssemblyManifest(p,ep);const blob=new Blob([JSON.stringify(manifest,null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`${(p.title||'cinetale').replace(/[^a-z0-9]+/gi,'-').toLowerCase()}-final-assembly.json`;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
 
-function renderStudioAfterSceneMediaUpdate(){
-  const list=$('#sceneList');
-  if(sceneListPlaybackLocked(list)){
-    list.__cinetaleDeferredRender=true;
-    updateSceneMediaStatuses(current(),episodeOf(current()));
-    return;
+function renderStudioAfterSceneMediaUpdate(index=null){
+  const p=current(),ep=episodeOf(p),list=$('#sceneList');
+  if(!p||!ep||!list){renderStudio();return}
+  // Media completion is a scene-local event. Never remount the whole Studio just because one
+  // provider job finished; doing so visibly reloads every <video> and caused cross-scene flicker.
+  if(Number.isInteger(index)){
+    const scene=ep.scenes?.[index],card=list.querySelector(`[data-scene-card-index="${index}"]`),surface=card?.querySelector('.scene-visual');
+    if(scene&&card&&surface){
+      const art=visualSrc(scene),existing=surface.querySelector('video[data-scene-video-preview]');
+      if(scene.videoUrl){
+        const desired=sceneStudioVideoUrl(scene,p);
+        if(existing){
+          const currentSrc=normalizedMediaUrl(existing.currentSrc||existing.getAttribute('src')||'');
+          if(desired&&currentSrc!==normalizedMediaUrl(desired)){stopSceneVideoVoicePlayback(existing,{restoreProviderAudio:false});existing.muted=sceneHasSpokenContent(scene)&&!sceneHasValidatedLipSync(p,scene);existing.src=desired;existing.load()}
+        }else{
+          surface.innerHTML=`${sceneVideoMarkup(scene,art,scene.title||`Scene ${index+1}`,index,p)}<div class="asset-tag hidden" data-scene-media-status="${index}"></div>`;
+        }
+        const button=card.querySelector(`[data-scene-video="${index}"]`);if(button){button.textContent=videoButtonLabel(scene);button.disabled=videoButtonDisabled(scene,false)}
+        bindSceneVideoVoicePlayback(p,ep);updateSceneMediaStatuses(p,ep);renderFinalAssembly(p,ep);return;
+      }
+      updateSceneMediaStatuses(p,ep);return;
+    }
   }
+  // Fall back to a full render only when the card is genuinely absent (navigation/schema change).
   renderStudio();
 }
 
@@ -1728,17 +1759,17 @@ async function pollVideo(i,operation,button,{background=false}={}){
       if(d.status==='ready'){
         confirmedVideoOperations.delete(operation);
         updateProjectById(projectId,x=>{const e=findEpisodeById(x,episodeId);if(!e?.scenes?.[i])return;const target=e.scenes[i];if(target.videoOperation!==operation)return;target.videoUrl=d.videoUrl;target.videoOperation=null;target.videoQueuedAt=null;target.videoError=null;target.videoPlaybackError=null;resetSceneLipSyncForNewSource(target,d.videoUrl);x.videoStatus='ready';x.finalAssembly=null;x.renderStatus=null;x.finalVideoMeta=null},{render:false});
-        if(current()?.id===projectId)renderStudioAfterSceneMediaUpdate();toast('Scene video clip is ready.');scheduleSceneLipSyncAfterSourceReady(projectId,episodeId,i);return;
+        if(current()?.id===projectId)renderStudioAfterSceneMediaUpdate(i);toast('Scene video clip is ready.');scheduleSceneLipSyncAfterSourceReady(projectId,episodeId,i);return;
       }
       if(d.status==='error'){
         confirmedVideoOperations.delete(operation);
         updateProjectById(projectId,x=>{const e=findEpisodeById(x,episodeId),target=e?.scenes?.[i];if(target?.videoOperation===operation){target.videoOperation=null;target.videoQueuedAt=null;target.videoError=d.error||'Video generation failed'}},{render:false});
-        if(current()?.id===projectId)renderStudioAfterSceneMediaUpdate();throw new Error(d.error||'Video generation failed');
+        if(current()?.id===projectId)renderStudioAfterSceneMediaUpdate(i);throw new Error(d.error||'Video generation failed');
       }
     }
     confirmedVideoOperations.delete(operation);
     updateProjectById(projectId,x=>{const e=findEpisodeById(x,episodeId),target=e?.scenes?.[i];if(target&&target.videoOperation===operation){target.videoOperation=null;target.videoQueuedAt=null;target.videoError='Video rendering timed out. Your previous clip was preserved; try Regenerate clip again.'}},{render:false});
-    if(current()?.id===projectId)renderStudioAfterSceneMediaUpdate();throw new Error('Video rendering timed out. Your previous clip was preserved; try Regenerate clip again.');
+    if(current()?.id===projectId)renderStudioAfterSceneMediaUpdate(i);throw new Error('Video rendering timed out. Your previous clip was preserved; try Regenerate clip again.');
   })().finally(()=>videoPollers.delete(key));
   videoPollers.set(key,job);return job;
 }
@@ -1832,7 +1863,7 @@ async function ensureAutoSceneVideo(projectId,episodeId,index,tier,onProgress){l
 function coverageModeFromAuto(mode){return mode==='cinematic'?'cinematic':mode==='fast'?'fast':'balanced'}
 function coverageEntry(scene,shotId){return coverageClips(scene).find(x=>x?.shotId===shotId)||null}
 async function waitForCoverageVideo(projectId,episodeId,sceneIndex,shot,operation,onProgress){for(let attempt=0;attempt<96;attempt++){if(state.autoFinalCancelRequested)throw new Error('Automatic production was paused by the creator.');let p=state.projects.find(x=>x.id===projectId),ep=findEpisodeById(p,episodeId),scene=ep?.scenes?.[sceneIndex],entry=coverageEntry(scene,shot.id);if(entry?.videoUrl)return entry.videoUrl;if(!scene)throw new Error('A scene disappeared while cinematic coverage was rendering.');onProgress?.(`Rendering coverage shot ${shot.order} for scene ${scene.number||sceneIndex+1} · ${videoElapsedLabel(entry?.queuedAt||Date.now())}`);await sleep(attempt<6?4500:Math.min(10000,6500+attempt*120));const d=await fetchVideoStatus(operation,{retries:3});if(d.status==='ready'){updateProjectById(projectId,x=>{const e=findEpisodeById(x,episodeId),target=e?.scenes?.[sceneIndex];if(!target)return;target.coverageClips=Array.isArray(target.coverageClips)?target.coverageClips:[];const item=target.coverageClips.find(c=>c.shotId===shot.id);if(item){item.videoUrl=d.videoUrl;item.operation=null;item.queuedAt=null;item.error=null}else target.coverageClips.push({shotId:shot.id,order:shot.order,videoUrl:d.videoUrl,durationSec:Number(shot.targetClipSec)||0});x.finalAssembly=null;x.renderStatus=null;x.finalVideoMeta=null},{render:false});return d.videoUrl}if(d.status==='error')throw new Error(d.error||'Coverage video generation failed')}throw new Error('A cinematic coverage shot is still rendering. Completed work was saved so you can resume later.')}
-async function ensureAutoCoverageShot(projectId,episodeId,sceneIndex,shotIndex,tier,mode,onProgress){let p=state.projects.find(x=>x.id===projectId),ep=findEpisodeById(p,episodeId),scene=ep?.scenes?.[sceneIndex];if(!scene)throw new Error('A selected scene could not be found.');const plan=ensureSceneCoverage(scene,coverageModeFromAuto(mode)),shot=plan[shotIndex];if(!shot)return null;const primary=primaryCoverageShot(scene,coverageModeFromAuto(mode)),primaryId=scene.videoPrimaryShotId||primary?.id||plan[0]?.id;if(shot.id===primaryId)return ensureAutoSceneVideo(projectId,episodeId,sceneIndex,tier,onProgress);let entry=coverageEntry(scene,shot.id);if(entry?.videoUrl)return entry.videoUrl;if(!entry?.operation){onProgress?.(`Planning shot ${shot.order}/${plan.length} for scene ${scene.number||sceneIndex+1}…`);await waitForAutoVideoSubmissionSlot(onProgress);const shotScene={...scene,coverageShot:shot,visual:shot.visual||scene.visual,camera:shot.camera||scene.camera,dialogue:shot.speaking&&shot.spokenLine?[`${shot.speaker||''}: ${shot.spokenLine}`]:[],narration:''};let d;try{d=await apiPost('/api/video-job',{projectId:p.id,episode:ep.number,allowQualityFallback:tier!=='premium',project:{title:p.title,format:p.format,style:projectStyle(p),culturalTreatment:p.culturalTreatment,characters:p.characters,worldBible:p.worldBible},scene:shotScene})}catch(e){throw new Error(videoQuotaMessage(e))}if(d.status==='not_configured')throw new Error('Live video is not enabled. Set ENABLE_LIVE_VIDEO=true in Vercel and redeploy.');bumpUsage('video');if(d.videoUrl){updateProjectById(projectId,x=>{const e=findEpisodeById(x,episodeId),target=e?.scenes?.[sceneIndex];if(!target)return;target.coverageClips=Array.isArray(target.coverageClips)?target.coverageClips:[];target.coverageClips.push({shotId:shot.id,order:shot.order,videoUrl:d.videoUrl,durationSec:Number(d.durationSeconds)||Number(shot.targetClipSec)||0,model:d.model||null,speaking:Boolean(shot.speaking),speaker:shot.speaker||'',spokenLine:shot.spokenLine||'',speechGuide:Boolean(d.speaking||shot.speaking)})},{render:false});return d.videoUrl}if(!d.operation)throw new Error('The video provider did not return a coverage render job.');updateProjectById(projectId,x=>{const e=findEpisodeById(x,episodeId),target=e?.scenes?.[sceneIndex];if(!target)return;target.coverageClips=Array.isArray(target.coverageClips)?target.coverageClips:[];target.coverageClips.push({shotId:shot.id,order:shot.order,operation:d.operation,queuedAt:Date.now(),durationSec:Number(d.durationSeconds)||Number(shot.targetClipSec)||0,model:d.model||null,speaking:Boolean(shot.speaking),speaker:shot.speaker||'',spokenLine:shot.spokenLine||'',speechGuide:Boolean(d.speaking||shot.speaking)})},{render:false});entry={operation:d.operation}}
+async function ensureAutoCoverageShot(projectId,episodeId,sceneIndex,shotIndex,tier,mode,onProgress){let p=state.projects.find(x=>x.id===projectId),ep=findEpisodeById(p,episodeId),scene=ep?.scenes?.[sceneIndex];if(!scene)throw new Error('A selected scene could not be found.');const plan=ensureSceneCoverage(scene,coverageModeFromAuto(mode)),shot=plan[shotIndex];if(!shot)return null;const primary=primaryCoverageShot(scene,coverageModeFromAuto(mode)),primaryId=scene.videoPrimaryShotId||primary?.id||plan[0]?.id;if(shot.id===primaryId)return ensureAutoSceneVideo(projectId,episodeId,sceneIndex,tier,onProgress);let entry=coverageEntry(scene,shot.id);if(entry?.videoUrl)return entry.videoUrl;if(!entry?.operation){onProgress?.(`Planning shot ${shot.order}/${plan.length} for scene ${scene.number||sceneIndex+1}…`);await waitForAutoVideoSubmissionSlot(onProgress);const shotScene={...scene,coverageShot:shot,visual:shot.visual||scene.visual,camera:shot.camera||scene.camera,dialogue:shot.speaking&&shot.spokenLine?[`${shot.speaker||''}: ${shot.spokenLine}`]:[],narration:''};let d;try{d=await apiPost('/api/video-job',{projectId:p.id,episode:ep.number,allowQualityFallback:tier!=='premium',project:{title:p.title,format:p.format,style:projectStyle(p),culturalTreatment:p.culturalTreatment,characters:p.characters,worldBible:p.worldBible},scene:shotScene})}catch(e){throw new Error(videoQuotaMessage(e))}if(d.status==='not_configured')throw new Error('Live video is not enabled. Set ENABLE_LIVE_VIDEO=true in Vercel and redeploy.');bumpUsage('video');if(d.videoUrl){updateProjectById(projectId,x=>{const e=findEpisodeById(x,episodeId),target=e?.scenes?.[sceneIndex];if(!target)return;target.coverageClips=Array.isArray(target.coverageClips)?target.coverageClips:[];target.coverageClips.push({shotId:shot.id,order:shot.order,startSec:Number(shot.startSec)||0,endSec:Number(shot.endSec)||0,plannedDurationSec:Number(shot.durationSec)||0,videoUrl:d.videoUrl,durationSec:Number(d.durationSeconds)||Number(shot.targetClipSec)||0,model:d.model||null,speaking:Boolean(shot.speaking),speaker:shot.speaker||'',spokenLine:shot.spokenLine||'',speechGuide:Boolean(d.speaking||shot.speaking)})},{render:false});return d.videoUrl}if(!d.operation)throw new Error('The video provider did not return a coverage render job.');updateProjectById(projectId,x=>{const e=findEpisodeById(x,episodeId),target=e?.scenes?.[sceneIndex];if(!target)return;target.coverageClips=Array.isArray(target.coverageClips)?target.coverageClips:[];target.coverageClips.push({shotId:shot.id,order:shot.order,startSec:Number(shot.startSec)||0,endSec:Number(shot.endSec)||0,plannedDurationSec:Number(shot.durationSec)||0,operation:d.operation,queuedAt:Date.now(),durationSec:Number(d.durationSeconds)||Number(shot.targetClipSec)||0,model:d.model||null,speaking:Boolean(shot.speaking),speaker:shot.speaker||'',spokenLine:shot.spokenLine||'',speechGuide:Boolean(d.speaking||shot.speaking)})},{render:false});entry={operation:d.operation}}
   p=state.projects.find(x=>x.id===projectId);ep=findEpisodeById(p,episodeId);scene=ep?.scenes?.[sceneIndex];entry=coverageEntry(scene,shot.id);if(entry?.videoUrl)return entry.videoUrl;if(!entry?.operation)throw new Error('The cinematic coverage job could not be started.');return waitForCoverageVideo(projectId,episodeId,sceneIndex,shot,entry.operation,onProgress)}
 async function ensureCinematicCoverage(projectId,episodeId,indices,tier,mode,onProgress){const coverageMode=coverageModeFromAuto(mode);if(coverageMode==='fast')return;for(const sceneIndex of indices){let p=state.projects.find(x=>x.id===projectId),ep=findEpisodeById(p,episodeId),scene=ep?.scenes?.[sceneIndex];if(!scene||scene.finalIncluded===false)continue;const target=coverageTargetCount(scene,coverageMode);for(let shotIndex=0;shotIndex<target;shotIndex++){if(state.autoFinalCancelRequested)throw new Error('Automatic production was paused by the creator.');await ensureAutoCoverageShot(projectId,episodeId,sceneIndex,shotIndex,tier,mode,onProgress)}}}
 function autoFinalLockKey(projectId){return `cinetale.final.lock.${projectId}`}

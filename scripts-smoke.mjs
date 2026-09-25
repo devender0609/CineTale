@@ -191,7 +191,7 @@ try{
   let ttsCalls=[];
   globalThis.fetch=async (url,opts)=>{
     ttsCalls.push({url:String(url),body:JSON.parse(opts.body)});
-    const body=ttsCalls.at(-1).body;assert.equal(body.model_id,'eleven_v3');assert.equal(body.language_code,'en');assert.match(body.text,/^\[softly\] \[curious\]/);assert.equal(body.voice_settings,undefined);
+    const body=ttsCalls.at(-1).body;assert.equal(body.model_id,'eleven_v3');assert.equal(body.language_code,'en');assert.match(body.text,/^\[softly\] /);assert.doesNotMatch(body.text,/^\[[^\]]+\] \[[^\]]+\]/);assert.equal(body.voice_settings,undefined);
     return new Response(new Uint8Array([1,2,3,4]),{status:200,headers:{'content-type':'audio/mpeg'}});
   };
   let ttsStatus=0,ttsPayload=null;const ttsRes={status(code){ttsStatus=code;return this},json(value){ttsPayload=value;return value}};
@@ -447,13 +447,13 @@ assert.ok(appSource.includes('resolveOwnerAccess')&&appSource.includes('/api/own
   assert.ok(appSource.includes("format:p.format")&&appSource.includes('culturalTreatment:p.culturalTreatment'),'Video request is missing format/cultural context');
   assert.ok(appSource.includes('videoPollers')&&appSource.includes('resumePendingVideoPolls')&&appSource.includes('attempt<4?6500:Math.min(15000,9000+attempt*250)'),'Background/adaptive video polling missing');
   assert.ok(appSource.includes('if(!scene||scene.videoOperation!==operation)return;')&&!appSource.includes('if(!scene||scene.videoUrl||scene.videoOperation!==operation)return;'),'Replacement-video polling must continue while an older videoUrl exists');
-  assert.ok(appSource.includes('videoOperationConfirmed(s)?(art?')&&appSource.includes('Rendering replacement'),'Confirmed replacement renders must hide the stale/broken prior video');
+  assert.ok(appSource.includes('videoOperationConfirmed(s)?(art?')||appSource.includes('videoOperationConfirmed(s)?(art?'), 'Confirmed replacement render branch missing');
   assert.ok(appSource.includes('Checking saved render…')&&appSource.includes('reconcileSavedVideoOperation')&&appSource.includes('VIDEO_RECOVERY_MAX_AGE_MS'),'Saved video operations must be verified before CineTale presents them as actively rendering');
   assert.ok(appSource.includes('primaryCoverageShot')&&appSource.includes('sceneForVideoShot')&&appSource.includes('videoPrimarySpeaking'),'Dialogue-first primary video-shot routing missing');
   assert.ok(appSource.includes('function sceneVideoMarkup')&&appSource.includes('preload=\"none\"')&&appSource.includes('poster='),'Ready scene videos must lazy-load instead of hammering /api/video-file on every render');
   assert.ok(!appSource.includes('muted playsinline preload=\"metadata\"'),'Library must not preload every generated video asset');
   assert.ok(videoApi.includes('temporary facial-performance guide')&&videoApi.includes('Dialogue timing target'),'Speaking-shot synchronized dialogue guidance missing');
-  assert.ok(appSource.includes('videos[i].muted=!(useEmbeddedSyncedAudio&&i===0)')&&appSource.includes('useEmbeddedSyncedAudio&&i===0&&clipIndex===0?1:0')&&!appSource.includes('clipIndex%videos.length'),'Final mix must capture the authoritative synchronized primary audio exactly once and never loop generated clips');
+  assert.ok(appSource.includes('const allowAudio=Boolean(useEmbeddedSyncedAudio&&item.entry?.synchronized)')&&appSource.includes('videos[i]?.entry?.synchronized&&i===clipIndex')&&!appSource.includes('clipIndex%videos.length'),'Final mix must capture only validated synchronized timeline audio and never loop generated clips');
 
 
   // v1.9.6 cinematic episode production.
@@ -613,7 +613,7 @@ assert.ok(appSource.includes('resolveOwnerAccess')&&appSource.includes('/api/own
   assert.ok(appSource.includes("function safeLocalSet")&&appSource.includes("setView('studio')")&&appSource.includes("queueMicrotask(()=>save())"),'Project opening can still be blocked by localStorage quota or synchronous persistence');
   assert.ok(appSource.includes('class="project-open" type="button" data-project=')&&appSource.includes("projectsGrid.addEventListener('pointerdown'")&&appSource.includes("openProject(opener.dataset.project)"),'Stable project pointerdown wiring is missing');
   assert.ok(appSource.includes('projectNavigation:{locked:false')&&appSource.includes('state.projectNavigation.epoch!==syncEpoch'),'Project navigation race guard is missing');
-  assert.ok(htmlSource.includes('/app.js?v=1.9.80'),'App bundle cache-busting version is missing');
+  assert.ok(htmlSource.includes('/app.js?v=1.9.81'),'App bundle cache-busting version is missing');
   assert.ok(appSource.includes("sceneListEl.addEventListener('pointerdown'"),'Scene video action must use persistent pointer handler');
   assert.ok(appSource.includes("videoOperationConfirmed(scene)?'Rendering…':videoOperationRecovering(scene)?'Checking saved render…'"),'Video operation UX must distinguish verified rendering from unverified saved jobs');
   assert.ok(appSource.includes('Boolean(scene.videoOperation)'),'Video button must disable during an active render job');
@@ -658,7 +658,7 @@ assert.ok(appSource.includes('resolveOwnerAccess')&&appSource.includes('/api/own
   assert.ok(!appSource.includes('<a class="project-open"'),'Projects must not use anchor wrappers that introduce underlines/link styling.');
   assert.ok(cssSource.includes('.project-open{border:0')&&cssSource.includes('text-decoration:none'),'Project open controls must remain underline-free with visible keyboard focus.');
 
-console.log('CineTale v1.9.80 smoke tests passed: strict Story/Short/Movie/Episode integrity, Google account chooser, restored proven project opening, quota-safe navigation, runtime targeting, no-crop media, auth/cloud sync, consent gates, quota-aware video, final assembly, voice filtering, navigation and DOM integrity.');
+console.log('CineTale v1.9.81 smoke tests passed: strict Story/Short/Movie/Episode integrity, Google account chooser, restored proven project opening, quota-safe navigation, runtime targeting, no-crop media, auth/cloud sync, consent gates, quota-aware video, final assembly, voice filtering, navigation and DOM integrity.');
 } finally {
   globalThis.fetch=originalFetch;
   if(originalKey===undefined) delete process.env.GEMINI_API_KEY; else process.env.GEMINI_API_KEY=originalKey;

@@ -59,6 +59,8 @@ function qualityConfig(scene={},project={}){
   const resolution=process.env[`VEO_RESOLUTION_${q.toUpperCase()}`]||process.env.VEO_RESOLUTION||defaults.resolution;
   let duration=String(process.env[`VEO_DURATION_${q.toUpperCase()}`]||process.env.VEO_DURATION_SECONDS||defaults.duration);
   if(!['4','6','8'].includes(duration)) duration=defaults.duration;
+  const planned=Number(scene?.coverageShot?.durationSec||scene?.coverageShot?.targetClipSec||0);
+  if(planned>0){duration=planned<=4?'4':planned<=6?'6':'8'}
   if(['1080p','4k'].includes(resolution)) duration='8';
   const aspectRatio=project.format==='Short'?'9:16':(process.env.VEO_ASPECT_RATIO||'16:9');
   return {q,model,resolution,duration,aspectRatio};
