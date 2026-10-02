@@ -1,0 +1,15 @@
+import fs from 'node:fs';
+import assert from 'node:assert/strict';
+const app=fs.readFileSync(new URL('./app.js', import.meta.url),'utf8');
+const checks=[];const check=(name,fn)=>{fn();checks.push(name)};
+check('release version advanced',()=>assert.match(app,/const APP_VERSION = '1\.12\.4'/));
+check('terminal ready claim preserves pending shot metadata',()=>assert.ok(app.includes('const pending=pendingPrimaryVideoPatch(t);Object.assign(t,pending,patch||{})')));
+check('terminal ready poll no longer requires cleared operation to remain present',()=>assert.ok(!app.includes('targetNow.videoOperation!==operation')));
+check('terminal ready poll commits the claimed provider result',()=>assert.ok(app.includes("commitPrimarySceneVideo(projectId,episodeId,i,d.videoUrl,{operation,patch:")));
+check('modern primary source marker recognizes durable primary asset paths',()=>assert.match(app,/function modernPrimarySourceMarker\(scene=\{\}\)/));
+check('saved modern primary video can recover missing shot provenance',()=>assert.match(app,/function recoverModernPrimaryVideoProvenance\(project=\{\},episode=\{\},scene=\{\}\)/));
+check('provenance recovery is fail-closed for existing contracts',()=>assert.ok(app.includes("if(String(scene.videoProductionContract||'').trim())return false")));
+check('provenance recovery restores exact primary shot metadata and contract',()=>assert.ok(app.includes('Object.assign(scene,speakingVideoMeta(shot))')&&app.includes('scene.videoProductionContract=videoProductionContract(project,episode,scene,shot)')));
+check('legacy identity error is cleared only after safe provenance recovery',()=>assert.ok(app.includes("if(scene.lipSyncErrorCode==='legacy_video_identity_unverified')")));
+check('startup migration repairs persisted modern source provenance before save',()=>assert.ok(app.includes('migrateProjectShotTimelines(p);recoverPersistedModernPrimaryVideoProvenance(p)}save();')));
+console.log(`v1.11.0 primary-video provenance recovery regression: ${checks.length}/${checks.length} passed`);for(const x of checks)console.log('PASS',x);

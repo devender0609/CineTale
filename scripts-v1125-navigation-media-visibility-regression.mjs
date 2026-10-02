@@ -1,0 +1,13 @@
+import fs from 'node:fs';
+import assert from 'node:assert/strict';
+const app=fs.readFileSync(new URL('./app.js',import.meta.url),'utf8');
+const css=fs.readFileSync(new URL('./styles.css',import.meta.url),'utf8');
+const html=fs.readFileSync(new URL('./index.html',import.meta.url),'utf8');
+const pkg=JSON.parse(fs.readFileSync(new URL('./package.json',import.meta.url),'utf8'));
+assert.equal(pkg.version,'1.12.4');
+assert.ok(app.includes("const APP_VERSION = '1.12.4'"));
+assert.ok(html.includes('/app.js?v=1.12.4')&&html.includes('/styles.css?v=1.12.4'));
+for(const needle of ['function workflowTarget(','function bindWorkflowNavigation(',"key==='video'","#sceneProductionTitle","#finalAssemblyPanel","setAttribute('tabindex','0')"]) assert.ok(app.includes(needle),`missing workflow navigation safeguard: ${needle}`);
+for(const needle of ['.nav-indicator{z-index:0!important','.nav-item.active{background:linear-gradient(135deg,#6953d8,#a85bd8)!important','.workflow-step{cursor:pointer!important','.workflow-step:focus-visible']) assert.ok(css.includes(needle),`missing visible navigation style: ${needle}`);
+assert.ok(app.includes("scene.shotTimelineVersion!=='1.11.0'"),'migration marker must advance with repaired UI release');
+console.log('v1.11.0 navigation/media visibility regression passed');

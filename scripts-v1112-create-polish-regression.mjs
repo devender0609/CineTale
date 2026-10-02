@@ -1,0 +1,21 @@
+import fs from 'node:fs';
+import assert from 'node:assert/strict';
+const app=fs.readFileSync('app.js','utf8');
+const html=fs.readFileSync('index.html','utf8');
+const css=fs.readFileSync('styles.css','utf8');
+const pkg=JSON.parse(fs.readFileSync('package.json','utf8'));
+const checks=[];
+function ok(name,cond){assert.ok(cond,name);checks.push(name)}
+ok('version bumped',pkg.version==='1.12.4'&&app.includes("const APP_VERSION = '1.12.4'")&&html.includes('/app.js?v=1.12.4')&&html.includes('/styles.css?v=1.12.4'));
+ok('movie labeled long-form beta',html.includes('format-badge">Long-form beta')&&app.includes('Long-form beta. Plan a standalone movie structure'));
+ok('story input simplified',html.includes('simplified-story-entry')&&html.includes('story-input-shell')&&html.includes('mic-button-inside')&&!html.includes('class="story-input-tools" aria-label="Story input method"'));
+ok('voice input preserved',html.includes('id="storyMicBtn"')&&html.includes('id="speechStatus"')&&html.includes('id="typeStoryBtn"')&&html.includes('id="speakStoryBtn"'));
+ok('mic reset copy simplified',app.includes("textContent='Speak'"));
+ok('planning actions sticky',css.includes('.create-footer-actions{position:sticky')&&css.includes('bottom:12px'));
+ok('marketing headline shortened',html.includes('Your story. One studio. From idea to finished production.'));
+ok('world intelligence card present',html.includes('<h3>World & cultural intelligence</h3>'));
+ok('continuity card present',html.includes('<h3>Characters & continuity</h3>'));
+ok('cost control card present',html.includes('<h3>Smart production & cost control</h3>'));
+ok('paid generation remains explicit',html.includes('keep paid generation explicit'));
+ok('world detail progressive disclosure preserved',html.includes('id="worldDetails"')&&html.includes('Edit world details'));
+console.log(`v1.12.4 create polish regression passed (${checks.length}/${checks.length})`);

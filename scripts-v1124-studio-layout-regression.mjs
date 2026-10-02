@@ -1,0 +1,18 @@
+import fs from 'node:fs';
+import assert from 'node:assert/strict';
+const app=fs.readFileSync('app.js','utf8');
+const css=fs.readFileSync('styles.css','utf8');
+const html=fs.readFileSync('index.html','utf8');
+assert.match(app,/APP_VERSION\s*=\s*'1\.12\.4'/,'build must be v1.12.4');
+assert.match(css,/v1\.12\.4 — mature Studio composition/,'v1.12.4 Studio CSS must exist');
+assert.match(css,/\.studio-layout\{display:block!important\}/,'detached sidebar layout must be removed');
+assert.match(css,/#studioEpisodes\{display:flex!important/,'episode navigation must become horizontal');
+assert.match(css,/\.episode-banner\{display:grid!important/,'episode header must use compact editorial grid');
+assert.match(css,/\.studio-mode-guided \.scene-final-toggle.*display:none!important/,'guided mode must hide final toggle noise');
+assert.match(css,/\.scene-advanced-toggle\{grid-column:2!important/,'advanced controls must be compact inspector action');
+assert.match(css,/\.final-stage-dormant \.final-assembly-actions\{display:none!important\}/,'dormant final stage must hide premature actions');
+assert.match(app,/panel\.classList\.toggle\('final-stage-dormant'/,'final stage dormancy must be driven by readiness');
+assert.match(app,/Continuity protected/,'compact intelligence language must be user-facing');
+assert.match(html,/id="studioEpisodes"/,'episode navigation host must remain present');
+assert.match(html,/id="finalAssemblyPanel"/,'final assembly host must remain present');
+console.log('CineTale v1.12.4 Studio layout regression passed: 12/12');

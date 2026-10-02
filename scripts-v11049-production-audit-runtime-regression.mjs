@@ -1,0 +1,11 @@
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+const app=fs.readFileSync(new URL('./app.js',import.meta.url),'utf8');
+assert.ok(app.includes("const APP_VERSION = '1.12.4'"));
+assert.ok(app.includes("function sceneProductionLogicAuditUnsafe("));
+assert.ok(app.includes("const parts=dialogueParts(entry),hints=shotIdentityHints(shot,entry,binding);"));
+const auditBlock=app.slice(app.indexOf('function sceneProductionLogicAuditUnsafe('),app.indexOf('function sceneProductionLogicAudit(project={}'));
+assert.ok(!auditBlock.includes("const hints=shotIdentityHints(shot,entry,binding);\n    const match=resolveCharacterIdentityAuthoritative(project,{dialogueSpeaker:parts.speaker"));
+assert.ok(app.includes("'logic-audit-runtime':'CineTale could not verify this scene safely. Repair the scene before production.'"));
+assert.ok(app.includes("try{return sceneProductionLogicAuditUnsafe(project,scene,mode)}"));
+console.log('v1.11.0 production audit runtime regression: PASS');

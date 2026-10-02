@@ -1,0 +1,12 @@
+import fs from 'node:fs';
+import assert from 'node:assert/strict';
+const app=fs.readFileSync(new URL('./app.js',import.meta.url),'utf8');
+assert.ok(app.includes("const APP_VERSION = '1.12.4'"),'version must be v1.12.4');
+assert.ok(app.includes('function refreshSceneShotProductionState(projectId,episodeId,sceneIndex)'),'targeted state refresh helper missing');
+assert.ok(app.includes("const freshTimeline=makeNode(sceneShotTimelineUi(p,scene))"),'shot timeline must be rebuilt from canonical live state');
+assert.ok(app.includes("const freshCoverage=makeNode(coverageUi(scene))"),'scene coverage summary must be rebuilt from canonical live state');
+assert.ok(app.includes("const reflect=msg=>{if(button?.isConnected&&msg)button.textContent=msg;refreshSceneShotProductionState(p.id,episodeId,sceneIndex)}"),'generation progress must reconcile UI state');
+assert.ok(app.includes("await ensureAutoCoverageShot(p.id,episodeId,sceneIndex"),'selected shot generation path must remain intact');
+assert.ok(app.includes('refreshSceneShotProductionState(p.id,episodeId,sceneIndex);toast(`Shot ${shot.order} is ready.`)'),'completion must reconcile before ready toast');
+assert.ok(app.includes("card.querySelectorAll('.scene-shot-card[data-shot-id]').forEach(node=>node.onclick=()=>selectSceneShot(sceneIndex,node.dataset.shotId))"),'timeline replacement must restore shot navigation handlers');
+console.log('v1.11.0 shot-state reconciliation regression: PASS');

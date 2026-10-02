@@ -1,0 +1,15 @@
+import fs from 'node:fs';
+import assert from 'node:assert/strict';
+const app=fs.readFileSync(new URL('./app.js', import.meta.url),'utf8');
+const checks=[];
+const check=(name,fn)=>{fn();checks.push(name)};
+check('syncing has distinct kind',()=>assert.match(app,/item\.state==='syncing'\)return \{label:'DIALOGUE SYNCING',kind:'syncing'\}/));
+check('sync-error state exists',()=>assert.match(app,/item\.state==='sync-error'\)return \{label:'DIALOGUE SYNC FAILED',kind:'sync-error'\}/));
+check('syncing button is not Rendering',()=>assert.ok(app.includes('Dialogue syncing for Shot ${shot.order}…')));
+check('terminal sync error preserves source and exposes retry',()=>assert.ok(app.includes('Retry Shot ${shot.order} dialogue')));
+check('sync click guard does not submit duplicate work',()=>assert.ok(app.includes('dialogue is already synchronizing. No new video or dialogue job was submitted.')));
+check('same sync operation has one poller',()=>assert.ok(app.includes('coverageShotSyncPollsInFlight=new Map()')&&app.includes('coverageShotSyncPollsInFlight.get(pollKey)')));
+check('terminal provider sync failure clears sync operation',()=>assert.ok(app.includes("it.syncOperation=null;it.syncStatus='error'")));
+check('pending and sync-error both resume dialogue only',()=>assert.ok(app.includes("(status.kind==='pending'||status.kind==='sync-error')&&shot.speaking")));
+console.log(`v1.11.0 speaking-shot sync-state regression: ${checks.length}/${checks.length} passed`);
+for(const x of checks) console.log('PASS',x);

@@ -1,0 +1,15 @@
+import fs from 'node:fs';
+import assert from 'node:assert/strict';
+const app=fs.readFileSync(new URL('./app.js',import.meta.url),'utf8');
+const html=fs.readFileSync(new URL('./index.html',import.meta.url),'utf8');
+assert.ok(app.includes("const APP_VERSION = '1.12.4'"));
+assert.ok(html.includes('/app.js?v=1.12.4')&&html.includes('/styles.css?v=1.12.4'));
+assert.match(app,/sceneVideoAction\(scene=\{\},project=null\)[\s\S]*sceneSourceDurablyOwned\(scene\)[\s\S]*return 'finalizing'/s,'owned unsynchronized speaking source must automatically finalize without another Veo generation or Complete clip step');
+assert.match(app,/function scheduleSceneLipSyncAfterSourceReady[\s\S]*ensureSceneLipSync\(project,scene,index,\{quiet:true,allowSubmit:true\}\)/,'generated speaking clips must continue automatically into synchronization/finalization');
+assert.match(app,/player-triggered-audio-finalization/,'ordinary Play must transparently resume browser-blocked audio finalization');
+assert.match(app,/scene-source-preview[\s\S]*data-sync-gated=\"1\"/,'unfinished source must remain visible as a clean visual-only video');
+assert.doesNotMatch(app.slice(app.indexOf('function sceneVideoMarkup'),app.indexOf('function fitSceneVideoToSurface')),/Visual ready|Finish dialogue/,'video frame must not contain unfinished-state copy');
+assert.match(app,/sceneMediaDecodeShieldMarkup\(art,title\).*<video controls playsinline preload="metadata" class="scene-video-element"\$\{poster\}\$\{sync\}\$\{exact\}/s,'finished synchronized/non-speaking asset must use one controllable native player behind a decode shield until the first frame is ready');
+assert.match(app,/const exact=isMountedSynced\?' data-lip-sync-ready="1"'/,'validated synchronized asset must carry the ready marker');
+assert.match(app,/sourceSpeakingShot\(s\)\|\|primaryCoverageShot/,'synchronization must bind to the exact source-video speaking-shot identity');
+console.log('v1.10.9 finished-speaking-clip state regression PASS');

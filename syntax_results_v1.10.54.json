@@ -1,0 +1,722 @@
+[
+  {
+    "file": "api/auth-config.js",
+    "code": 0,
+    "out": ""
+  },
+  {
+    "file": "api/create-personal-voice.js",
+    "code": 0,
+    "out": ""
+  },
+  {
+    "file": "api/dialogue.js",
+    "code": 0,
+    "out": ""
+  },
+  {
+    "file": "api/generate-image.js",
+    "code": 0,
+    "out": ""
+  },
+  {
+    "file": "api/generate-next.js",
+    "code": 0,
+    "out": ""
+  },
+  {
+    "file": "api/generate-plan.js",
+    "code": 0,
+    "out": ""
+  },
+  {
+    "file": "api/health.js",
+    "code": 0,
+    "out": ""
+  },
+  {
+    "file": "api/lipsync-job.js",
+    "code": 0,
+    "out": ""
+  },
+  {
+    "file": "api/lipsync-status.js",
+    "code": 0,
+    "out": ""
+  },
+  {
+    "file": "api/lipsync-video.js",
+    "code": 0,
+    "out": ""
+  },
+  {
+    "file": "api/owner-status.js",
+    "code": 0,
+    "out": ""
+  },
+  {
+    "file": "api/owner.js",
+    "code": 0,
+    "out": ""
+  },
+  {
+    "file": "api/transcribe.js",
+    "code": 0,
+    "out": ""
+  },
+  {
+    "file": "api/tts.js",
+    "code": 0,
+    "out": ""
+  },
+  {
+    "file": "api/verify-visual-fallback.js",
+    "code": 0,
+    "out": ""
+  },
+  {
+    "file": "api/verify-voice.js",
+    "code": 0,
+    "out": ""
+  },
+  {
+    "file": "api/video-file.js",
+    "code": 0,
+    "out": ""
+  },
+  {
+    "file": "api/video-job.js",
+    "code": 0,
+    "out": ""
+  },
+  {
+    "file": "api/video-status.js",
+    "code": 0,
+    "out": ""
+  },
+  {
+    "file": "api/voices.js",
+    "code": 0,
+    "out": ""
+  },
+  {
+    "file": "app.js",
+    "code": 0,
+    "out": ""
+  },
+  {
+    "file": "lib/ai.js",
+    "code": 0,
+    "out": ""
+  },
+  {
+    "file": "lib/demo.js",
+    "code": 0,
+    "out": ""
+  },
+  {
+    "file": "lib/production.js",
+    "code": 0,
+    "out": ""
+  },
+  {
+    "file": "scripts-check.mjs",
+    "code": 0,
+    "out": ""
+  },
+  {
+    "file": "scripts-deep-qa.mjs",
+    "code": 0,
+    "out": ""
+  },
+  {
+    "file": "scripts-lipsync-adoption-regression.mjs",
+    "code": 0,
+    "out": ""
+  },
+  {
+    "file": "scripts-lipsync-regression.mjs",
+    "code": 0,
+    "out": ""
+  },
+  {
+    "file": "scripts-lipsync-status-resilience.mjs",
+    "code": 0,
+    "out": ""
+  },
+  {
+    "file": "scripts-lipsync-v1947-regression.mjs",
+    "code": 0,
+    "out": ""
+  },
+  {
+    "file": "scripts-player-lifecycle-regression.mjs",
+    "code": 0,
+    "out": ""
+  },
+  {
+    "file": "scripts-scene-audio-regression.mjs",
+    "code": 0,
+    "out": ""
+  },
+  {
+    "file": "scripts-smoke.mjs",
+    "code": 0,
+    "out": ""
+  },
+  {
+    "file": "scripts-v1100-production-contract-regression.mjs",
+    "code": 0,
+    "out": ""
+  },
+  {
+    "file": "scripts-v1101-finish-action-regression.mjs",
+    "code": 0,
+    "out": ""
+  },
+  {
+    "file": "scripts-v11013-live-presubmit-regression.mjs",
+    "code": 0,
+    "out": ""
+  },
+  {
+    "file": "scripts-v11014-retry-telemetry-player-url-regression.mjs",
+    "code": 0,
+    "out": ""
+  },
+  {
+    "file": "scripts-v11015-approved-audio-finalization-regression.mjs",
+    "code": 0,
+    "out": ""
+  },
+  {
+    "file": "scripts-v11016-automatic-dialogue-finalization-regression.mjs",
+    "code": 0,
+    "out": ""
+  },
+  {
+    "file": "scripts-v11017-stale-dialogue-refresh-regression.mjs",
+    "code": 0,
+    "out": ""
+  },
+  {
+    "file": "scripts-v11018-lipsync-polling-recovery-regression.mjs",
+    "code": 0,
+    "out": ""
+  },
+  {
+    "file": "scripts-v1102-owned-source-transport-regression.mjs",
+    "code": 0,
+    "out": ""
+  },
+  {
+    "file": "scripts-v11029-shot-grid-layout-regression.mjs",
+    "code": 0,
+    "out": ""
+  },
+  {
+    "file": "scripts-v1103-durable-source-repair-regression.mjs",
+    "code": 0,
+    "out": ""
+  },
+  {
+    "file": "scripts-v1103-storage-repair-runtime.mjs",
+    "code": 0,
+    "out": ""
+  },
+  {
+    "file": "scripts-v11030-lipsync-block-recovery-regression.mjs",
+    "code": 0,
+    "out": ""
+  },
+  {
+    "file": "scripts-v11031-scene-shell-restoration-regression.mjs",
+    "code": 0,
+    "out": ""
+  },
+  {
+    "file": "scripts-v11032-shot-navigation-voice-modal-regression.mjs",
+    "code": 0,
+    "out": ""
+  },
+  {
+    "file": "scripts-v11033-shot-listen-routing-regression.mjs",
+    "code": 0,
+    "out": ""
+  },
+  {
+    "file": "scripts-v11034-shot-status-selection-regression.mjs",
+    "code": 0,
+    "out": ""
+  },
+  {
+    "file": "scripts-v11035-shot-state-reconciliation-regression.mjs",
+    "code": 0,
+    "out": ""
+  },
+  {
+    "file": "scripts-v11036-scene-sequence-preview-regression.mjs",
+    "code": 0,
+    "out": ""
+  },
+  {
+    "file": "scripts-v11037-story-directed-continuity-regression.mjs",
+    "code": 0,
+    "out": ""
+  },
+  {
+    "file": "scripts-v11038-speaking-shot-completion-regression.mjs",
+    "code": 0,
+    "out": ""
+  },
+  {
+    "file": "scripts-v11039-app-wide-release-audit.mjs",
+    "code": 0,
+    "out": ""
+  },
+  {
+    "file": "scripts-v11039-selected-shot-context-regression.mjs",
+    "code": 0,
+    "out": ""
+  },
+  {
+    "file": "scripts-v1104-authenticated-storage-handoff.mjs",
+    "code": 0,
+    "out": ""
+  },
+  {
+    "file": "scripts-v11040-pending-shot-action-regression.mjs",
+    "code": 0,
+    "out": ""
+  },
+  {
+    "file": "scripts-v11041-auto-scene-editor-regression.mjs",
+    "code": 0,
+    "out": ""
+  },
+  {
+    "file": "scripts-v11042-story-intelligence-cinematic-direction-regression.mjs",
+    "code": 0,
+    "out": ""
+  },
+  {
+    "file": "scripts-v11043-story-to-shot-director-regression.mjs",
+    "code": 0,
+    "out": ""
+  },
+  {
+    "file": "scripts-v11044-production-logic-integrity-regression.mjs",
+    "code": 0,
+    "out": ""
+  },
+  {
+    "file": "scripts-v11045-self-healing-plan-regression.mjs",
+    "code": 0,
+    "out": ""
+  },
+  {
+    "file": "scripts-v11046-system-integrity-regression.mjs",
+    "code": 0,
+    "out": ""
+  },
+  {
+    "file": "scripts-v11047-persisted-identity-migration-regression.mjs",
+    "code": 0,
+    "out": ""
+  },
+  {
+    "file": "scripts-v11047-persisted-identity-reconciliation-regression.mjs",
+    "code": 0,
+    "out": ""
+  },
+  {
+    "file": "scripts-v11048-authoritative-identity-repair-regression.mjs",
+    "code": 0,
+    "out": ""
+  },
+  {
+    "file": "scripts-v11049-production-audit-runtime-regression.mjs",
+    "code": 0,
+    "out": ""
+  },
+  {
+    "file": "scripts-v1105-clean-scene-workflow-regression.mjs",
+    "code": 0,
+    "out": ""
+  },
+  {
+    "file": "scripts-v11050-full-system-integrity-regression.mjs",
+    "code": 0,
+    "out": ""
+  },
+  {
+    "file": "scripts-v11051-legacy-dialogue-object-lifecycle-regression.mjs",
+    "code": 0,
+    "out": ""
+  },
+  {
+    "file": "scripts-v11052-mixed-script-speaker-recovery-regression.mjs",
+    "code": 0,
+    "out": ""
+  },
+  {
+    "file": "scripts-v11053-video-terminal-state-regression.mjs",
+    "code": 0,
+    "out": ""
+  },
+  {
+    "file": "scripts-v11054-persisted-video-terminal-recovery-regression.mjs",
+    "code": 0,
+    "out": ""
+  },
+  {
+    "file": "scripts-v1106-authoritative-sync-adoption-regression.mjs",
+    "code": 0,
+    "out": ""
+  },
+  {
+    "file": "scripts-v1107-authoritative-audio-dom-regression.mjs",
+    "code": 0,
+    "out": ""
+  },
+  {
+    "file": "scripts-v1107-sync-422-asset-retry-runtime.mjs",
+    "code": 0,
+    "out": ""
+  },
+  {
+    "file": "scripts-v1108-fresh-sync-job-polling-regression.mjs",
+    "code": 0,
+    "out": ""
+  },
+  {
+    "file": "scripts-v1109-user-retry-state-machine-regression.mjs",
+    "code": 0,
+    "out": ""
+  },
+  {
+    "file": "scripts-v1110-sync-diagnostics-regression.mjs",
+    "code": 0,
+    "out": ""
+  },
+  {
+    "file": "scripts-v1111-owner-diagnostics-access-regression.mjs",
+    "code": 0,
+    "out": ""
+  },
+  {
+    "file": "scripts-v1111-owner-endpoint-runtime.mjs",
+    "code": 0,
+    "out": ""
+  },
+  {
+    "file": "scripts-v1112-live-sync-control-regression.mjs",
+    "code": 0,
+    "out": ""
+  },
+  {
+    "file": "scripts-v1112-live-sync-runtime.mjs",
+    "code": 0,
+    "out": ""
+  },
+  {
+    "file": "scripts-v1119-provider-audio-authoritative-regression.mjs",
+    "code": 0,
+    "out": ""
+  },
+  {
+    "file": "scripts-v1120-episode-completion-regression.mjs",
+    "code": 0,
+    "out": ""
+  },
+  {
+    "file": "scripts-v1121-auto-final-sync-continuation-regression.mjs",
+    "code": 0,
+    "out": ""
+  },
+  {
+    "file": "scripts-v1122-deterministic-final-timeline-regression.mjs",
+    "code": 0,
+    "out": ""
+  },
+  {
+    "file": "scripts-v1123-shot-timeline-story-engine-regression.mjs",
+    "code": 0,
+    "out": ""
+  },
+  {
+    "file": "scripts-v1124-existing-project-shot-migration-regression.mjs",
+    "code": 0,
+    "out": ""
+  },
+  {
+    "file": "scripts-v1125-navigation-media-visibility-regression.mjs",
+    "code": 0,
+    "out": ""
+  },
+  {
+    "file": "scripts-v1126-episode-media-recovery-regression.mjs",
+    "code": 0,
+    "out": ""
+  },
+  {
+    "file": "scripts-v1126-production-state-merge-runtime.mjs",
+    "code": 0,
+    "out": ""
+  },
+  {
+    "file": "scripts-v1127-null-safe-shot-plan-regression.mjs",
+    "code": 0,
+    "out": ""
+  },
+  {
+    "file": "scripts-v1128-shot-inventory-credit-safety-regression.mjs",
+    "code": 0,
+    "out": ""
+  },
+  {
+    "file": "scripts-v1948-regression.mjs",
+    "code": 0,
+    "out": ""
+  },
+  {
+    "file": "scripts-v1949-regression.mjs",
+    "code": 0,
+    "out": ""
+  },
+  {
+    "file": "scripts-v1950-regression.mjs",
+    "code": 0,
+    "out": ""
+  },
+  {
+    "file": "scripts-v1951-regression.mjs",
+    "code": 0,
+    "out": ""
+  },
+  {
+    "file": "scripts-v1952-regression.mjs",
+    "code": 0,
+    "out": ""
+  },
+  {
+    "file": "scripts-v1953-regression.mjs",
+    "code": 0,
+    "out": ""
+  },
+  {
+    "file": "scripts-v1954-regression.mjs",
+    "code": 0,
+    "out": ""
+  },
+  {
+    "file": "scripts-v1955-regression.mjs",
+    "code": 0,
+    "out": ""
+  },
+  {
+    "file": "scripts-v1956-regression.mjs",
+    "code": 0,
+    "out": ""
+  },
+  {
+    "file": "scripts-v1957-regression.mjs",
+    "code": 0,
+    "out": ""
+  },
+  {
+    "file": "scripts-v1958-regression.mjs",
+    "code": 0,
+    "out": ""
+  },
+  {
+    "file": "scripts-v1959-regression.mjs",
+    "code": 0,
+    "out": ""
+  },
+  {
+    "file": "scripts-v1960-regression.mjs",
+    "code": 0,
+    "out": ""
+  },
+  {
+    "file": "scripts-v1961-regression.mjs",
+    "code": 0,
+    "out": ""
+  },
+  {
+    "file": "scripts-v1962-regression.mjs",
+    "code": 0,
+    "out": ""
+  },
+  {
+    "file": "scripts-v1963-preview-sequence-regression.mjs",
+    "code": 0,
+    "out": ""
+  },
+  {
+    "file": "scripts-v1964-regression.mjs",
+    "code": 0,
+    "out": ""
+  },
+  {
+    "file": "scripts-v1965-regression.mjs",
+    "code": 0,
+    "out": ""
+  },
+  {
+    "file": "scripts-v1966-preview-close-regression.mjs",
+    "code": 0,
+    "out": ""
+  },
+  {
+    "file": "scripts-v1967-regression.mjs",
+    "code": 0,
+    "out": ""
+  },
+  {
+    "file": "scripts-v1968-regression.mjs",
+    "code": 0,
+    "out": ""
+  },
+  {
+    "file": "scripts-v1969-regression.mjs",
+    "code": 0,
+    "out": ""
+  },
+  {
+    "file": "scripts-v1970-regression.mjs",
+    "code": 0,
+    "out": ""
+  },
+  {
+    "file": "scripts-v1971-final-playback-regression.mjs",
+    "code": 0,
+    "out": ""
+  },
+  {
+    "file": "scripts-v1972-final-progress-stability.mjs",
+    "code": 0,
+    "out": ""
+  },
+  {
+    "file": "scripts-v1973-exhaustive-final-ux-regression.mjs",
+    "code": 0,
+    "out": ""
+  },
+  {
+    "file": "scripts-v1974-cloud-final-persistence.mjs",
+    "code": 0,
+    "out": ""
+  },
+  {
+    "file": "scripts-v1975-final-sync-integrity.mjs",
+    "code": 0,
+    "out": ""
+  },
+  {
+    "file": "scripts-v1976-final-media-integrity.mjs",
+    "code": 0,
+    "out": ""
+  },
+  {
+    "file": "scripts-v1977-audio-provenance-regression.mjs",
+    "code": 0,
+    "out": ""
+  },
+  {
+    "file": "scripts-v1978-scene-isolation-regression.mjs",
+    "code": 0,
+    "out": ""
+  },
+  {
+    "file": "scripts-v1979-media-control-interactivity.mjs",
+    "code": 0,
+    "out": ""
+  },
+  {
+    "file": "scripts-v1980-media-state-regression.mjs",
+    "code": 0,
+    "out": ""
+  },
+  {
+    "file": "scripts-v1981-professional-timeline-regression.mjs",
+    "code": 0,
+    "out": ""
+  },
+  {
+    "file": "scripts-v1982-studio-media-recovery-regression.mjs",
+    "code": 0,
+    "out": ""
+  },
+  {
+    "file": "scripts-v1983-stable-player-regression.mjs",
+    "code": 0,
+    "out": ""
+  },
+  {
+    "file": "scripts-v1985-native-player-visibility-regression.mjs",
+    "code": 0,
+    "out": ""
+  },
+  {
+    "file": "scripts-v1986-strict-production-contract-regression.mjs",
+    "code": 0,
+    "out": ""
+  },
+  {
+    "file": "scripts-v1987-durable-scene-media-regression.mjs",
+    "code": 0,
+    "out": ""
+  },
+  {
+    "file": "scripts-v1988-transactional-owned-media-regression.mjs",
+    "code": 0,
+    "out": ""
+  },
+  {
+    "file": "scripts-v1989-end-to-end-speaking-clip-regression.mjs",
+    "code": 0,
+    "out": ""
+  },
+  {
+    "file": "scripts-v1990-listen-preserves-video-regression.mjs",
+    "code": 0,
+    "out": ""
+  },
+  {
+    "file": "scripts-v1991-finished-speaking-clip-regression.mjs",
+    "code": 0,
+    "out": ""
+  },
+  {
+    "file": "scripts-v1992-clickable-preview-regression.mjs",
+    "code": 0,
+    "out": ""
+  },
+  {
+    "file": "scripts-v1993-finished-player-handoff-regression.mjs",
+    "code": 0,
+    "out": ""
+  },
+  {
+    "file": "scripts-v1994-embedded-audio-recovery-regression.mjs",
+    "code": 0,
+    "out": ""
+  },
+  {
+    "file": "scripts-video-regression.mjs",
+    "code": 0,
+    "out": ""
+  },
+  {
+    "file": "scripts-voice-continuity.mjs",
+    "code": 0,
+    "out": ""
+  },
+  {
+    "file": "scripts-voice-mix-regression.mjs",
+    "code": 0,
+    "out": ""
+  }
+]

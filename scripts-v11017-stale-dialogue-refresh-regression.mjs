@@ -1,0 +1,18 @@
+import fs from 'node:fs';
+import assert from 'node:assert/strict';
+const app=fs.readFileSync(new URL('./app.js',import.meta.url),'utf8');
+const html=fs.readFileSync(new URL('./index.html',import.meta.url),'utf8');
+const pkg=JSON.parse(fs.readFileSync(new URL('./package.json',import.meta.url),'utf8'));
+assert.equal(pkg.version,'1.12.4');
+assert.ok(app.includes("const APP_VERSION = '1.12.4'"));
+assert.ok(html.includes('/app.js?v=1.12.4')&&html.includes('/styles.css?v=1.12.4'));
+assert.ok(app.includes('function sceneHasSupersededDialogueSync'),'must detect stale paid sync tied to older approved voice/performance');
+assert.ok(app.includes("syncDiag('stale-dialogue-sync-superseded'"),'must trace superseded dialogue sync');
+assert.ok(app.includes("syncDiag('auto-dialogue-refresh-authorized'"),'must trace automatic replacement authorization');
+assert.match(app,/if\(sceneHasSupersededDialogueSync\(p,s\)\)[\s\S]{0,900}allowSubmit=true/,'superseded current-identity sync must authorize one automatic replacement submission');
+assert.match(app,/function supersedeStaleDialogueSyncForAutomaticRefresh[\s\S]{0,1500}resetSceneLipSyncOnly\(t,t\.videoUrl\)[\s\S]{0,400}t\.lipSyncAutoPending=true[\s\S]{0,200}t\.lipSyncStatus='preparing'/,'must preserve source while detaching stale sync and marking automatic refresh');
+assert.match(app,/lipSyncSupersededGenerationId=String\(t\.lipSyncGenerationId\|\|t\.lipSyncOperation\|\|''\)/,'must retain prior paid generation id for diagnostics/audit before reset');
+assert.match(app,/return productionContractIdentityCompatible\(scene\.lipSyncProductionContract\|\|scene\.videoProductionContract\|\|'',sceneVideoProductionContract\(project,scene\)\)/,'automatic refresh must remain constrained to same exact production identity');
+const labels=app.slice(app.indexOf('function videoButtonLabel'),app.indexOf('function sceneVideoMarkup'));
+assert.ok(!labels.includes('Complete clip'),'Complete clip must remain absent from normal user workflow');
+console.log('v1.10.20 stale dialogue refresh regression PASS');

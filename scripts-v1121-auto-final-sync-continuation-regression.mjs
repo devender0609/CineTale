@@ -1,0 +1,22 @@
+import fs from 'node:fs';
+import assert from 'node:assert/strict';
+const app=fs.readFileSync('app.js','utf8');
+const pkg=JSON.parse(fs.readFileSync('package.json','utf8'));
+const html=fs.readFileSync('index.html','utf8');
+assert.equal(pkg.version,'1.12.4');
+assert.ok(app.includes("const APP_VERSION = '1.12.4'"));
+assert.ok(html.includes('/app.js?v=1.12.4')&&html.includes('/styles.css?v=1.12.4'));
+assert.ok(app.includes('async function ensureAutoFinalDialogueSync'));
+assert.ok(app.includes("autoFinalJobPatch(projectId,{status:'running',stage:label,lastError:''})"));
+assert.ok(app.includes("syncDiag('auto-final-sync-wait'"));
+assert.ok(app.includes("await ensureAutoFinalDialogueSync(projectId,episodeId,index"));
+assert.ok(!app.includes('dialogue synchronization did not finish. Completed work was saved; resume final production after synchronization is available.'));
+assert.ok(app.includes('Finishing scene ${sceneNo} of ${selectedFinalScenes(episode).length} · synchronizing dialogue…'));
+// Behavioral model: ordinary provider processing is a wait state, not a user-resume/error state.
+const active=s=>Boolean(s.operation||['processing','waiting','preparing'].includes(s.status)||['PENDING','PROCESSING','WAITING_FOR_SLOT'].includes(s.provider));
+assert.equal(active({operation:'job1',status:'processing',provider:'PROCESSING'}),true);
+assert.equal(active({operation:'',status:'ready',provider:'COMPLETED'}),false);
+const definitive=s=>s.status==='error'&&!s.operation&&!['lipsync_busy',''].includes(s.errorCode||'');
+assert.equal(definitive({status:'processing',operation:'job1',errorCode:''}),false);
+assert.equal(definitive({status:'error',operation:'',errorCode:'provider_failed'}),true);
+console.log('v1.11.0 automatic final-sync continuation regression PASS');

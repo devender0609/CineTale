@@ -1,0 +1,25 @@
+import fs from 'node:fs';
+const app=fs.readFileSync(new URL('./app.js',import.meta.url),'utf8');
+const auth=fs.readFileSync(new URL('./api/auth-config.js',import.meta.url),'utf8');
+const env=fs.readFileSync(new URL('./.env.example',import.meta.url),'utf8');
+const must=(cond,msg)=>{if(!cond)throw new Error(msg)};
+must(app.includes("const APP_VERSION = '1.12.4'"),'app version must be 1.12.4');
+must(app.includes("pipelineVersion:13"),'final final pipeline version must be 13');
+must(app.includes("durationMode:'auto-edited-planned-shot-story-timeline'"),'new deterministic duration mode missing');
+must(!app.includes('clipIndex%videos.length'),'final renderer must never modulo-loop/repeat generated clips');
+must(app.includes('for(let clipIndex=0;clipIndex<videos.length;clipIndex++)'),'final renderer must consume each source at most once');
+must(app.includes('const editPlan=sceneEditPlan(liveProject,liveScene)')&&app.includes('available=Math.max(.25,media-Math.max(0,Number(edit.trimInSec)||0)-Math.max(0,Number(edit.trimOutSec)||0))'),'shot durations must be bounded by real media, planned duration, and conservative edit trims');
+must(app.includes('completePlannedShotCoverage:true')&&app.includes('allSpeakingShotsSynchronized:true'),'final timeline must require every planned shot and every speaking shot synchronized');
+must(app.includes("audioPolicy:'validated-dialogue+narration+controlled-visual-silence'"),'story timeline must use synchronized dialogue plus narration and controlled visual silence');
+must(app.includes('item.entry?.synchronized?1:0')&&app.includes('videoGains[i].gain.value=i===clipIndex'),'only the active validated story shot may contribute authoritative audio');
+must(!app.slice(app.indexOf('async function prepareFinalSceneAsset'),app.indexOf('async function renderFinalVideoFile')).includes('sceneCachedVoiceUrls('),'final render must not replay detached cached TTS over synchronized speaking video');
+must(app.includes('recorder.start(1000);await sleep(220);'),'recorder warm-up missing');
+must(app.includes('c.oauthUrl||c.url'),'Google OAuth must support a branded Supabase custom auth domain');
+must(auth.includes('SUPABASE_OAUTH_URL'),'auth-config must expose optional branded OAuth origin');
+must(env.includes('SUPABASE_OAUTH_URL='),'deployment template must document branded OAuth origin');
+
+const production=await import('./lib/production.js');
+must(production.coverageTargetCount({durationSec:30,narration:'brief'},'balanced')>=5,'balanced production must plan enough distinct coverage for a 30-second beat');
+must(production.coverageTargetCount({durationSec:30,narration:'brief'},'cinematic')>=4,'cinematic production must plan enough distinct coverage for a 30-second beat');
+must(app.includes('preview.muted=false;preview.volume=1;'),'final player must restore audible playback explicitly');
+console.log('v1.12.4 final sync/no-repeat/auth-branding regression: PASS');

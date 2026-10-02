@@ -1,0 +1,11 @@
+import fs from 'node:fs';import assert from 'node:assert/strict';
+const app=fs.readFileSync('app.js','utf8'),html=fs.readFileSync('index.html','utf8'),pkg=JSON.parse(fs.readFileSync('package.json','utf8'));
+assert.equal(pkg.version,'1.12.4');
+assert.ok(app.includes("const APP_VERSION = '1.12.4'"));
+assert.ok(html.includes('/app.js?v=1.12.4')&&html.includes('/styles.css?v=1.12.4'));
+assert.match(app,/const validatedSync=sceneHasValidatedLipSync\(liveProject,liveScene\)&&normalizedMediaUrl\(candidate\)===normalizedMediaUrl\(sceneValidatedSyncPlaybackUrl\(liveScene,liveProject\)\)/,'recovery must identify sync by hydrated runtime URL');
+assert.doesNotMatch(app,/normalizedMediaUrl\(candidate\)!==normalizedMediaUrl\(liveScene\.lipSyncVideoUrl\|\|'\'\)/,'must not compare runtime blob URL with provider sync URL for mute decision');
+assert.match(app,/if\(validatedSync\)\{video\.removeAttribute\('data-sync-gated'\);video\.defaultMuted=false;video\.muted=false;video\.removeAttribute\('muted'\);video\.volume=1;video\.dataset\.lipSyncReady='1'/,'recovered validated sync must be explicitly audible');
+assert.match(app,/const mountedAuthoritativeSync=Boolean\([\s\S]*mountedSrc===mountedDesired\);[\s\S]*video\.defaultMuted=false;video\.muted=false;video\.removeAttribute\('muted'\);video\.volume=1/,'mounted final player must shed inherited mute state using live authoritative source identity');
+assert.match(app,/if\(video\.dataset\.lipSyncReady==='1'\|\|\(desired&&currentSrc===desired\)\)\{[\s\S]*video\.muted=false;[\s\S]*video\.volume=1/,'play handler must never re-mute finished sync asset');
+console.log('v1.10.9 embedded-audio recovery regression PASS');

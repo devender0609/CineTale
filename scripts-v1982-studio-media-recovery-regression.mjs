@@ -1,0 +1,12 @@
+import fs from 'node:fs';
+import assert from 'node:assert/strict';
+const app=fs.readFileSync(new URL('./app.js', import.meta.url),'utf8');
+assert.ok(app.includes('preload="metadata"'), 'scene videos should use metadata preload to avoid all clips competing for full download at Studio open');
+assert.ok(!app.includes('video.currentTime=Math.min(.08,video.duration/20)'), 'Studio must not seek every paused video on initial load; that caused visible decode/flicker work');
+assert.ok(!app.includes('async function adoptValidatedSceneMediaIfMounted'), 'unused mounted-player hot-swap helper should be removed');
+assert.ok(app.includes('Opening Studio is not consent to spend additional lip-sync credits'), 'Studio open must not authorize legacy unsynchronized scenes for new paid lip-sync work');
+assert.ok(app.includes('allowSubmit:liveScene.lipSyncAutoPending===true'), 'reload recovery must resume only an already-authorized fresh post-video synchronization');
+assert.ok(app.includes('Promise.allSettled(pending.map'), 'saved synchronized media should be recovered in parallel rather than serially delaying later scenes');
+assert.ok(!app.includes('if(url)await adoptValidatedSceneMediaIfMounted'), 'background recovery must not hot-swap an already-mounted player');
+assert.match(app,/validatedSync\)\{video\.removeAttribute\('data-sync-gated'\);video\.defaultMuted=false;video\.muted=false;video\.removeAttribute\('muted'\);video\.volume=1;video\.dataset\.lipSyncReady='1'/, 'validated synchronized media must restore native audible playback and clear stale gate state');
+console.log('PASS v1.12.4 Studio media recovery regression');

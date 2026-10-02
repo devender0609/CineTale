@@ -1,0 +1,15 @@
+import fs from 'node:fs';
+import assert from 'node:assert/strict';
+const app=fs.readFileSync(new URL('./app.js',import.meta.url),'utf8');
+const css=fs.readFileSync(new URL('./styles.css',import.meta.url),'utf8');
+const pkg=JSON.parse(fs.readFileSync(new URL('./package.json',import.meta.url),'utf8'));
+const html=fs.readFileSync(new URL('./index.html',import.meta.url),'utf8');
+assert.equal(pkg.version,'1.12.4');
+assert.ok(app.includes("const APP_VERSION = '1.12.4'"));
+assert.ok(html.includes('/app.js?v=1.12.4')&&html.includes('/styles.css?v=1.12.4'));
+assert.ok(app.includes("const oldTimeline=oldCard.querySelector('.scene-shot-timeline'),freshTimeline=freshCard.querySelector('.scene-shot-timeline')"),'shot timeline must be refreshed during player-preserving patch');
+assert.ok(app.includes("else{const mediaColumn=oldCard.querySelector('.scene-media-column');mediaColumn?.after(freshCopy)}"),'missing scene copy must be restored beside media column');
+assert.ok(app.includes("else oldCard.append(freshActions)"),'missing production controls must be restored');
+assert.ok(app.includes("else oldCard.querySelector('.scene-media-column')?.append(freshSupport)"),'missing media support must be restored');
+assert.ok(css.includes('.scene-card>.scene-shot-timeline')&&css.includes('grid-column:1/-1!important'),'shot plan must span scene card');
+console.log('v1.11.0 scene shell restoration regression PASS');

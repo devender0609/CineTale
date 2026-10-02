@@ -1,0 +1,12 @@
+import fs from 'node:fs';
+import assert from 'node:assert/strict';
+const app=fs.readFileSync(new URL('./app.js',import.meta.url),'utf8');
+const html=fs.readFileSync(new URL('./index.html',import.meta.url),'utf8');
+assert.ok(app.includes("const APP_VERSION = '1.12.4'"));
+assert.ok(html.includes('id="syncDiagnosticResult"')&&html.includes('id="copySyncDiagnosticBtn"')&&html.includes('owner-only'));
+for(const stage of ['ensure-sync-start','audio-ready','source-ready-for-server','lipsync-submit-attempt','lipsync-submit-response','pre-poll-contract-check','poll-start','lipsync-status-response','sync-url-received','sync-persisted','sync-authoritative','player-bound','player-play','player-authoritative-audio-enabled','ensure-sync-error'])assert.ok(app.includes(`'${stage}'`),`missing diagnostic stage ${stage}`);
+assert.ok(app.includes("sessionStorage.setItem(syncDiagnosticKey"));
+assert.ok(app.includes("sourceStoragePath:String(scene?.videoStoragePath||'')"));
+assert.ok(app.includes("muted:v.muted")&&app.includes("defaultMuted:v.defaultMuted")&&app.includes("volume:v.volume"));
+assert.ok(!app.includes('audioDataUrl:audioDataUrl'),'diagnostics must not dump approved audio payload');
+console.log('PASS v1.10.20 owner-only speaking clip production trace regression');

@@ -1,0 +1,17 @@
+import fs from 'node:fs';import assert from 'node:assert/strict';
+const app=fs.readFileSync(new URL('./app.js',import.meta.url),'utf8');
+const html=fs.readFileSync(new URL('./index.html',import.meta.url),'utf8');
+assert.ok(app.includes("const APP_VERSION = '1.12.4'"));
+assert.ok(html.includes('/app.js?v=1.12.4')&&html.includes('/styles.css?v=1.12.4'));
+const a=app.indexOf('function sceneVideoMarkup'),b=app.indexOf('function fitSceneVideoToSurface',a),markup=app.slice(a,b);
+const unfinished=markup.slice(markup.indexOf('if(speaking&&!isMountedSynced)'),markup.lastIndexOf('return `<video controls'));
+assert.match(unfinished,/<video controls playsinline[^>]*muted[^>]*scene-source-preview[^>]*data-sync-gated="1"/,'owned unsynchronized speaking source must remain visible as a clean video surface');
+assert.doesNotMatch(unfinished,/Visual ready|Finish dialogue|scene-awaiting-sync-copy/,'video frame must not contain production-status copy');
+const syncUi=app.slice(app.indexOf('function sceneSyncStateUi'),app.indexOf('function updateSceneMediaStatuses'));
+assert.doesNotMatch(syncUi,/Visual ready · finish dialogue/,'idle sync state must not display Visual ready copy');
+assert.doesNotMatch(app.slice(app.indexOf('function videoButtonLabel'),app.indexOf('function videoButtonDisabled')),/'Finish clip'/,'normal scene action must not expose Finish clip label');
+assert.match(app,/function sceneVideoAction[\s\S]*return 'finalizing'/,'existing valid source must enter automatic dialogue finalization without a second completion action');
+assert.match(app,/if\(action==='finalizing'\)[\s\S]{0,400}scheduleSceneLipSyncAfterSourceReady/,'stale clicks during automatic finalization must resume the non-billable automatic path instead of creating a separate Complete clip workflow');
+assert.match(app,/async function pollVideo[\s\S]*commitPrimarySceneVideo[\s\S]*ensureSceneLipSync\(afterSource,afterScene,i,\{quiet:false,allowSubmit:true,propagateErrors:true\}\)/,'background regenerate must automatically continue into dialogue synchronization');
+assert.match(app,/async function requestVideo[\s\S]*commitPrimarySceneVideo[\s\S]*ensureSceneLipSync\(liveProject,liveScene,i,\{quiet:false,allowSubmit:true,propagateErrors:true\}\)/,'immediate video generation must automatically continue into dialogue synchronization');
+console.log('v1.10.9 clean scene workflow regression PASS');

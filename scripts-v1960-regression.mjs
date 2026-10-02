@@ -1,0 +1,18 @@
+import fs from 'node:fs';
+const app=fs.readFileSync('app.js','utf8');
+const must=(ok,msg)=>{if(!ok)throw new Error(msg)};
+must(app.includes('function sceneSourceMatchesCurrentProduction(project={},scene={})')&&app.includes('function sceneProductionReady(project={},scene={}){return Boolean(sceneSourceMatchesCurrentProduction(project,scene)&&(!sceneHasSpokenContent(scene)||sceneHasValidatedLipSync(project,scene)))}'),'Speaking scenes are not gated on current durable source + validated lip sync.');
+must(app.includes("function resetSceneLipSyncForNewSource(scene={},videoUrl='')"),'Missing new-source lip-sync reset helper.');
+must(app.includes('function scheduleSceneLipSyncAfterSourceReady(projectId,episodeId,index'),'Missing automatic post-video lip-sync scheduler.');
+must(app.includes("ensureSceneLipSync(project,scene,index,{quiet:true,allowSubmit:true})"),'Post-video sync does not explicitly submit the fresh source.');
+must(app.includes('async function commitPrimarySceneVideo'),'Fresh video completion does not use transactional adoption.');
+must(app.includes('resetSceneLipSyncForNewSource(target,providerUrl)'),'Fresh video adoption does not invalidate stale synchronized output.');
+must(app.includes('scheduleSceneLipSyncAfterSourceReady(projectId,episodeId,index)'),'Durably adopted source does not launch post-video synchronization.');
+must(app.includes('selected.filter(x=>sceneStoryTimelineReady(p,x.scene)).length'),'Final readiness must require the complete planned story timeline.');
+must(app.includes('productionReady=sceneStoryTimelineReady(p,scene)'),'Final assembly does not use full story-timeline readiness.');
+must(app.includes("'◌ PRODUCING'"),'Final assembly has no active production state label.');
+must(app.includes('scenes.some(x=>!sceneStoryTimelineReady(p,x.scene))'),'Prepare final assembly does not enforce complete planned shot timelines.');
+must(app.includes('lipSyncAutoPending=true'),'Fresh speaking source is not persisted as auto-sync pending.');
+must(app.includes('allowSubmit:liveScene.lipSyncAutoPending===true'),'Reload warmup cannot resume an explicitly authorized post-video sync submission.');
+must(/WAITING_FOR_SLOT[\s\S]*?scheduleSceneLipSyncAfterSourceReady/.test(app),'Busy-provider path does not retry the authorized scene after the active slot clears.');
+console.log('v1.12.4 post-video sync + durable readiness regression: PASS');

@@ -1,0 +1,18 @@
+import fs from 'node:fs';import assert from 'node:assert/strict';import vm from 'node:vm';
+const app=fs.readFileSync(new URL('./app.js',import.meta.url),'utf8');
+const html=fs.readFileSync(new URL('./index.html',import.meta.url),'utf8');
+assert.ok(app.includes("const APP_VERSION = '1.12.4'"));
+assert.ok(html.includes('/app.js?v=1.12.4')&&html.includes('/styles.css?v=1.12.4'));
+assert.ok(app.includes("retryTelemetryKey='cinetale.sync.retry.telemetry.v1'"),'persistent retry telemetry key missing');
+assert.ok(app.includes("'retry-button-clicked-capture'"),'capture-phase retry marker missing');
+assert.ok(app.includes("document.addEventListener('click'"),'document capture listener missing');
+assert.ok(app.includes('Retry clicks captured:'),'visible retry counter missing');
+assert.ok(app.includes('retryTelemetry:{...retryTelemetry}'),'retry telemetry missing from report');
+assert.ok(html.includes('id="retryTelemetrySummary"'),'owner diagnostics retry summary missing');
+const a=app.indexOf('function canonicalMediaUrl'),b=app.indexOf('function normalizeSceneMediaReferences',a);assert.ok(a>=0&&b>a);
+const src=app.slice(a,b)+';this.canonicalMediaUrl=canonicalMediaUrl;';
+const context={URL,location:{origin:'https://cine-tale.vercel.app'}};vm.createContext(context);vm.runInContext(src,context);
+assert.equal(context.canonicalMediaUrl('https://cine-tale.vercel.apphttps://cine-tale.vercel.app/abc'),'https://cine-tale.vercel.app/abc');
+assert.equal(context.canonicalMediaUrl('https://other.examplehttps://cine-tale.vercel.app/abc'),'https://cine-tale.vercel.app/abc');
+assert.equal(context.canonicalMediaUrl('/api/video-file?x=1'),'https://cine-tale.vercel.app/api/video-file?x=1');
+console.log('v1.10.20 retry telemetry + player URL regression: PASS');

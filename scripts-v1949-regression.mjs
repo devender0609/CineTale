@@ -1,0 +1,14 @@
+import fs from 'node:fs';import assert from 'node:assert/strict';
+const app=fs.readFileSync('app.js','utf8');const html=fs.readFileSync('index.html','utf8');
+assert.ok(app.includes("const APP_VERSION = '1.12.4'"));
+assert.ok(app.includes('LIP_SYNC_JOB_STALE_MS=15*60*1000'));
+assert.ok(app.includes('lipSyncRetryCount'));
+assert.ok(app.includes('sceneHasValidatedLipSync'));
+const a=app.indexOf('function sceneVideoMarkup'),b=app.indexOf('function fitSceneVideoToSurface',a),markup=app.slice(a,b);
+assert.match(markup,/if\(speaking&&!isMountedSynced\)[\s\S]*scene-source-preview[\s\S]*data-sync-gated=\"1\"/);
+const unfinished=markup.slice(markup.indexOf('if(speaking&&!isMountedSynced)'),markup.lastIndexOf('return `<video controls'));
+assert.match(unfinished,/<video/,'unfinished speaking source must remain visible as a video preview');
+assert.doesNotMatch(unfinished,/Visual ready|Finish dialogue/);
+assert.ok(!app.includes('ctl.gating=true'));
+assert.ok(html.includes('/app.js?v=1.12.4')&&html.includes('/styles.css?v=1.12.4'));
+console.log('v1.10.9 stale-job protection + synchronized-only speaking playback regression PASS');

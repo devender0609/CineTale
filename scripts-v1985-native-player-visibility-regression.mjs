@@ -1,0 +1,17 @@
+import fs from 'node:fs';
+import assert from 'node:assert/strict';
+const app=fs.readFileSync(new URL('./app.js',import.meta.url),'utf8');
+const css=fs.readFileSync(new URL('./styles.css',import.meta.url),'utf8');
+const html=fs.readFileSync(new URL('./index.html',import.meta.url),'utf8');
+const pkg=JSON.parse(fs.readFileSync(new URL('./package.json',import.meta.url),'utf8'));
+assert.equal(pkg.version,'1.12.4');
+assert.ok(app.includes("const APP_VERSION = '1.12.4'"));
+assert.ok(html.includes('/app.js?v=1.12.4')&&html.includes('/styles.css?v=1.12.4'));
+assert.ok(/function sceneVideoMarkup[\s\S]*<video controls playsinline/.test(app),'scene video must render native controls directly');
+assert.ok(/const poster=art\?` poster=/.test(app),'storyboard should use the native video poster attribute when available');
+assert.ok(!app.includes('class="scene-video-poster"'),'scene media must not render a DOM poster overlay above native controls');
+assert.ok(!app.includes('scene-video-poster-empty'),'empty black DOM overlay must not exist');
+assert.ok(!css.includes('.scene-visual>.scene-video-poster'),'CSS must not recreate a poster overlay');
+assert.ok(/\.scene-visual>video\.scene-video-element\{[\s\S]*opacity:1!important;[\s\S]*visibility:visible!important/.test(css),'video surface must remain visibly mounted during loading');
+assert.ok(/preload="metadata" class="scene-video-element"/.test(app),'scene player should keep metadata preload for fast initial Studio load');
+console.log('v1.12.4 native-player visibility regression PASS');

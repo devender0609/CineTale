@@ -1,0 +1,15 @@
+import fs from 'node:fs';
+const app=fs.readFileSync('app.js','utf8');
+const fail=(m)=>{console.error('FAIL',m);process.exitCode=1};
+const pass=(m)=>console.log('PASS',m);
+if(app.includes('function scheduleStudioSceneAudioWarmup')) fail('Studio-open approved-audio warmup still competes with initial video loading'); else pass('Studio-open approved-audio warmup removed');
+if(app.includes('function prepareSceneApprovedAudio')) fail('unused decoded-audio preparation cache remains'); else pass('unused decoded-audio preparation cache removed');
+if(app.includes('async function startSceneVideoVoicePlayback')) fail('legacy detached-audio scene playback helper remains'); else pass('legacy detached-audio scene playback helper removed');
+const playBlock=app.slice(app.indexOf("video.addEventListener('play'"), app.indexOf("video.addEventListener('pause'"));
+if(/video\.pause\(\)/.test(playBlock)&&!playBlock.includes('player-triggered-audio-finalization')) fail('play handler cancels native play outside transparent approved-audio finalization'); else pass('play handler only pauses to transparently finalize approved audio when required');
+if(playBlock.includes('startSceneVideoVoicePlayback')) fail('play handler still starts detached approved audio over source video'); else pass('play handler keeps unsynchronized video visual-only');
+if(!app.includes("video.dataset.voiceSync='visual-only'")) fail('visual-only source state missing'); else pass('visual-only source state present');
+if(!app.includes('video.muted=true')) fail('unsynchronized source can expose provider/source speech'); else pass('unsynchronized source speech remains muted');
+if(app.includes("video.dataset.voiceSyncRewound!=='1'")) fail('legacy detached-audio rewind behavior remains'); else pass('no detached-audio rewind behavior remains');
+if(!app.includes("requestIdleCallback(()=>void runRecovery(),{timeout:1800})")&&!app.includes("setTimeout(()=>void runRecovery(),1200)")) fail('background lip-sync recovery is not deferred behind initial media loading'); else pass('background recovery deferred behind initial media loading');
+if(process.exitCode) process.exit(process.exitCode);

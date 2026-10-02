@@ -1,0 +1,10 @@
+import fs from 'node:fs';import assert from 'node:assert/strict';
+const app=fs.readFileSync(new URL('./app.js',import.meta.url),'utf8');
+assert.ok(app.includes("const APP_VERSION = '1.12.4'"));
+const a=app.indexOf('function sceneVideoMarkup'),b=app.indexOf('function fitSceneVideoToSurface',a),markup=app.slice(a,b);
+assert.match(markup,/if\(speaking&&!isMountedSynced\)/);
+assert.match(markup,/scene-source-preview[\s\S]*data-sync-gated=\"1\"/,'unfinished source must be a clean visual-only video preview');
+const unfinished=markup.slice(markup.indexOf('if(speaking&&!isMountedSynced)'),markup.lastIndexOf('return `<video controls'));
+assert.doesNotMatch(unfinished,/Visual ready|Finish dialogue/,'unfinished video must not show production messages on its frame');
+assert.match(app,/sceneProductionReady\(project=\{\},scene=\{\}\).*sceneHasValidatedLipSync/s);
+console.log('v1.10.9 synchronized-only speaking-player regression PASS');

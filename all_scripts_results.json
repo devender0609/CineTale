@@ -1,0 +1,582 @@
+[
+  {
+    "file": "scripts-check.mjs",
+    "code": 0,
+    "out": "CineTale checks passed: no merge markers; JSON valid.\n"
+  },
+  {
+    "file": "scripts-deep-qa.mjs",
+    "code": 0,
+    "out": "CineTale deep QA passed: 188 static IDs, 475 DOM refs, 19 API routes, 3 local assets, 280 files checked.\n"
+  },
+  {
+    "file": "scripts-lipsync-adoption-regression.mjs",
+    "code": 0,
+    "out": "PASS pipeline revision advances for provider-rendered sync assets\nPASS validated lip-sync gate exists\nPASS primary video never uses unvalidated sync result\nPASS provider result is browser-validated before use\nPASS invalid provider result is rejected\nPASS scene DOM replacement is deferred during player session\nPASS player session lock begins on play\nPASS playback completion handler is stable and synchronous\nPASS ended playback never hot-swaps the media source\nPASS technical media state is removed from the video overlay\nPASS status API preserves Sync Labs provenance\nPASS status API only proxies supported synchronized-media hosts\n"
+  },
+  {
+    "file": "scripts-lipsync-regression.mjs",
+    "code": 0,
+    "out": "dedicated lip-sync + fallback hardening regression PASS\n"
+  },
+  {
+    "file": "scripts-lipsync-status-resilience.mjs",
+    "code": 0,
+    "out": "lip-sync status resilience regression PASS\n"
+  },
+  {
+    "file": "scripts-lipsync-v1947-regression.mjs",
+    "code": 0,
+    "out": "PASS app version advanced\nPASS studio source pin follows the newly validated desired asset instead of pinning Veo forever\nPASS playback only treats a validated synchronized URL as authoritative\nPASS saved queue jobs can resume\nPASS queue metadata persists for refresh-safe resume\nPASS existing paid job is resumed before new submission\nPASS user video overlay has no provider/debug/status wording\nPASS Sync Labs status endpoint is present\nPASS completed Sync Labs generations are recognized\nPASS Sync Labs output URL is retrieved\nPASS FAL fallback status path remains available\nv1.9.51 carries forward lip-sync adoption/resume regression PASS\n"
+  },
+  {
+    "file": "scripts-player-lifecycle-regression.mjs",
+    "code": 0,
+    "out": "PASS studio source is pinned for the mounted scene lifecycle\nPASS studio pin is signature-aware\nPASS only validated sync can become primary video\nPASS scene markup uses stable studio source\nPASS new lip-sync jobs clear prior validation\nPASS provider result remains unvalidated until browser probe succeeds\nPASS FAL result is browser-probed before validation\nPASS saved synchronized provider result is revalidated before authoritative reuse\nPASS active player session prevents scene DOM replacement\nPASS player session lock begins on play\nPASS pause never adopts a new source\nPASS ended never hot-swaps a new source\nPASS background sync does not require a Studio remount\nPASS adoption function itself rejects active playback\nPASS failed synchronized playback never substitutes the silent source\nPASS ended does not remount Studio\nPASS stable scene-player lifecycle regression\n"
+  },
+  {
+    "file": "scripts-scene-audio-regression.mjs",
+    "code": 0,
+    "out": "scene dialogue/video sync regression PASS\n"
+  },
+  {
+    "file": "scripts-smoke.mjs",
+    "code": 1,
+    "out": "enerate-image] Live image generation failed {\n  message: 'RESOURCE_EXHAUSTED: quota exceeded',\n  model: 'gemini-3.1-flash-image',\n  hasGeminiKey: true,\n  hasOpenAIKey: false,\n  requestedPrimary: 'auto',\n  aspect: '16:9',\n  quality: 'standard',\n  referenceCount: 0\n}\n[CineTale image] Gemini route unavailable; trying next route {\n  model: 'gemini-3.1-flash-image',\n  status: 400,\n  message: 'Image delivery mode is not supported.'\n}\n[CineTale image] Gemini route unavailable; trying next route {\n  model: 'gemini-3.1-flash-lite-image',\n  status: 400,\n  message: 'Image delivery mode is not supported.'\n}\n[CineTale image] Visual provider unavailable; trying backup {\n  provider: 'gemini',\n  status: 400,\n  message: 'Image delivery mode is not supported.'\n}\n[CineTale generate-image] Live image generation failed {\n  message: 'Image delivery mode is not supported.',\n  model: 'gemini-3.1-flash-image',\n  hasGeminiKey: true,\n  hasOpenAIKey: false,\n  requestedPrimary: 'auto',\n  aspect: '16:9',\n  quality: 'standard',\n  referenceCount: 0\n}\n[CineTale tts] ElevenLabs model failed; trying fallback { model: 'eleven_v3', status: 422, message: 'model unavailable' }\nnode:internal/modules/run_main:123\n    triggerUncaughtException(\n    ^\n\nAssertionError [ERR_ASSERTION]: App bundle cache-busting version is missing\n    at file:///mnt/data/cinetale_11050_work/scripts-smoke.mjs:616:10 {\n  generatedMessage: false,\n  code: 'ERR_ASSERTION',\n  actual: false,\n  expected: true,\n  operator: '=='\n}\n\nNode.js v22.16.0\n"
+  },
+  {
+    "file": "scripts-v1100-production-contract-regression.mjs",
+    "code": 1,
+    "out": "node:internal/modules/run_main:123\n    triggerUncaughtException(\n    ^\n\nAssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n+ actual - expected\n\n+ '1.10.50'\n- '1.10.49'\n        ^\n\n    at file:///mnt/data/cinetale_11050_work/scripts-v1100-production-contract-regression.mjs:7:8\n    at ModuleJob.run (node:internal/modules/esm/module_job:274:25)\n    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:644:26)\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5) {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: '1.10.50',\n  expected: '1.10.49',\n  operator: 'strictEqual'\n}\n\nNode.js v22.16.0\n"
+  },
+  {
+    "file": "scripts-v1101-finish-action-regression.mjs",
+    "code": 0,
+    "out": "v1.10.9 Finish clip action regression: PASS\n"
+  },
+  {
+    "file": "scripts-v11013-live-presubmit-regression.mjs",
+    "code": 1,
+    "out": " mergeCharacterVoiceSelections(base={},other={}){\\n' +\n    '  const b=structuredClone(base||{}),others=Array.isArray(other?.characters)?other.characters:[];\\n' +\n    '  if(!Array.isArray(b.characters))return b;\\n' +\n    '  b.characters=b.characters.map((c,i)=>{\\n' +\n    '    const alt=others.find(x=>x?.id&&c?.id&&x.id===c.id)||others.find(x=>normalizeName(x?.name)===normalizeName(c?.name))||others[i];\\n' +\n    '    if(!alt||voiceSelectionStamp(alt)<=voiceSelectionStamp(c))return c;\\n' +\n    \"    for(const key of ['voiceId','voiceName','voiceMode','voiceLocked','voiceSelectionUpdatedAt','voiceRevision','voicePerformance','voicePace','voiceAccentDirection','voiceCustomDirection','voicePreviewLine','voiceConsent']){\\n\" +\n    '      if(key in alt)c[key]=structuredClone(alt[key]);\\n' +\n    '    }\\n' +\n    '    return c;\\n' +\n    '  });\\n' +\n    '  return b;\\n' +\n    '}\\n' +\n    'function projectRecoveryStore(){return safeParse(localStorage.getItem(projectRecoveryKey),{projects:{}})||{projects:{}}}\\n' +\n    \"function writeProjectRecoveryStore(store){try{localStorage.setItem(projectRecoveryKey,JSON.stringify(store))}catch(e){console.warn('[CineTale recovery] Snapshot save unavailable',e)}}\\n\" +\n    'function captureProjectRecoverySnapshot(project={}){\\n' +\n    '  if(!project?.id)return false;const episodes=(project.episodes||[]).filter(ep=>Array.isArray(ep.scenes)&&ep.sc'... 555425 more characters,\n  expected: /APP_VERSION\\s*=\\s*'1\\.10\\.49'/,\n  operator: 'match'\n}\n\nNode.js v22.16.0\n"
+  },
+  {
+    "file": "scripts-v11014-retry-telemetry-player-url-regression.mjs",
+    "code": 1,
+    "out": "node:internal/modules/run_main:123\n    triggerUncaughtException(\n    ^\n\nAssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:\n\n  assert.ok(html.includes('/app.js?v=1.10.49')&&html.includes('/styles.css?v=1.10.49'))\n\n    at file:///mnt/data/cinetale_11050_work/scripts-v11014-retry-telemetry-player-url-regression.mjs:5:8\n    at ModuleJob.run (node:internal/modules/esm/module_job:274:25)\n    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:644:26)\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5) {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: false,\n  expected: true,\n  operator: '=='\n}\n\nNode.js v22.16.0\n"
+  },
+  {
+    "file": "scripts-v11015-approved-audio-finalization-regression.mjs",
+    "code": 1,
+    "out": "node:internal/modules/run_main:123\n    triggerUncaughtException(\n    ^\n\nAssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n+ actual - expected\n\n+ '1.10.50'\n- '1.10.49'\n        ^\n\n    at file:///mnt/data/cinetale_11050_work/scripts-v11015-approved-audio-finalization-regression.mjs:5:8\n    at ModuleJob.run (node:internal/modules/esm/module_job:274:25)\n    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:644:26)\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5) {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: '1.10.50',\n  expected: '1.10.49',\n  operator: 'strictEqual'\n}\n\nNode.js v22.16.0\n"
+  },
+  {
+    "file": "scripts-v11016-automatic-dialogue-finalization-regression.mjs",
+    "code": 1,
+    "out": "node:internal/modules/run_main:123\n    triggerUncaughtException(\n    ^\n\nAssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n+ actual - expected\n\n+ '1.10.50'\n- '1.10.49'\n        ^\n\n    at file:///mnt/data/cinetale_11050_work/scripts-v11016-automatic-dialogue-finalization-regression.mjs:6:8\n    at ModuleJob.run (node:internal/modules/esm/module_job:274:25)\n    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:644:26)\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5) {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: '1.10.50',\n  expected: '1.10.49',\n  operator: 'strictEqual'\n}\n\nNode.js v22.16.0\n"
+  },
+  {
+    "file": "scripts-v11017-stale-dialogue-refresh-regression.mjs",
+    "code": 1,
+    "out": "node:internal/modules/run_main:123\n    triggerUncaughtException(\n    ^\n\nAssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n+ actual - expected\n\n+ '1.10.50'\n- '1.10.49'\n        ^\n\n    at file:///mnt/data/cinetale_11050_work/scripts-v11017-stale-dialogue-refresh-regression.mjs:6:8\n    at ModuleJob.run (node:internal/modules/esm/module_job:274:25)\n    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:644:26)\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5) {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: '1.10.50',\n  expected: '1.10.49',\n  operator: 'strictEqual'\n}\n\nNode.js v22.16.0\n"
+  },
+  {
+    "file": "scripts-v11018-lipsync-polling-recovery-regression.mjs",
+    "code": 0,
+    "out": "v1.10.20 lip-sync polling recovery regression PASS\n"
+  },
+  {
+    "file": "scripts-v1102-owned-source-transport-regression.mjs",
+    "code": 1,
+    "out": "node:internal/modules/run_main:123\n    triggerUncaughtException(\n    ^\n\nAssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n+ actual - expected\n\n+ '1.10.50'\n- '1.10.49'\n        ^\n\n    at file:///mnt/data/cinetale_11050_work/scripts-v1102-owned-source-transport-regression.mjs:7:8\n    at ModuleJob.run (node:internal/modules/esm/module_job:274:25)\n    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:644:26)\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5) {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: '1.10.50',\n  expected: '1.10.49',\n  operator: 'strictEqual'\n}\n\nNode.js v22.16.0\n"
+  },
+  {
+    "file": "scripts-v11029-shot-grid-layout-regression.mjs",
+    "code": 1,
+    "out": "file:///mnt/data/cinetale_11050_work/scripts-v11029-shot-grid-layout-regression.mjs:5\nconst fail=m=>{throw new Error(m)};\n                     ^\n\nError: cache bust must be 1.10.49\n    at fail (file:///mnt/data/cinetale_11050_work/scripts-v11029-shot-grid-layout-regression.mjs:5:22)\n    at file:///mnt/data/cinetale_11050_work/scripts-v11029-shot-grid-layout-regression.mjs:7:81\n    at ModuleJob.run (node:internal/modules/esm/module_job:274:25)\n    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:644:26)\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5)\n\nNode.js v22.16.0\n"
+  },
+  {
+    "file": "scripts-v1103-durable-source-repair-regression.mjs",
+    "code": 1,
+    "out": "node:internal/modules/run_main:123\n    triggerUncaughtException(\n    ^\n\nAssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n+ actual - expected\n\n+ '1.10.50'\n- '1.10.49'\n        ^\n\n    at file:///mnt/data/cinetale_11050_work/scripts-v1103-durable-source-repair-regression.mjs:6:8\n    at ModuleJob.run (node:internal/modules/esm/module_job:274:25)\n    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:644:26)\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5) {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: '1.10.50',\n  expected: '1.10.49',\n  operator: 'strictEqual'\n}\n\nNode.js v22.16.0\n"
+  },
+  {
+    "file": "scripts-v1103-storage-repair-runtime.mjs",
+    "code": 0,
+    "out": "v1.10.9 404 -> IndexedDB -> cloud self-repair runtime regression PASS\n"
+  },
+  {
+    "file": "scripts-v11030-lipsync-block-recovery-regression.mjs",
+    "code": 1,
+    "out": "node:internal/modules/run_main:123\n    triggerUncaughtException(\n    ^\n\nAssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n+ actual - expected\n\n+ '1.10.50'\n- '1.10.49'\n        ^\n\n    at file:///mnt/data/cinetale_11050_work/scripts-v11030-lipsync-block-recovery-regression.mjs:9:8\n    at ModuleJob.run (node:internal/modules/esm/module_job:274:25)\n    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:644:26)\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5) {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: '1.10.50',\n  expected: '1.10.49',\n  operator: 'strictEqual'\n}\n\nNode.js v22.16.0\n"
+  },
+  {
+    "file": "scripts-v11031-scene-shell-restoration-regression.mjs",
+    "code": 1,
+    "out": "node:internal/modules/run_main:123\n    triggerUncaughtException(\n    ^\n\nAssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n+ actual - expected\n\n+ '1.10.50'\n- '1.10.49'\n        ^\n\n    at file:///mnt/data/cinetale_11050_work/scripts-v11031-scene-shell-restoration-regression.mjs:7:8\n    at ModuleJob.run (node:internal/modules/esm/module_job:274:25)\n    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:644:26)\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5) {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: '1.10.50',\n  expected: '1.10.49',\n  operator: 'strictEqual'\n}\n\nNode.js v22.16.0\n"
+  },
+  {
+    "file": "scripts-v11032-shot-navigation-voice-modal-regression.mjs",
+    "code": 0,
+    "out": "v1.10.49 shot navigation / voice preview / modal close regression: PASS\n"
+  },
+  {
+    "file": "scripts-v11033-shot-listen-routing-regression.mjs",
+    "code": 0,
+    "out": "v1.10.49 selected-shot Listen routing regression: PASS\n"
+  },
+  {
+    "file": "scripts-v11034-shot-status-selection-regression.mjs",
+    "code": 0,
+    "out": "v1.10.49 shot status/selection regression: PASS\n"
+  },
+  {
+    "file": "scripts-v11035-shot-state-reconciliation-regression.mjs",
+    "code": 0,
+    "out": "v1.10.49 shot-state reconciliation regression: PASS\n"
+  },
+  {
+    "file": "scripts-v11036-scene-sequence-preview-regression.mjs",
+    "code": 1,
+    "out": "node:internal/modules/run_main:123\n    triggerUncaughtException(\n    ^\n\nAssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n+ actual - expected\n\n+ '1.10.50'\n- '1.10.49'\n        ^\n\n    at file:///mnt/data/cinetale_11050_work/scripts-v11036-scene-sequence-preview-regression.mjs:7:8\n    at ModuleJob.run (node:internal/modules/esm/module_job:274:25)\n    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:644:26)\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5) {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: '1.10.50',\n  expected: '1.10.49',\n  operator: 'strictEqual'\n}\n\nNode.js v22.16.0\n"
+  },
+  {
+    "file": "scripts-v11037-story-directed-continuity-regression.mjs",
+    "code": 1,
+    "out": "node:internal/modules/run_main:123\n    triggerUncaughtException(\n    ^\n\nAssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:\n\n  assert.ok(app.includes(\"const SHOT_DIRECTOR_PIPELINE_REV = 'v1.10.49-story-to-shot-director'\"))\n\n    at file:///mnt/data/cinetale_11050_work/scripts-v11037-story-directed-continuity-regression.mjs:26:8\n    at ModuleJob.run (node:internal/modules/esm/module_job:274:25)\n    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:644:26)\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5) {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: false,\n  expected: true,\n  operator: '=='\n}\n\nNode.js v22.16.0\n"
+  },
+  {
+    "file": "scripts-v11038-speaking-shot-completion-regression.mjs",
+    "code": 0,
+    "out": "PASS v1.10.49 speaking-shot completion regression\n"
+  },
+  {
+    "file": "scripts-v11039-app-wide-release-audit.mjs",
+    "code": 0,
+    "out": "v1.10.49 app-wide release audit PASS \u00b7 188 static IDs \u00b7 4 primary views\n"
+  },
+  {
+    "file": "scripts-v11039-selected-shot-context-regression.mjs",
+    "code": 1,
+    "out": "node:internal/modules/run_main:123\n    triggerUncaughtException(\n    ^\n\nAssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n+ actual - expected\n\n+ '1.10.50'\n- '1.10.49'\n        ^\n\n    at file:///mnt/data/cinetale_11050_work/scripts-v11039-selected-shot-context-regression.mjs:6:8\n    at ModuleJob.run (node:internal/modules/esm/module_job:274:25)\n    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:644:26)\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5) {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: '1.10.50',\n  expected: '1.10.49',\n  operator: 'strictEqual'\n}\n\nNode.js v22.16.0\n"
+  },
+  {
+    "file": "scripts-v1104-authenticated-storage-handoff.mjs",
+    "code": 0,
+    "out": "v1.10.9 authenticated storage -> actual bytes -> Sync Labs regression PASS\n"
+  },
+  {
+    "file": "scripts-v11040-pending-shot-action-regression.mjs",
+    "code": 1,
+    "out": "node:internal/modules/run_main:123\n    triggerUncaughtException(\n    ^\n\nAssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n+ actual - expected\n\n+ '1.10.50'\n- '1.10.49'\n        ^\n\n    at file:///mnt/data/cinetale_11050_work/scripts-v11040-pending-shot-action-regression.mjs:6:8\n    at ModuleJob.run (node:internal/modules/esm/module_job:274:25)\n    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:644:26)\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5) {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: '1.10.50',\n  expected: '1.10.49',\n  operator: 'strictEqual'\n}\n\nNode.js v22.16.0\n"
+  },
+  {
+    "file": "scripts-v11041-auto-scene-editor-regression.mjs",
+    "code": 1,
+    "out": "node:internal/modules/run_main:123\n    triggerUncaughtException(\n    ^\n\nAssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n+ actual - expected\n\n+ '1.10.50'\n- '1.10.49'\n        ^\n\n    at file:///mnt/data/cinetale_11050_work/scripts-v11041-auto-scene-editor-regression.mjs:6:8\n    at ModuleJob.run (node:internal/modules/esm/module_job:274:25)\n    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:644:26)\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5) {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: '1.10.50',\n  expected: '1.10.49',\n  operator: 'strictEqual'\n}\n\nNode.js v22.16.0\n"
+  },
+  {
+    "file": "scripts-v11042-story-intelligence-cinematic-direction-regression.mjs",
+    "code": 1,
+    "out": "node:internal/modules/run_main:123\n    triggerUncaughtException(\n    ^\n\nAssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:\n\n  assert.ok(app.includes(\"SHOT_DIRECTOR_PIPELINE_REV = 'v1.10.49-story-to-shot-director'\"))\n\n    at file:///mnt/data/cinetale_11050_work/scripts-v11042-story-intelligence-cinematic-direction-regression.mjs:36:8\n    at ModuleJob.run (node:internal/modules/esm/module_job:274:25)\n    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:644:26)\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5) {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: false,\n  expected: true,\n  operator: '=='\n}\n\nNode.js v22.16.0\n"
+  },
+  {
+    "file": "scripts-v11043-story-to-shot-director-regression.mjs",
+    "code": 1,
+    "out": "node:internal/modules/run_main:123\n    triggerUncaughtException(\n    ^\n\nAssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:\n\n  assert.ok(app.includes(\"SHOT_DIRECTOR_PIPELINE_REV = 'v1.10.49-story-to-shot-director'\"))\n\n    at file:///mnt/data/cinetale_11050_work/scripts-v11043-story-to-shot-director-regression.mjs:53:8\n    at ModuleJob.run (node:internal/modules/esm/module_job:274:25)\n    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:644:26)\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5) {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: false,\n  expected: true,\n  operator: '=='\n}\n\nNode.js v22.16.0\n"
+  },
+  {
+    "file": "scripts-v11044-production-logic-integrity-regression.mjs",
+    "code": 1,
+    "out": "node:internal/modules/run_main:123\n    triggerUncaughtException(\n    ^\n\nAssertionError [ERR_ASSERTION]: app missing scene.shotTimelineVersion='1.10.49'\n    at file:///mnt/data/cinetale_11050_work/scripts-v11044-production-logic-integrity-regression.mjs:47:10\n    at ModuleJob.run (node:internal/modules/esm/module_job:274:25)\n    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:644:26)\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5) {\n  generatedMessage: false,\n  code: 'ERR_ASSERTION',\n  actual: false,\n  expected: true,\n  operator: '=='\n}\n\nNode.js v22.16.0\n"
+  },
+  {
+    "file": "scripts-v11045-self-healing-plan-regression.mjs",
+    "code": 1,
+    "out": "node:internal/modules/run_main:123\n    triggerUncaughtException(\n    ^\n\nAssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:\n\n  assert.ok(app.includes(\"target.shotTimelineVersion='1.10.49'\"))\n\n    at file:///mnt/data/cinetale_11050_work/scripts-v11045-self-healing-plan-regression.mjs:52:8\n    at ModuleJob.run (node:internal/modules/esm/module_job:274:25)\n    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:644:26)\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5) {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: false,\n  expected: true,\n  operator: '=='\n}\n\nNode.js v22.16.0\n"
+  },
+  {
+    "file": "scripts-v11046-system-integrity-regression.mjs",
+    "code": 1,
+    "out": "node:internal/modules/run_main:123\n    triggerUncaughtException(\n    ^\n\nAssertionError [ERR_ASSERTION]: missing revision:'v1.10.49-system-integrity'\n    at file:///mnt/data/cinetale_11050_work/scripts-v11046-system-integrity-regression.mjs:16:10\n    at ModuleJob.run (node:internal/modules/esm/module_job:274:25)\n    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:644:26)\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5) {\n  generatedMessage: false,\n  code: 'ERR_ASSERTION',\n  actual: false,\n  expected: true,\n  operator: '=='\n}\n\nNode.js v22.16.0\n"
+  },
+  {
+    "file": "scripts-v11047-persisted-identity-migration-regression.mjs",
+    "code": 1,
+    "out": "node:internal/modules/run_main:123\n    triggerUncaughtException(\n    ^\n\nAssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n+ actual - expected\n\n+ 'v1.10.50'\n- 'v1.10.49'\n         ^\n\n    at file:///mnt/data/cinetale_11050_work/scripts-v11047-persisted-identity-migration-regression.mjs:48:8\n    at ModuleJob.run (node:internal/modules/esm/module_job:274:25)\n    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:644:26)\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5) {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: 'v1.10.50',\n  expected: 'v1.10.49',\n  operator: 'strictEqual'\n}\n\nNode.js v22.16.0\n"
+  },
+  {
+    "file": "scripts-v11047-persisted-identity-reconciliation-regression.mjs",
+    "code": 1,
+    "out": "node:internal/modules/run_main:123\n    triggerUncaughtException(\n    ^\n\nAssertionError [ERR_ASSERTION]: missing logicGateRevision:'v1.10.49-persisted-identity-reconciliation'\n    at file:///mnt/data/cinetale_11050_work/scripts-v11047-persisted-identity-reconciliation-regression.mjs:16:11\n    at ModuleJob.run (node:internal/modules/esm/module_job:274:25)\n    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:644:26)\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5) {\n  generatedMessage: false,\n  code: 'ERR_ASSERTION',\n  actual: false,\n  expected: true,\n  operator: '=='\n}\n\nNode.js v22.16.0\n"
+  },
+  {
+    "file": "scripts-v11048-authoritative-identity-repair-regression.mjs",
+    "code": 1,
+    "out": "node:internal/modules/run_main:123\n    triggerUncaughtException(\n    ^\n\nAssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:\n\n  assert.ok(app.includes(\"reason:`authoritative-${kind}`\"))\n\n    at file:///mnt/data/cinetale_11050_work/scripts-v11048-authoritative-identity-repair-regression.mjs:7:8\n    at ModuleJob.run (node:internal/modules/esm/module_job:274:25)\n    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:644:26)\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5) {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: false,\n  expected: true,\n  operator: '=='\n}\n\nNode.js v22.16.0\n"
+  },
+  {
+    "file": "scripts-v11049-production-audit-runtime-regression.mjs",
+    "code": 0,
+    "out": "v1.10.49 production audit runtime regression: PASS\n"
+  },
+  {
+    "file": "scripts-v1105-clean-scene-workflow-regression.mjs",
+    "code": 1,
+    "out": "node:internal/modules/run_main:123\n    triggerUncaughtException(\n    ^\n\nAssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:\n\n  assert.ok(html.includes('/app.js?v=1.10.49')&&html.includes('/styles.css?v=1.10.49'))\n\n    at file:///mnt/data/cinetale_11050_work/scripts-v1105-clean-scene-workflow-regression.mjs:5:8\n    at ModuleJob.run (node:internal/modules/esm/module_job:274:25)\n    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:644:26)\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5) {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: false,\n  expected: true,\n  operator: '=='\n}\n\nNode.js v22.16.0\n"
+  },
+  {
+    "file": "scripts-v11050-full-system-integrity-regression.mjs",
+    "code": 0,
+    "out": "v1.10.50 full system integrity regression: PASS\n"
+  },
+  {
+    "file": "scripts-v1106-authoritative-sync-adoption-regression.mjs",
+    "code": 0,
+    "out": "v1.10.9 authoritative sync adoption regression: PASS\n"
+  },
+  {
+    "file": "scripts-v1107-authoritative-audio-dom-regression.mjs",
+    "code": 0,
+    "out": "v1.10.9 authoritative audio DOM regression PASS\n"
+  },
+  {
+    "file": "scripts-v1107-sync-422-asset-retry-runtime.mjs",
+    "code": 0,
+    "out": "v1.10.9 Sync Labs 422 -> assetId JSON retry runtime regression PASS\n"
+  },
+  {
+    "file": "scripts-v1108-fresh-sync-job-polling-regression.mjs",
+    "code": 0,
+    "out": "v1.10.9 fresh accepted sync job -> polling identity regression PASS\n"
+  },
+  {
+    "file": "scripts-v1109-user-retry-state-machine-regression.mjs",
+    "code": 0,
+    "out": "PASS v1.10.20 user retry state machine\n"
+  },
+  {
+    "file": "scripts-v1110-sync-diagnostics-regression.mjs",
+    "code": 0,
+    "out": "PASS v1.10.20 owner-only speaking clip production trace regression\n"
+  },
+  {
+    "file": "scripts-v1111-owner-diagnostics-access-regression.mjs",
+    "code": 1,
+    "out": "file:///mnt/data/cinetale_11050_work/scripts-v1111-owner-diagnostics-access-regression.mjs:6\nfunction ok(cond,msg){if(!cond)throw new Error(msg)}\n                                     ^\n\nError: package version must be 1.10.49\n    at ok (file:///mnt/data/cinetale_11050_work/scripts-v1111-owner-diagnostics-access-regression.mjs:6:38)\n    at file:///mnt/data/cinetale_11050_work/scripts-v1111-owner-diagnostics-access-regression.mjs:7:1\n    at ModuleJob.run (node:internal/modules/esm/module_job:274:25)\n    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:644:26)\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5)\n\nNode.js v22.16.0\n"
+  },
+  {
+    "file": "scripts-v1111-owner-endpoint-runtime.mjs",
+    "code": 0,
+    "out": "v1.10.20 owner endpoint runtime: PASS\n"
+  },
+  {
+    "file": "scripts-v1112-live-sync-control-regression.mjs",
+    "code": 1,
+    "out": "node:internal/modules/run_main:123\n    triggerUncaughtException(\n    ^\n\nAssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n+ actual - expected\n\n+ '1.10.50'\n- '1.10.49'\n        ^\n\n    at file:///mnt/data/cinetale_11050_work/scripts-v1112-live-sync-control-regression.mjs:6:8\n    at ModuleJob.run (node:internal/modules/esm/module_job:274:25)\n    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:644:26)\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5) {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: '1.10.50',\n  expected: '1.10.49',\n  operator: 'strictEqual'\n}\n\nNode.js v22.16.0\n"
+  },
+  {
+    "file": "scripts-v1112-live-sync-runtime.mjs",
+    "code": 0,
+    "out": "v1.10.20 live sync runtime regression: PASS\n"
+  },
+  {
+    "file": "scripts-v1119-provider-audio-authoritative-regression.mjs",
+    "code": 0,
+    "out": "v1.10.20 provider-audio authoritative regression passed\n"
+  },
+  {
+    "file": "scripts-v1120-episode-completion-regression.mjs",
+    "code": 1,
+    "out": "node:internal/modules/run_main:123\n    triggerUncaughtException(\n    ^\n\nAssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n+ actual - expected\n\n+ '1.10.50'\n- '1.10.49'\n        ^\n\n    at file:///mnt/data/cinetale_11050_work/scripts-v1120-episode-completion-regression.mjs:6:8\n    at ModuleJob.run (node:internal/modules/esm/module_job:274:25)\n    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:644:26)\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5) {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: '1.10.50',\n  expected: '1.10.49',\n  operator: 'strictEqual'\n}\n\nNode.js v22.16.0\n"
+  },
+  {
+    "file": "scripts-v1121-auto-final-sync-continuation-regression.mjs",
+    "code": 1,
+    "out": "node:internal/modules/run_main:123\n    triggerUncaughtException(\n    ^\n\nAssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n+ actual - expected\n\n+ '1.10.50'\n- '1.10.49'\n        ^\n\n    at file:///mnt/data/cinetale_11050_work/scripts-v1121-auto-final-sync-continuation-regression.mjs:6:8\n    at ModuleJob.run (node:internal/modules/esm/module_job:274:25)\n    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:644:26)\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5) {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: '1.10.50',\n  expected: '1.10.49',\n  operator: 'strictEqual'\n}\n\nNode.js v22.16.0\n"
+  },
+  {
+    "file": "scripts-v1122-deterministic-final-timeline-regression.mjs",
+    "code": 1,
+    "out": "node:internal/modules/run_main:123\n    triggerUncaughtException(\n    ^\n\nAssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n+ actual - expected\n\n+ '1.10.50'\n- '1.10.49'\n        ^\n\n    at file:///mnt/data/cinetale_11050_work/scripts-v1122-deterministic-final-timeline-regression.mjs:7:8\n    at ModuleJob.run (node:internal/modules/esm/module_job:274:25)\n    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:644:26)\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5) {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: '1.10.50',\n  expected: '1.10.49',\n  operator: 'strictEqual'\n}\n\nNode.js v22.16.0\n"
+  },
+  {
+    "file": "scripts-v1123-shot-timeline-story-engine-regression.mjs",
+    "code": 1,
+    "out": "node:internal/modules/run_main:123\n    triggerUncaughtException(\n    ^\n\nAssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n+ actual - expected\n\n+ '1.10.50'\n- '1.10.49'\n        ^\n\n    at file:///mnt/data/cinetale_11050_work/scripts-v1123-shot-timeline-story-engine-regression.mjs:8:8\n    at ModuleJob.run (node:internal/modules/esm/module_job:274:25)\n    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:644:26)\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5) {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: '1.10.50',\n  expected: '1.10.49',\n  operator: 'strictEqual'\n}\n\nNode.js v22.16.0\n"
+  },
+  {
+    "file": "scripts-v1124-existing-project-shot-migration-regression.mjs",
+    "code": 1,
+    "out": "node:internal/modules/run_main:123\n    triggerUncaughtException(\n    ^\n\nAssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n+ actual - expected\n\n+ '1.10.50'\n- '1.10.49'\n        ^\n\n    at file:///mnt/data/cinetale_11050_work/scripts-v1124-existing-project-shot-migration-regression.mjs:9:8\n    at ModuleJob.run (node:internal/modules/esm/module_job:274:25)\n    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:644:26)\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5) {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: '1.10.50',\n  expected: '1.10.49',\n  operator: 'strictEqual'\n}\n\nNode.js v22.16.0\n"
+  },
+  {
+    "file": "scripts-v1125-navigation-media-visibility-regression.mjs",
+    "code": 1,
+    "out": "node:internal/modules/run_main:123\n    triggerUncaughtException(\n    ^\n\nAssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n+ actual - expected\n\n+ '1.10.50'\n- '1.10.49'\n        ^\n\n    at file:///mnt/data/cinetale_11050_work/scripts-v1125-navigation-media-visibility-regression.mjs:7:8\n    at ModuleJob.run (node:internal/modules/esm/module_job:274:25)\n    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:644:26)\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5) {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: '1.10.50',\n  expected: '1.10.49',\n  operator: 'strictEqual'\n}\n\nNode.js v22.16.0\n"
+  },
+  {
+    "file": "scripts-v1126-episode-media-recovery-regression.mjs",
+    "code": 1,
+    "out": "node:internal/modules/run_main:123\n    triggerUncaughtException(\n    ^\n\nAssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n+ actual - expected\n\n+ '1.10.50'\n- '1.10.49'\n        ^\n\n    at file:///mnt/data/cinetale_11050_work/scripts-v1126-episode-media-recovery-regression.mjs:6:8\n    at ModuleJob.run (node:internal/modules/esm/module_job:274:25)\n    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:644:26)\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5) {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: '1.10.50',\n  expected: '1.10.49',\n  operator: 'strictEqual'\n}\n\nNode.js v22.16.0\n"
+  },
+  {
+    "file": "scripts-v1126-production-state-merge-runtime.mjs",
+    "code": 0,
+    "out": "v1.10.49 production-state merge runtime PASS\n"
+  },
+  {
+    "file": "scripts-v1127-null-safe-shot-plan-regression.mjs",
+    "code": 1,
+    "out": "node:internal/modules/run_main:123\n    triggerUncaughtException(\n    ^\n\nAssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n+ actual - expected\n\n+ '1.10.50'\n- '1.10.49'\n        ^\n\n    at file:///mnt/data/cinetale_11050_work/scripts-v1127-null-safe-shot-plan-regression.mjs:8:8\n    at ModuleJob.run (node:internal/modules/esm/module_job:274:25)\n    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:644:26)\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5) {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: '1.10.50',\n  expected: '1.10.49',\n  operator: 'strictEqual'\n}\n\nNode.js v22.16.0\n"
+  },
+  {
+    "file": "scripts-v1128-shot-inventory-credit-safety-regression.mjs",
+    "code": 1,
+    "out": "node:internal/modules/run_main:123\n    triggerUncaughtException(\n    ^\n\nAssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n+ actual - expected\n\n+ '1.10.50'\n- '1.10.49'\n        ^\n\n    at file:///mnt/data/cinetale_11050_work/scripts-v1128-shot-inventory-credit-safety-regression.mjs:7:8\n    at ModuleJob.run (node:internal/modules/esm/module_job:274:25)\n    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:644:26)\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5) {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: '1.10.50',\n  expected: '1.10.49',\n  operator: 'strictEqual'\n}\n\nNode.js v22.16.0\n"
+  },
+  {
+    "file": "scripts-v1948-regression.mjs",
+    "code": 1,
+    "out": "node:internal/modules/run_main:123\n    triggerUncaughtException(\n    ^\n\nAssertionError [ERR_ASSERTION]: browser cache busting not advanced\n    at file:///mnt/data/cinetale_11050_work/scripts-v1948-regression.mjs:16:8\n    at ModuleJob.run (node:internal/modules/esm/module_job:274:25)\n    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:644:26)\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5) {\n  generatedMessage: false,\n  code: 'ERR_ASSERTION',\n  actual: false,\n  expected: true,\n  operator: '=='\n}\n\nNode.js v22.16.0\n"
+  },
+  {
+    "file": "scripts-v1949-regression.mjs",
+    "code": 1,
+    "out": "node:internal/modules/run_main:123\n    triggerUncaughtException(\n    ^\n\nAssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:\n\n  assert.ok(html.includes('/app.js?v=1.10.49')&&html.includes('/styles.css?v=1.10.49'))\n\n    at file:///mnt/data/cinetale_11050_work/scripts-v1949-regression.mjs:13:8\n    at ModuleJob.run (node:internal/modules/esm/module_job:274:25)\n    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:644:26)\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5) {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: false,\n  expected: true,\n  operator: '=='\n}\n\nNode.js v22.16.0\n"
+  },
+  {
+    "file": "scripts-v1950-regression.mjs",
+    "code": 0,
+    "out": "PASS Studio-open approved-audio warmup removed\nPASS unused decoded-audio preparation cache removed\nPASS legacy detached-audio scene playback helper removed\nPASS play handler only pauses to transparently finalize approved audio when required\nPASS play handler keeps unsynchronized video visual-only\nPASS visual-only source state present\nPASS unsynchronized source speech remains muted\nPASS no detached-audio rewind behavior remains\nPASS background recovery deferred behind initial media loading\n"
+  },
+  {
+    "file": "scripts-v1951-regression.mjs",
+    "code": 1,
+    "out": "node:internal/modules/run_main:123\n    triggerUncaughtException(\n    ^\n\nAssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:\n\n  assert.ok(html.includes('/app.js?v=1.10.49')&&html.includes('/styles.css?v=1.10.49'))\n\n    at file:///mnt/data/cinetale_11050_work/scripts-v1951-regression.mjs:15:8\n    at ModuleJob.run (node:internal/modules/esm/module_job:274:25)\n    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:644:26)\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5) {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: false,\n  expected: true,\n  operator: '=='\n}\n\nNode.js v22.16.0\n"
+  },
+  {
+    "file": "scripts-v1952-regression.mjs",
+    "code": 1,
+    "out": "node:internal/modules/run_main:123\n    triggerUncaughtException(\n    ^\n\nAssertionError [ERR_ASSERTION]: cache busting advanced\n    at file:///mnt/data/cinetale_11050_work/scripts-v1952-regression.mjs:10:8\n    at ModuleJob.run (node:internal/modules/esm/module_job:274:25)\n    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:644:26)\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5) {\n  generatedMessage: false,\n  code: 'ERR_ASSERTION',\n  actual: false,\n  expected: true,\n  operator: '=='\n}\n\nNode.js v22.16.0\n"
+  },
+  {
+    "file": "scripts-v1953-regression.mjs",
+    "code": 0,
+    "out": "[CineTale lipsync-job] ProviderError: Free account Sync-3 allowance exhausted\n    at submitSyncLabs (file:///mnt/data/cinetale_11050_work/api/lipsync-job.js:189:9)\n    at async handler (file:///mnt/data/cinetale_11050_work/api/lipsync-job.js:206:41)\n    at async file:///mnt/data/cinetale_11050_work/scripts-v1953-regression.mjs:59:1 {\n  providerStatus: 429,\n  code: 'generation_quota_exceeded',\n  details: {\n    error: 'Free account Sync-3 allowance exhausted',\n    errorCode: 'generation_quota_exceeded',\n    providerRequestId: undefined\n  }\n}\nv1.9.53 Sync Labs direct-upload/submission regression: PASS\n"
+  },
+  {
+    "file": "scripts-v1954-regression.mjs",
+    "code": 0,
+    "out": "[CineTale lipsync-job] ProviderError: Sync-3 allowance exhausted\n    at submitSyncLabs (file:///mnt/data/cinetale_11050_work/api/lipsync-job.js:189:9)\n    at async handler (file:///mnt/data/cinetale_11050_work/api/lipsync-job.js:206:41)\n    at async file:///mnt/data/cinetale_11050_work/scripts-v1954-regression.mjs:14:18 {\n  providerStatus: 429,\n  code: 'generation_quota_exceeded',\n  details: {\n    error: 'Sync-3 allowance exhausted',\n    errorCode: 'generation_quota_exceeded',\n    requestId: 'req_quota',\n    providerRequestId: 'req_quota'\n  }\n}\nv1.9.54 transient-provider safety regression carried forward: PASS\n"
+  },
+  {
+    "file": "scripts-v1955-regression.mjs",
+    "code": 0,
+    "out": "[CineTale lipsync-job] ProviderError: Allowance exhausted\n    at submitSyncLabs (file:///mnt/data/cinetale_11050_work/api/lipsync-job.js:189:9)\n    at async handler (file:///mnt/data/cinetale_11050_work/api/lipsync-job.js:206:41)\n    at async file:///mnt/data/cinetale_11050_work/scripts-v1955-regression.mjs:68:18 {\n  providerStatus: 429,\n  code: 'generation_quota_exceeded',\n  details: {\n    error: 'Allowance exhausted',\n    errorCode: 'generation_quota_exceeded',\n    providerRequestId: undefined\n  }\n}\nv1.9.55 split Sync Labs submit/recovery regression: PASS\n"
+  },
+  {
+    "file": "scripts-v1956-regression.mjs",
+    "code": 1,
+    "out": "node:internal/modules/run_main:123\n    triggerUncaughtException(\n    ^\n\nAssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:\n\n  assert.ok(html.includes('/app.js?v=1.10.49')&&html.includes('/styles.css?v=1.10.49'))\n\n    at file:///mnt/data/cinetale_11050_work/scripts-v1956-regression.mjs:5:125\n    at ModuleJob.run (node:internal/modules/esm/module_job:274:25)\n    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:644:26)\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5) {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: false,\n  expected: true,\n  operator: '=='\n}\n\nNode.js v22.16.0\n"
+  },
+  {
+    "file": "scripts-v1957-regression.mjs",
+    "code": 1,
+    "out": "node:internal/modules/run_main:123\n    triggerUncaughtException(\n    ^\n\nAssertionError [ERR_ASSERTION]: cache busting not advanced\n    at file:///mnt/data/cinetale_11050_work/scripts-v1957-regression.mjs:7:8\n    at ModuleJob.run (node:internal/modules/esm/module_job:274:25)\n    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:644:26)\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5) {\n  generatedMessage: false,\n  code: 'ERR_ASSERTION',\n  actual: false,\n  expected: true,\n  operator: '=='\n}\n\nNode.js v22.16.0\n"
+  },
+  {
+    "file": "scripts-v1958-regression.mjs",
+    "code": 1,
+    "out": "node:internal/modules/run_main:123\n    triggerUncaughtException(\n    ^\n\nAssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n+ actual - expected\n\n+ '1.10.50'\n- '1.10.49'\n        ^\n\n    at file:///mnt/data/cinetale_11050_work/scripts-v1958-regression.mjs:7:8\n    at ModuleJob.run (node:internal/modules/esm/module_job:274:25)\n    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:644:26)\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5) {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: '1.10.50',\n  expected: '1.10.49',\n  operator: 'strictEqual'\n}\n\nNode.js v22.16.0\n"
+  },
+  {
+    "file": "scripts-v1959-regression.mjs",
+    "code": 1,
+    "out": "node:internal/modules/run_main:123\n    triggerUncaughtException(\n    ^\n\nAssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n+ actual - expected\n\n+ '1.10.50'\n- '1.10.49'\n        ^\n\n    at file:///mnt/data/cinetale_11050_work/scripts-v1959-regression.mjs:7:8\n    at ModuleJob.run (node:internal/modules/esm/module_job:274:25)\n    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:644:26)\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5) {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: '1.10.50',\n  expected: '1.10.49',\n  operator: 'strictEqual'\n}\n\nNode.js v22.16.0\n"
+  },
+  {
+    "file": "scripts-v1960-regression.mjs",
+    "code": 0,
+    "out": "v1.9.89 post-video sync + durable readiness regression: PASS\n"
+  },
+  {
+    "file": "scripts-v1961-regression.mjs",
+    "code": 0,
+    "out": "v1.9.89 studio-open no-surprise-billing regression: PASS\n"
+  },
+  {
+    "file": "scripts-v1962-regression.mjs",
+    "code": 0,
+    "out": "v1.10.9 synchronized-only speaking-player regression PASS\n"
+  },
+  {
+    "file": "scripts-v1963-preview-sequence-regression.mjs",
+    "code": 0,
+    "out": "v1.9.66 preview sequence carry-forward regression: PASS\n"
+  },
+  {
+    "file": "scripts-v1964-regression.mjs",
+    "code": 0,
+    "out": "v1.9.66 read-only preview/state regression: PASS\n"
+  },
+  {
+    "file": "scripts-v1965-regression.mjs",
+    "code": 1,
+    "out": "node:internal/modules/run_main:123\n    triggerUncaughtException(\n    ^\n\nAssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:\n\n  assert.ok(html.includes('/app.js?v=1.10.49')&&html.includes('/styles.css?v=1.10.49'))\n\n    at file:///mnt/data/cinetale_11050_work/scripts-v1965-regression.mjs:4:8\n    at ModuleJob.run (node:internal/modules/esm/module_job:274:25)\n    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:644:26)\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5) {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: false,\n  expected: true,\n  operator: '=='\n}\n\nNode.js v22.16.0\n"
+  },
+  {
+    "file": "scripts-v1966-preview-close-regression.mjs",
+    "code": 0,
+    "out": "v1.9.66 preview-close/no-remount regression: PASS\n"
+  },
+  {
+    "file": "scripts-v1967-regression.mjs",
+    "code": 0,
+    "out": "CineTale v1.9.67 regression passed: validated paid lip-sync assets survive unrelated cast/binding metadata changes and migrate to scene-semantic signatures.\n"
+  },
+  {
+    "file": "scripts-v1968-regression.mjs",
+    "code": 1,
+    "out": "node:internal/modules/run_main:123\n    triggerUncaughtException(\n    ^\n\nAssertionError [ERR_ASSERTION]: cache busting\n    at file:///mnt/data/cinetale_11050_work/scripts-v1968-regression.mjs:6:8\n    at ModuleJob.run (node:internal/modules/esm/module_job:274:25)\n    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:644:26)\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5) {\n  generatedMessage: false,\n  code: 'ERR_ASSERTION',\n  actual: false,\n  expected: true,\n  operator: '=='\n}\n\nNode.js v22.16.0\n"
+  },
+  {
+    "file": "scripts-v1969-regression.mjs",
+    "code": 0,
+    "out": "v1.9.69 final-render sync gate + stable player regression passed.\n"
+  },
+  {
+    "file": "scripts-v1970-regression.mjs",
+    "code": 0,
+    "out": "v1.9.89 synchronized-audio + no-repeat + stable final player regression passed.\n"
+  },
+  {
+    "file": "scripts-v1971-final-playback-regression.mjs",
+    "code": 0,
+    "out": "v1.9.89 final playback verification regression PASS\n"
+  },
+  {
+    "file": "scripts-v1972-final-progress-stability.mjs",
+    "code": 0,
+    "out": "v1.9.89 final progress stability regression PASS\n"
+  },
+  {
+    "file": "scripts-v1973-exhaustive-final-ux-regression.mjs",
+    "code": 1,
+    "out": "node:internal/modules/run_main:123\n    triggerUncaughtException(\n    ^\n\nAssertionError [ERR_ASSERTION]: cache bust\n    at file:///mnt/data/cinetale_11050_work/scripts-v1973-exhaustive-final-ux-regression.mjs:7:8\n    at ModuleJob.run (node:internal/modules/esm/module_job:274:25)\n    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:644:26)\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5) {\n  generatedMessage: false,\n  code: 'ERR_ASSERTION',\n  actual: false,\n  expected: true,\n  operator: '=='\n}\n\nNode.js v22.16.0\n"
+  },
+  {
+    "file": "scripts-v1974-cloud-final-persistence.mjs",
+    "code": 1,
+    "out": "FAIL version advanced\nPASS private final-video bucket configured\nPASS per-user RLS folder restriction present\nPASS direct authenticated storage upload present\nPASS cloud download restoration present\nPASS browser copy remains fallback\nPASS final meta records cloud path and pipeline 13\nPASS guest final persistence is truthfully labeled\nPASS signed-in final persistence is truthfully labeled\nPASS library restoration uses shared restore path\n"
+  },
+  {
+    "file": "scripts-v1975-final-sync-integrity.mjs",
+    "code": 0,
+    "out": "v1.9.89 final sync/no-repeat/auth-branding regression: PASS\n"
+  },
+  {
+    "file": "scripts-v1976-final-media-integrity.mjs",
+    "code": 1,
+    "out": "node:internal/modules/run_main:123\n    triggerUncaughtException(\n    ^\n\nAssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:\n\n  assert.ok(html.includes('/app.js?v=1.10.49')&&html.includes('/styles.css?v=1.10.49'))\n\n    at file:///mnt/data/cinetale_11050_work/scripts-v1976-final-media-integrity.mjs:6:8\n    at ModuleJob.run (node:internal/modules/esm/module_job:274:25)\n    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:644:26)\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5) {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: false,\n  expected: true,\n  operator: '=='\n}\n\nNode.js v22.16.0\n"
+  },
+  {
+    "file": "scripts-v1977-audio-provenance-regression.mjs",
+    "code": 1,
+    "out": "node:internal/modules/run_main:123\n    triggerUncaughtException(\n    ^\n\nAssertionError [ERR_ASSERTION]: cache busting must be 1.9.89\n    at file:///mnt/data/cinetale_11050_work/scripts-v1977-audio-provenance-regression.mjs:6:8\n    at ModuleJob.run (node:internal/modules/esm/module_job:274:25)\n    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:644:26)\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5) {\n  generatedMessage: false,\n  code: 'ERR_ASSERTION',\n  actual: false,\n  expected: true,\n  operator: '=='\n}\n\nNode.js v22.16.0\n"
+  },
+  {
+    "file": "scripts-v1978-scene-isolation-regression.mjs",
+    "code": 0,
+    "out": "PASS unsynced speaking visual stays a clean source-video preview\nPASS requestVideo persists without global render\nPASS media completion patches one scene instead of remounting Studio\nv1.10.9 scene isolation regression passed\n"
+  },
+  {
+    "file": "scripts-v1979-media-control-interactivity.mjs",
+    "code": 1,
+    "out": "node:internal/modules/run_main:123\n    triggerUncaughtException(\n    ^\n\nAssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:\n\n  assert.ok(html.includes('/app.js?v=1.10.49')&&html.includes('/styles.css?v=1.10.49'))\n\n    at file:///mnt/data/cinetale_11050_work/scripts-v1979-media-control-interactivity.mjs:3:65\n    at ModuleJob.run (node:internal/modules/esm/module_job:274:25)\n    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:644:26)\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5) {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: false,\n  expected: true,\n  operator: '=='\n}\n\nNode.js v22.16.0\n"
+  },
+  {
+    "file": "scripts-v1980-media-state-regression.mjs",
+    "code": 1,
+    "out": "node:internal/modules/run_main:123\n    triggerUncaughtException(\n    ^\n\nAssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n+ actual - expected\n\n+ '1.10.50'\n- '1.10.49'\n        ^\n\n    at file:///mnt/data/cinetale_11050_work/scripts-v1980-media-state-regression.mjs:7:8\n    at ModuleJob.run (node:internal/modules/esm/module_job:274:25)\n    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:644:26)\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5) {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: '1.10.50',\n  expected: '1.10.49',\n  operator: 'strictEqual'\n}\n\nNode.js v22.16.0\n"
+  },
+  {
+    "file": "scripts-v1981-professional-timeline-regression.mjs",
+    "code": 1,
+    "out": "node:internal/modules/run_main:123\n    triggerUncaughtException(\n    ^\n\nAssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n+ actual - expected\n\n+ '1.10.50'\n- '1.10.49'\n        ^\n\n    at file:///mnt/data/cinetale_11050_work/scripts-v1981-professional-timeline-regression.mjs:11:8\n    at ModuleJob.run (node:internal/modules/esm/module_job:274:25)\n    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:644:26)\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5) {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: '1.10.50',\n  expected: '1.10.49',\n  operator: 'strictEqual'\n}\n\nNode.js v22.16.0\n"
+  },
+  {
+    "file": "scripts-v1982-studio-media-recovery-regression.mjs",
+    "code": 0,
+    "out": "PASS v1.9.89 Studio media recovery regression\n"
+  },
+  {
+    "file": "scripts-v1983-stable-player-regression.mjs",
+    "code": 1,
+    "out": "node:internal/modules/run_main:123\n    triggerUncaughtException(\n    ^\n\nAssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n+ actual - expected\n\n+ '1.10.50'\n- '1.10.49'\n        ^\n\n    at file:///mnt/data/cinetale_11050_work/scripts-v1983-stable-player-regression.mjs:7:8\n    at ModuleJob.run (node:internal/modules/esm/module_job:274:25)\n    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:644:26)\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5) {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: '1.10.50',\n  expected: '1.10.49',\n  operator: 'strictEqual'\n}\n\nNode.js v22.16.0\n"
+  },
+  {
+    "file": "scripts-v1985-native-player-visibility-regression.mjs",
+    "code": 1,
+    "out": "node:internal/modules/run_main:123\n    triggerUncaughtException(\n    ^\n\nAssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n+ actual - expected\n\n+ '1.10.50'\n- '1.10.49'\n        ^\n\n    at file:///mnt/data/cinetale_11050_work/scripts-v1985-native-player-visibility-regression.mjs:7:8\n    at ModuleJob.run (node:internal/modules/esm/module_job:274:25)\n    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:644:26)\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5) {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: '1.10.50',\n  expected: '1.10.49',\n  operator: 'strictEqual'\n}\n\nNode.js v22.16.0\n"
+  },
+  {
+    "file": "scripts-v1986-strict-production-contract-regression.mjs",
+    "code": 1,
+    "out": "node:internal/modules/run_main:123\n    triggerUncaughtException(\n    ^\n\nAssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n+ actual - expected\n\n+ '1.10.50'\n- '1.10.49'\n        ^\n\n    at file:///mnt/data/cinetale_11050_work/scripts-v1986-strict-production-contract-regression.mjs:6:8\n    at ModuleJob.run (node:internal/modules/esm/module_job:274:25)\n    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:644:26)\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5) {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: '1.10.50',\n  expected: '1.10.49',\n  operator: 'strictEqual'\n}\n\nNode.js v22.16.0\n"
+  },
+  {
+    "file": "scripts-v1987-durable-scene-media-regression.mjs",
+    "code": 0,
+    "out": "v1.9.89 durable scene-media regression PASS\n"
+  },
+  {
+    "file": "scripts-v1988-transactional-owned-media-regression.mjs",
+    "code": 0,
+    "out": "PASS version\nPASS transactional source helper\nPASS provider result persisted before source adoption\nPASS source ready requires durable ownership\nPASS sync ready requires durable ownership\nPASS sync persisted before validation\nPASS cloud copy verified by reopening\nPASS storage path versioned\nPASS visible player does not mount unowned provider URL\nPASS coverage video persisted transactionally\nPASS coverage final uses owned runtime\nPASS validated sync playback uses durable runtime blob\nPASS 12/12 v1.9.89 transactional media checks\n"
+  },
+  {
+    "file": "scripts-v1989-end-to-end-speaking-clip-regression.mjs",
+    "code": 0,
+    "out": "v1.10.9 end-to-end speaking clip regression PASS\n"
+  },
+  {
+    "file": "scripts-v1990-listen-preserves-video-regression.mjs",
+    "code": 0,
+    "out": "v1.10.9 Listen-preserves-visual regression passed\n"
+  },
+  {
+    "file": "scripts-v1991-finished-speaking-clip-regression.mjs",
+    "code": 1,
+    "out": "node:internal/modules/run_main:123\n    triggerUncaughtException(\n    ^\n\nAssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:\n\n  assert.ok(html.includes('/app.js?v=1.10.49')&&html.includes('/styles.css?v=1.10.49'))\n\n    at file:///mnt/data/cinetale_11050_work/scripts-v1991-finished-speaking-clip-regression.mjs:6:8\n    at ModuleJob.run (node:internal/modules/esm/module_job:274:25)\n    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:644:26)\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5) {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: false,\n  expected: true,\n  operator: '=='\n}\n\nNode.js v22.16.0\n"
+  },
+  {
+    "file": "scripts-v1992-clickable-preview-regression.mjs",
+    "code": 1,
+    "out": "node:internal/modules/run_main:123\n    triggerUncaughtException(\n    ^\n\nAssertionError [ERR_ASSERTION]: cache bust\n    at file:///mnt/data/cinetale_11050_work/scripts-v1992-clickable-preview-regression.mjs:3:75\n    at ModuleJob.run (node:internal/modules/esm/module_job:274:25)\n    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:644:26)\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5) {\n  generatedMessage: false,\n  code: 'ERR_ASSERTION',\n  actual: false,\n  expected: true,\n  operator: '=='\n}\n\nNode.js v22.16.0\n"
+  },
+  {
+    "file": "scripts-v1993-finished-player-handoff-regression.mjs",
+    "code": 1,
+    "out": "node:internal/modules/run_main:123\n    triggerUncaughtException(\n    ^\n\nAssertionError [ERR_ASSERTION]: package version\n+ actual - expected\n\n+ '1.10.50'\n- '1.10.49'\n        ^\n\n    at file:///mnt/data/cinetale_11050_work/scripts-v1993-finished-player-handoff-regression.mjs:6:8\n    at ModuleJob.run (node:internal/modules/esm/module_job:274:25)\n    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:644:26)\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5) {\n  generatedMessage: false,\n  code: 'ERR_ASSERTION',\n  actual: '1.10.50',\n  expected: '1.10.49',\n  operator: 'strictEqual'\n}\n\nNode.js v22.16.0\n"
+  },
+  {
+    "file": "scripts-v1994-embedded-audio-recovery-regression.mjs",
+    "code": 1,
+    "out": "node:internal/modules/run_main:123\n    triggerUncaughtException(\n    ^\n\nAssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n+ actual - expected\n\n+ '1.10.50'\n- '1.10.49'\n        ^\n\n    at file:///mnt/data/cinetale_11050_work/scripts-v1994-embedded-audio-recovery-regression.mjs:3:8\n    at ModuleJob.run (node:internal/modules/esm/module_job:274:25)\n    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:644:26)\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5) {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: '1.10.50',\n  expected: '1.10.49',\n  operator: 'strictEqual'\n}\n\nNode.js v22.16.0\n"
+  },
+  {
+    "file": "scripts-video-regression.mjs",
+    "code": 0,
+    "out": "video MIME/range regression PASS\n"
+  },
+  {
+    "file": "scripts-voice-continuity.mjs",
+    "code": 0,
+    "out": "character-ID voice continuity regression PASS\n"
+  },
+  {
+    "file": "scripts-voice-mix-regression.mjs",
+    "code": 0,
+    "out": "clean approved-voice mix regression PASS\n"
+  }
+]

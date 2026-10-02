@@ -1,0 +1,16 @@
+import fs from 'node:fs';
+import assert from 'node:assert/strict';
+const app=fs.readFileSync('app.js','utf8');
+const pkg=JSON.parse(fs.readFileSync('package.json','utf8'));
+assert.equal(pkg.version,'1.12.4');
+assert.ok(app.includes("const APP_VERSION = '1.12.4'"));
+assert.ok(app.includes("queueMicrotask(()=>{save();reconcilePersistedVideoJobsOnOpen(id).catch(()=>{})})"),'opening a project must trigger persisted-job reconciliation');
+assert.ok(app.includes('function resumePendingCoverageVideoPolls()'),'active Studio must resume coverage jobs');
+assert.ok(app.includes('resumePendingVideoPolls();resumePendingCoverageVideoPolls();'),'Studio render must resume both primary and coverage jobs');
+assert.ok(app.includes('async function reconcileSavedCoverageOperation'),'coverage operations need a saved-job reconciler');
+assert.ok(app.includes('async function pollSavedCoverageOperation'),'pending saved coverage jobs need background polling');
+assert.ok(app.includes('clearCoverageTerminalState(projectId,task.episodeId,task.index,task.shotId,task.operation,terminalError)'),'terminal coverage jobs must release persisted generation state');
+assert.ok(app.includes("else if(d.status==='processing'||d.status==='pending'||d.status==='running'||d.done===false){pollSavedCoverageOperation"),'project-wide recovery must resume genuinely pending coverage jobs');
+const recovery=app.slice(app.indexOf('async function reconcileSavedCoverageOperation'),app.indexOf('async function reconcilePersistedVideoJobsOnOpen'));
+assert.ok(!recovery.includes("apiPost('/api/video-job'"),'recovery must never create a new billable video job');
+console.log('v1.11.0 persisted coverage open/recovery regression: PASS');

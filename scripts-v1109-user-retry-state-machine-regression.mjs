@@ -1,0 +1,10 @@
+import fs from 'node:fs';
+import assert from 'node:assert/strict';
+const app=fs.readFileSync(new URL('./app.js',import.meta.url),'utf8');
+assert.ok(app.includes("if(!userInitiated){syncDiag('retry-blocked-background'"),'background failed sync must stay fail-closed while diagnostics record the block');
+assert.ok(app.includes("t.lipSyncPlaybackFailedAt=null;t.lipSyncSubmissionFailedAt=null"),'explicit retry must clear stale failed-at guards');
+assert.ok(app.includes("t.lipSyncOperation=null;t.lipSyncStatusUrl='';t.lipSyncResponseUrl='';t.lipSyncStatus='idle'"),'explicit retry must discard the failed sync attempt without touching source video');
+const retryBlock=app.slice(app.indexOf("if(s.lipSyncStatus==='error'"),app.indexOf('const key=sceneLipSyncJobKey'));
+assert.ok(!/if\(s\.lipSyncStatus==='error'[\s\S]*\)return '';/.test(retryBlock.replace(/if\(!userInitiated\)\{[^}]*return '';\}/,'')),'there must be no unconditional failed-sync return that blocks Retry clip');
+assert.ok(app.includes('if(userInitiated){liveProject=state.projects.find'),'user retry must refresh persisted scene state before rebuilding production contract');
+console.log('PASS v1.10.20 user retry state machine');

@@ -1,0 +1,582 @@
+[
+  {
+    "file": "scripts-check.mjs",
+    "code": 0,
+    "out": "CineTale checks passed: no merge markers; JSON valid.\n"
+  },
+  {
+    "file": "scripts-deep-qa.mjs",
+    "code": 0,
+    "out": "CineTale deep QA passed: 188 static IDs, 475 DOM refs, 19 API routes, 3 local assets, 281 files checked.\n"
+  },
+  {
+    "file": "scripts-lipsync-adoption-regression.mjs",
+    "code": 0,
+    "out": "PASS pipeline revision advances for provider-rendered sync assets\nPASS validated lip-sync gate exists\nPASS primary video never uses unvalidated sync result\nPASS provider result is browser-validated before use\nPASS invalid provider result is rejected\nPASS scene DOM replacement is deferred during player session\nPASS player session lock begins on play\nPASS playback completion handler is stable and synchronous\nPASS ended playback never hot-swaps the media source\nPASS technical media state is removed from the video overlay\nPASS status API preserves Sync Labs provenance\nPASS status API only proxies supported synchronized-media hosts\n"
+  },
+  {
+    "file": "scripts-lipsync-regression.mjs",
+    "code": 0,
+    "out": "dedicated lip-sync + fallback hardening regression PASS\n"
+  },
+  {
+    "file": "scripts-lipsync-status-resilience.mjs",
+    "code": 0,
+    "out": "lip-sync status resilience regression PASS\n"
+  },
+  {
+    "file": "scripts-lipsync-v1947-regression.mjs",
+    "code": 0,
+    "out": "PASS app version advanced\nPASS studio source pin follows the newly validated desired asset instead of pinning Veo forever\nPASS playback only treats a validated synchronized URL as authoritative\nPASS saved queue jobs can resume\nPASS queue metadata persists for refresh-safe resume\nPASS existing paid job is resumed before new submission\nPASS user video overlay has no provider/debug/status wording\nPASS Sync Labs status endpoint is present\nPASS completed Sync Labs generations are recognized\nPASS Sync Labs output URL is retrieved\nPASS FAL fallback status path remains available\nv1.9.51 carries forward lip-sync adoption/resume regression PASS\n"
+  },
+  {
+    "file": "scripts-player-lifecycle-regression.mjs",
+    "code": 0,
+    "out": "PASS studio source is pinned for the mounted scene lifecycle\nPASS studio pin is signature-aware\nPASS only validated sync can become primary video\nPASS scene markup uses stable studio source\nPASS new lip-sync jobs clear prior validation\nPASS provider result remains unvalidated until browser probe succeeds\nPASS FAL result is browser-probed before validation\nPASS saved synchronized provider result is revalidated before authoritative reuse\nPASS active player session prevents scene DOM replacement\nPASS player session lock begins on play\nPASS pause never adopts a new source\nPASS ended never hot-swaps a new source\nPASS background sync does not require a Studio remount\nPASS adoption function itself rejects active playback\nPASS failed synchronized playback never substitutes the silent source\nPASS ended does not remount Studio\nPASS stable scene-player lifecycle regression\n"
+  },
+  {
+    "file": "scripts-scene-audio-regression.mjs",
+    "code": 0,
+    "out": "scene dialogue/video sync regression PASS\n"
+  },
+  {
+    "file": "scripts-smoke.mjs",
+    "code": 0,
+    "out": "CineTale image] Gemini route unavailable; trying next route {\n  model: 'gemini-3.1-flash-image',\n  status: 400,\n  message: 'Image delivery mode is not supported.'\n}\n[CineTale image] Gemini route unavailable; trying next route {\n  model: 'gemini-3.1-flash-lite-image',\n  status: 400,\n  message: 'Image delivery mode is not supported.'\n}\n[CineTale image] Visual provider unavailable; trying backup {\n  provider: 'gemini',\n  status: 400,\n  message: 'Image delivery mode is not supported.'\n}\n[CineTale generate-image] Live image generation failed {\n  message: 'Image delivery mode is not supported.',\n  model: 'gemini-3.1-flash-image',\n  hasGeminiKey: true,\n  hasOpenAIKey: false,\n  requestedPrimary: 'auto',\n  aspect: '16:9',\n  quality: 'standard',\n  referenceCount: 0\n}\n[CineTale tts] ElevenLabs model failed; trying fallback { model: 'eleven_v3', status: 422, message: 'model unavailable' }\nCineTale v1.10.20 smoke tests passed: strict Story/Short/Movie/Episode integrity, Google account chooser, restored proven project opening, quota-safe navigation, runtime targeting, no-crop media, auth/cloud sync, consent gates, quota-aware video, final assembly, voice filtering, navigation and DOM integrity.\n"
+  },
+  {
+    "file": "scripts-v1100-production-contract-regression.mjs",
+    "code": 0,
+    "out": "v1.10.9 production-contract regression PASS\n"
+  },
+  {
+    "file": "scripts-v1101-finish-action-regression.mjs",
+    "code": 0,
+    "out": "v1.10.9 Finish clip action regression: PASS\n"
+  },
+  {
+    "file": "scripts-v11013-live-presubmit-regression.mjs",
+    "code": 0,
+    "out": "v1.10.20 live pre-submit regression PASS\n"
+  },
+  {
+    "file": "scripts-v11014-retry-telemetry-player-url-regression.mjs",
+    "code": 0,
+    "out": "v1.10.20 retry telemetry + player URL regression: PASS\n"
+  },
+  {
+    "file": "scripts-v11015-approved-audio-finalization-regression.mjs",
+    "code": 0,
+    "out": "v1.10.20 approved-audio provider adoption regression: PASS\n"
+  },
+  {
+    "file": "scripts-v11016-automatic-dialogue-finalization-regression.mjs",
+    "code": 0,
+    "out": "v1.10.20 automatic dialogue finalization regression PASS\n"
+  },
+  {
+    "file": "scripts-v11017-stale-dialogue-refresh-regression.mjs",
+    "code": 0,
+    "out": "v1.10.20 stale dialogue refresh regression PASS\n"
+  },
+  {
+    "file": "scripts-v11018-lipsync-polling-recovery-regression.mjs",
+    "code": 0,
+    "out": "v1.10.20 lip-sync polling recovery regression PASS\n"
+  },
+  {
+    "file": "scripts-v1102-owned-source-transport-regression.mjs",
+    "code": 0,
+    "out": "v1.10.9 owned-source transport regression PASS\nv1.10.9 large owned-source asset transport runtime regression PASS\n"
+  },
+  {
+    "file": "scripts-v11029-shot-grid-layout-regression.mjs",
+    "code": 0,
+    "out": "v1.10.50 shot-grid layout regression passed\n"
+  },
+  {
+    "file": "scripts-v1103-durable-source-repair-regression.mjs",
+    "code": 0,
+    "out": "v1.10.9 durable source ownership/repair regression PASS\n"
+  },
+  {
+    "file": "scripts-v1103-storage-repair-runtime.mjs",
+    "code": 0,
+    "out": "v1.10.9 404 -> IndexedDB -> cloud self-repair runtime regression PASS\n"
+  },
+  {
+    "file": "scripts-v11030-lipsync-block-recovery-regression.mjs",
+    "code": 0,
+    "out": "[CineTale lipsync-job] ProviderError: Dialogue synchronization service temporarily rejected the server request.\n    at submitSyncLabs (file:///mnt/data/cinetale_11050_work/api/lipsync-job.js:156:89)\n    at async handler (file:///mnt/data/cinetale_11050_work/api/lipsync-job.js:206:41)\n    at async file:///mnt/data/cinetale_11050_work/scripts-v11030-lipsync-block-recovery-regression.mjs:40:21 {\n  providerStatus: 503,\n  code: 'provider_access_blocked',\n  details: { stage: 'sync-submit', providerStatus: 403 }\n}\n[CineTale lipsync-job] ProviderError: Dialogue synchronization service temporarily rejected the server request.\n    at submitSyncLabs (file:///mnt/data/cinetale_11050_work/api/lipsync-job.js:156:89)\n    at async handler (file:///mnt/data/cinetale_11050_work/api/lipsync-job.js:206:41)\n    at async file:///mnt/data/cinetale_11050_work/scripts-v11030-lipsync-block-recovery-regression.mjs:55:17 {\n  providerStatus: 503,\n  code: 'provider_access_blocked',\n  details: { stage: 'sync-submit', providerStatus: 403 }\n}\nv1.10.50 lip-sync block recovery regression PASS\n"
+  },
+  {
+    "file": "scripts-v11031-scene-shell-restoration-regression.mjs",
+    "code": 0,
+    "out": "v1.10.50 scene shell restoration regression PASS\n"
+  },
+  {
+    "file": "scripts-v11032-shot-navigation-voice-modal-regression.mjs",
+    "code": 0,
+    "out": "v1.10.50 shot navigation / voice preview / modal close regression: PASS\n"
+  },
+  {
+    "file": "scripts-v11033-shot-listen-routing-regression.mjs",
+    "code": 0,
+    "out": "v1.10.50 selected-shot Listen routing regression: PASS\n"
+  },
+  {
+    "file": "scripts-v11034-shot-status-selection-regression.mjs",
+    "code": 0,
+    "out": "v1.10.50 shot status/selection regression: PASS\n"
+  },
+  {
+    "file": "scripts-v11035-shot-state-reconciliation-regression.mjs",
+    "code": 0,
+    "out": "v1.10.50 shot-state reconciliation regression: PASS\n"
+  },
+  {
+    "file": "scripts-v11036-scene-sequence-preview-regression.mjs",
+    "code": 0,
+    "out": "v1.10.50 scene sequence preview regression: PASS\n"
+  },
+  {
+    "file": "scripts-v11037-story-directed-continuity-regression.mjs",
+    "code": 0,
+    "out": "v1.10.50 story-directed continuity regression: PASS\n"
+  },
+  {
+    "file": "scripts-v11038-speaking-shot-completion-regression.mjs",
+    "code": 0,
+    "out": "PASS v1.10.50 speaking-shot completion regression\n"
+  },
+  {
+    "file": "scripts-v11039-app-wide-release-audit.mjs",
+    "code": 0,
+    "out": "v1.10.50 app-wide release audit PASS \u00b7 188 static IDs \u00b7 4 primary views\n"
+  },
+  {
+    "file": "scripts-v11039-selected-shot-context-regression.mjs",
+    "code": 0,
+    "out": "v1.10.50 selected-shot context regression PASS\n"
+  },
+  {
+    "file": "scripts-v1104-authenticated-storage-handoff.mjs",
+    "code": 0,
+    "out": "v1.10.9 authenticated storage -> actual bytes -> Sync Labs regression PASS\n"
+  },
+  {
+    "file": "scripts-v11040-pending-shot-action-regression.mjs",
+    "code": 0,
+    "out": "v1.10.50 pending speaking-shot action regression PASS\n"
+  },
+  {
+    "file": "scripts-v11041-auto-scene-editor-regression.mjs",
+    "code": 1,
+    "out": "node:internal/modules/run_main:123\n    triggerUncaughtException(\n    ^\n\nAssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:\n\n  assert.ok(css.includes('v1.10.50 automatic scene edit'))\n\n    at file:///mnt/data/cinetale_11050_work/scripts-v11041-auto-scene-editor-regression.mjs:19:8\n    at ModuleJob.run (node:internal/modules/esm/module_job:274:25)\n    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:644:26)\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5) {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: false,\n  expected: true,\n  operator: '=='\n}\n\nNode.js v22.16.0\n"
+  },
+  {
+    "file": "scripts-v11042-story-intelligence-cinematic-direction-regression.mjs",
+    "code": 1,
+    "out": "node:internal/modules/run_main:123\n    triggerUncaughtException(\n    ^\n\nAssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n+ actual - expected\n\n+ 'v1.10.49'\n- 'v1.10.50'\n         ^\n\n    at file:///mnt/data/cinetale_11050_work/scripts-v11042-story-intelligence-cinematic-direction-regression.mjs:14:8\n    at ModuleJob.run (node:internal/modules/esm/module_job:274:25)\n    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:644:26)\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5) {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: 'v1.10.49',\n  expected: 'v1.10.50',\n  operator: 'strictEqual'\n}\n\nNode.js v22.16.0\n"
+  },
+  {
+    "file": "scripts-v11043-story-to-shot-director-regression.mjs",
+    "code": 1,
+    "out": "node:internal/modules/run_main:123\n    triggerUncaughtException(\n    ^\n\nAssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:\n\n  assert.ok(migrated.every(x=>x.plannerRevision==='v1.10.50-story-to-shot-director'))\n\n    at file:///mnt/data/cinetale_11050_work/scripts-v11043-story-to-shot-director-regression.mjs:34:8\n    at ModuleJob.run (node:internal/modules/esm/module_job:274:25)\n    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:644:26)\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5) {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: false,\n  expected: true,\n  operator: '=='\n}\n\nNode.js v22.16.0\n"
+  },
+  {
+    "file": "scripts-v11044-production-logic-integrity-regression.mjs",
+    "code": 0,
+    "out": "v1.10.50 production logic integrity regression: PASS\n"
+  },
+  {
+    "file": "scripts-v11045-self-healing-plan-regression.mjs",
+    "code": 1,
+    "out": "node:internal/modules/run_main:123\n    triggerUncaughtException(\n    ^\n\nAssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:\n\n  assert.ok(css.includes('v1.10.50 self-healing production-logic diagnostics'))\n\n    at file:///mnt/data/cinetale_11050_work/scripts-v11045-self-healing-plan-regression.mjs:54:8\n    at ModuleJob.run (node:internal/modules/esm/module_job:274:25)\n    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:644:26)\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5) {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: false,\n  expected: true,\n  operator: '=='\n}\n\nNode.js v22.16.0\n"
+  },
+  {
+    "file": "scripts-v11046-system-integrity-regression.mjs",
+    "code": 0,
+    "out": "v1.10.50 system integrity regression: PASS\n"
+  },
+  {
+    "file": "scripts-v11047-persisted-identity-migration-regression.mjs",
+    "code": 0,
+    "out": "v1.10.50 persisted multilingual identity migration regression: PASS\n"
+  },
+  {
+    "file": "scripts-v11047-persisted-identity-reconciliation-regression.mjs",
+    "code": 0,
+    "out": "v1.10.50 persisted identity reconciliation regression: PASS\n"
+  },
+  {
+    "file": "scripts-v11048-authoritative-identity-repair-regression.mjs",
+    "code": 1,
+    "out": "node:internal/modules/run_main:123\n    triggerUncaughtException(\n    ^\n\nAssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:\n\n  assert.ok(app.includes(\"reason:`authoritative-${kind}`\"))\n\n    at file:///mnt/data/cinetale_11050_work/scripts-v11048-authoritative-identity-repair-regression.mjs:7:8\n    at ModuleJob.run (node:internal/modules/esm/module_job:274:25)\n    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:644:26)\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5) {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: false,\n  expected: true,\n  operator: '=='\n}\n\nNode.js v22.16.0\n"
+  },
+  {
+    "file": "scripts-v11049-production-audit-runtime-regression.mjs",
+    "code": 0,
+    "out": "v1.10.50 production audit runtime regression: PASS\n"
+  },
+  {
+    "file": "scripts-v1105-clean-scene-workflow-regression.mjs",
+    "code": 0,
+    "out": "v1.10.9 clean scene workflow regression PASS\n"
+  },
+  {
+    "file": "scripts-v11050-full-system-integrity-regression.mjs",
+    "code": 0,
+    "out": "v1.10.50 full system integrity regression: PASS\n"
+  },
+  {
+    "file": "scripts-v1106-authoritative-sync-adoption-regression.mjs",
+    "code": 0,
+    "out": "v1.10.9 authoritative sync adoption regression: PASS\n"
+  },
+  {
+    "file": "scripts-v1107-authoritative-audio-dom-regression.mjs",
+    "code": 0,
+    "out": "v1.10.9 authoritative audio DOM regression PASS\n"
+  },
+  {
+    "file": "scripts-v1107-sync-422-asset-retry-runtime.mjs",
+    "code": 0,
+    "out": "v1.10.9 Sync Labs 422 -> assetId JSON retry runtime regression PASS\n"
+  },
+  {
+    "file": "scripts-v1108-fresh-sync-job-polling-regression.mjs",
+    "code": 0,
+    "out": "v1.10.9 fresh accepted sync job -> polling identity regression PASS\n"
+  },
+  {
+    "file": "scripts-v1109-user-retry-state-machine-regression.mjs",
+    "code": 0,
+    "out": "PASS v1.10.20 user retry state machine\n"
+  },
+  {
+    "file": "scripts-v1110-sync-diagnostics-regression.mjs",
+    "code": 0,
+    "out": "PASS v1.10.20 owner-only speaking clip production trace regression\n"
+  },
+  {
+    "file": "scripts-v1111-owner-diagnostics-access-regression.mjs",
+    "code": 0,
+    "out": "v1.10.20 owner diagnostics access regression: PASS\n"
+  },
+  {
+    "file": "scripts-v1111-owner-endpoint-runtime.mjs",
+    "code": 0,
+    "out": "v1.10.20 owner endpoint runtime: PASS\n"
+  },
+  {
+    "file": "scripts-v1112-live-sync-control-regression.mjs",
+    "code": 0,
+    "out": "v1.10.20 live sync control regression: PASS\n"
+  },
+  {
+    "file": "scripts-v1112-live-sync-runtime.mjs",
+    "code": 0,
+    "out": "v1.10.20 live sync runtime regression: PASS\n"
+  },
+  {
+    "file": "scripts-v1119-provider-audio-authoritative-regression.mjs",
+    "code": 0,
+    "out": "v1.10.20 provider-audio authoritative regression passed\n"
+  },
+  {
+    "file": "scripts-v1120-episode-completion-regression.mjs",
+    "code": 0,
+    "out": "v1.10.20 episode completion / legacy modernization regression PASS\n"
+  },
+  {
+    "file": "scripts-v1121-auto-final-sync-continuation-regression.mjs",
+    "code": 0,
+    "out": "v1.10.50 automatic final-sync continuation regression PASS\n"
+  },
+  {
+    "file": "scripts-v1122-deterministic-final-timeline-regression.mjs",
+    "code": 0,
+    "out": "v1.10.50 deterministic timeline compatibility regression passed on v1.10.50\n"
+  },
+  {
+    "file": "scripts-v1123-shot-timeline-story-engine-regression.mjs",
+    "code": 0,
+    "out": "v1.10.50 shot timeline story engine regression passed\n"
+  },
+  {
+    "file": "scripts-v1124-existing-project-shot-migration-regression.mjs",
+    "code": 0,
+    "out": "v1.10.50 existing-project shot migration regression passed\n"
+  },
+  {
+    "file": "scripts-v1125-navigation-media-visibility-regression.mjs",
+    "code": 0,
+    "out": "v1.10.50 navigation/media visibility regression passed\n"
+  },
+  {
+    "file": "scripts-v1126-episode-media-recovery-regression.mjs",
+    "code": 0,
+    "out": "v1.10.50 episode/media recovery regression PASS\n"
+  },
+  {
+    "file": "scripts-v1126-production-state-merge-runtime.mjs",
+    "code": 0,
+    "out": "v1.10.50 production-state merge runtime PASS\n"
+  },
+  {
+    "file": "scripts-v1127-null-safe-shot-plan-regression.mjs",
+    "code": 0,
+    "out": "v1.10.50 null-safe migrated shot-plan regression PASS\n"
+  },
+  {
+    "file": "scripts-v1128-shot-inventory-credit-safety-regression.mjs",
+    "code": 0,
+    "out": "v1.10.50 shot inventory + credit safety regression PASS\n"
+  },
+  {
+    "file": "scripts-v1948-regression.mjs",
+    "code": 0,
+    "out": "v1.9.51 carries forward proactive lip-sync + no-scroll final assembly regression PASS\n"
+  },
+  {
+    "file": "scripts-v1949-regression.mjs",
+    "code": 0,
+    "out": "v1.10.9 stale-job protection + synchronized-only speaking playback regression PASS\n"
+  },
+  {
+    "file": "scripts-v1950-regression.mjs",
+    "code": 0,
+    "out": "PASS Studio-open approved-audio warmup removed\nPASS unused decoded-audio preparation cache removed\nPASS legacy detached-audio scene playback helper removed\nPASS play handler only pauses to transparently finalize approved audio when required\nPASS play handler keeps unsynchronized video visual-only\nPASS visual-only source state present\nPASS unsynchronized source speech remains muted\nPASS no detached-audio rewind behavior remains\nPASS background recovery deferred behind initial media loading\n"
+  },
+  {
+    "file": "scripts-v1951-regression.mjs",
+    "code": 0,
+    "out": "v1.9.51 production Sync Labs render-stage regression PASS\n"
+  },
+  {
+    "file": "scripts-v1952-regression.mjs",
+    "code": 0,
+    "out": "v1.9.52 canonical Sync Labs output/adoption regression PASS\n"
+  },
+  {
+    "file": "scripts-v1953-regression.mjs",
+    "code": 0,
+    "out": "[CineTale lipsync-job] ProviderError: Free account Sync-3 allowance exhausted\n    at submitSyncLabs (file:///mnt/data/cinetale_11050_work/api/lipsync-job.js:189:9)\n    at async handler (file:///mnt/data/cinetale_11050_work/api/lipsync-job.js:206:41)\n    at async file:///mnt/data/cinetale_11050_work/scripts-v1953-regression.mjs:59:1 {\n  providerStatus: 429,\n  code: 'generation_quota_exceeded',\n  details: {\n    error: 'Free account Sync-3 allowance exhausted',\n    errorCode: 'generation_quota_exceeded',\n    providerRequestId: undefined\n  }\n}\nv1.9.53 Sync Labs direct-upload/submission regression: PASS\n"
+  },
+  {
+    "file": "scripts-v1954-regression.mjs",
+    "code": 0,
+    "out": "[CineTale lipsync-job] ProviderError: Sync-3 allowance exhausted\n    at submitSyncLabs (file:///mnt/data/cinetale_11050_work/api/lipsync-job.js:189:9)\n    at async handler (file:///mnt/data/cinetale_11050_work/api/lipsync-job.js:206:41)\n    at async file:///mnt/data/cinetale_11050_work/scripts-v1954-regression.mjs:14:18 {\n  providerStatus: 429,\n  code: 'generation_quota_exceeded',\n  details: {\n    error: 'Sync-3 allowance exhausted',\n    errorCode: 'generation_quota_exceeded',\n    requestId: 'req_quota',\n    providerRequestId: 'req_quota'\n  }\n}\nv1.9.54 transient-provider safety regression carried forward: PASS\n"
+  },
+  {
+    "file": "scripts-v1955-regression.mjs",
+    "code": 0,
+    "out": "[CineTale lipsync-job] ProviderError: Allowance exhausted\n    at submitSyncLabs (file:///mnt/data/cinetale_11050_work/api/lipsync-job.js:189:9)\n    at async handler (file:///mnt/data/cinetale_11050_work/api/lipsync-job.js:206:41)\n    at async file:///mnt/data/cinetale_11050_work/scripts-v1955-regression.mjs:68:18 {\n  providerStatus: 429,\n  code: 'generation_quota_exceeded',\n  details: {\n    error: 'Allowance exhausted',\n    errorCode: 'generation_quota_exceeded',\n    providerRequestId: undefined\n  }\n}\nv1.9.55 split Sync Labs submit/recovery regression: PASS\n"
+  },
+  {
+    "file": "scripts-v1956-regression.mjs",
+    "code": 0,
+    "out": "v1.9.56 production Sync Labs hardening regression: PASS\n"
+  },
+  {
+    "file": "scripts-v1957-regression.mjs",
+    "code": 0,
+    "out": "v1.9.66 exact-fit scene media regression: PASS\n"
+  },
+  {
+    "file": "scripts-v1958-regression.mjs",
+    "code": 0,
+    "out": "v1.9.66 responsive scene-player sizing regression PASS\n"
+  },
+  {
+    "file": "scripts-v1959-regression.mjs",
+    "code": 0,
+    "out": "v1.9.66 balanced scene-card media support regression PASS\n"
+  },
+  {
+    "file": "scripts-v1960-regression.mjs",
+    "code": 0,
+    "out": "v1.9.89 post-video sync + durable readiness regression: PASS\n"
+  },
+  {
+    "file": "scripts-v1961-regression.mjs",
+    "code": 0,
+    "out": "v1.9.89 studio-open no-surprise-billing regression: PASS\n"
+  },
+  {
+    "file": "scripts-v1962-regression.mjs",
+    "code": 0,
+    "out": "v1.10.9 synchronized-only speaking-player regression PASS\n"
+  },
+  {
+    "file": "scripts-v1963-preview-sequence-regression.mjs",
+    "code": 0,
+    "out": "v1.9.66 preview sequence carry-forward regression: PASS\n"
+  },
+  {
+    "file": "scripts-v1964-regression.mjs",
+    "code": 0,
+    "out": "v1.9.66 read-only preview/state regression: PASS\n"
+  },
+  {
+    "file": "scripts-v1965-regression.mjs",
+    "code": 0,
+    "out": "v1.9.66 multilingual/cultural intelligence + preview clickability regression: PASS\n"
+  },
+  {
+    "file": "scripts-v1966-preview-close-regression.mjs",
+    "code": 0,
+    "out": "v1.9.66 preview-close/no-remount regression: PASS\n"
+  },
+  {
+    "file": "scripts-v1967-regression.mjs",
+    "code": 0,
+    "out": "CineTale v1.9.67 regression passed: validated paid lip-sync assets survive unrelated cast/binding metadata changes and migrate to scene-semantic signatures.\n"
+  },
+  {
+    "file": "scripts-v1968-regression.mjs",
+    "code": 0,
+    "out": "CineTale v1.9.68 regression passed: stale saved Sync Labs assets are revalidated without resubmission and Preview advances after one ended wait per clip.\n"
+  },
+  {
+    "file": "scripts-v1969-regression.mjs",
+    "code": 0,
+    "out": "v1.9.69 final-render sync gate + stable player regression passed.\n"
+  },
+  {
+    "file": "scripts-v1970-regression.mjs",
+    "code": 0,
+    "out": "v1.9.89 synchronized-audio + no-repeat + stable final player regression passed.\n"
+  },
+  {
+    "file": "scripts-v1971-final-playback-regression.mjs",
+    "code": 0,
+    "out": "v1.9.89 final playback verification regression PASS\n"
+  },
+  {
+    "file": "scripts-v1972-final-progress-stability.mjs",
+    "code": 0,
+    "out": "v1.9.89 final progress stability regression PASS\n"
+  },
+  {
+    "file": "scripts-v1973-exhaustive-final-ux-regression.mjs",
+    "code": 0,
+    "out": "v1.9.89 exhaustive final UX/render stability regression PASS\n"
+  },
+  {
+    "file": "scripts-v1974-cloud-final-persistence.mjs",
+    "code": 0,
+    "out": "PASS version advanced\nPASS private final-video bucket configured\nPASS per-user RLS folder restriction present\nPASS direct authenticated storage upload present\nPASS cloud download restoration present\nPASS browser copy remains fallback\nPASS final meta records cloud path and pipeline 13\nPASS guest final persistence is truthfully labeled\nPASS signed-in final persistence is truthfully labeled\nPASS library restoration uses shared restore path\nv1.9.89 cloud final-video persistence regression PASS\n"
+  },
+  {
+    "file": "scripts-v1975-final-sync-integrity.mjs",
+    "code": 0,
+    "out": "v1.9.89 final sync/no-repeat/auth-branding regression: PASS\n"
+  },
+  {
+    "file": "scripts-v1976-final-media-integrity.mjs",
+    "code": 0,
+    "out": "v1.9.89 duplicate-media + atomic synced-scene + project-bound poller regression PASS\n"
+  },
+  {
+    "file": "scripts-v1977-audio-provenance-regression.mjs",
+    "code": 0,
+    "out": "v1.9.89 audio provenance + stale recovery + scene identity regression PASS\n"
+  },
+  {
+    "file": "scripts-v1978-scene-isolation-regression.mjs",
+    "code": 0,
+    "out": "PASS unsynced speaking visual stays a clean source-video preview\nPASS requestVideo persists without global render\nPASS media completion patches one scene instead of remounting Studio\nv1.10.9 scene isolation regression passed\n"
+  },
+  {
+    "file": "scripts-v1979-media-control-interactivity.mjs",
+    "code": 0,
+    "out": "v1.10.9 media-control interactivity regression PASS\n"
+  },
+  {
+    "file": "scripts-v1980-media-state-regression.mjs",
+    "code": 0,
+    "out": "v1.9.89 media-state + approved-audio preview + source-fallback regression PASS\n"
+  },
+  {
+    "file": "scripts-v1981-professional-timeline-regression.mjs",
+    "code": 0,
+    "out": "v1.9.89 professional timed-shot + stable-media regression PASS\n"
+  },
+  {
+    "file": "scripts-v1982-studio-media-recovery-regression.mjs",
+    "code": 0,
+    "out": "PASS v1.9.89 Studio media recovery regression\n"
+  },
+  {
+    "file": "scripts-v1983-stable-player-regression.mjs",
+    "code": 0,
+    "out": "PASS v1.9.89 stable attached-player / no-flicker regression\n"
+  },
+  {
+    "file": "scripts-v1985-native-player-visibility-regression.mjs",
+    "code": 0,
+    "out": "v1.9.89 native-player visibility regression PASS\n"
+  },
+  {
+    "file": "scripts-v1986-strict-production-contract-regression.mjs",
+    "code": 0,
+    "out": "v1.9.89 strict character/shot/audio/sync production contract regression PASS\n"
+  },
+  {
+    "file": "scripts-v1987-durable-scene-media-regression.mjs",
+    "code": 0,
+    "out": "v1.9.89 durable scene-media regression PASS\n"
+  },
+  {
+    "file": "scripts-v1988-transactional-owned-media-regression.mjs",
+    "code": 0,
+    "out": "PASS version\nPASS transactional source helper\nPASS provider result persisted before source adoption\nPASS source ready requires durable ownership\nPASS sync ready requires durable ownership\nPASS sync persisted before validation\nPASS cloud copy verified by reopening\nPASS storage path versioned\nPASS visible player does not mount unowned provider URL\nPASS coverage video persisted transactionally\nPASS coverage final uses owned runtime\nPASS validated sync playback uses durable runtime blob\nPASS 12/12 v1.9.89 transactional media checks\n"
+  },
+  {
+    "file": "scripts-v1989-end-to-end-speaking-clip-regression.mjs",
+    "code": 0,
+    "out": "v1.10.9 end-to-end speaking clip regression PASS\n"
+  },
+  {
+    "file": "scripts-v1990-listen-preserves-video-regression.mjs",
+    "code": 0,
+    "out": "v1.10.9 Listen-preserves-visual regression passed\n"
+  },
+  {
+    "file": "scripts-v1991-finished-speaking-clip-regression.mjs",
+    "code": 0,
+    "out": "v1.10.9 finished-speaking-clip state regression PASS\n"
+  },
+  {
+    "file": "scripts-v1992-clickable-preview-regression.mjs",
+    "code": 0,
+    "out": "v1.10.9 unambiguous visual-preview regression PASS\n"
+  },
+  {
+    "file": "scripts-v1993-finished-player-handoff-regression.mjs",
+    "code": 0,
+    "out": "v1.10.9 finished-player handoff regression PASS\n"
+  },
+  {
+    "file": "scripts-v1994-embedded-audio-recovery-regression.mjs",
+    "code": 0,
+    "out": "v1.10.9 embedded-audio recovery regression PASS\n"
+  },
+  {
+    "file": "scripts-video-regression.mjs",
+    "code": 0,
+    "out": "video MIME/range regression PASS\n"
+  },
+  {
+    "file": "scripts-voice-continuity.mjs",
+    "code": 0,
+    "out": "character-ID voice continuity regression PASS\n"
+  },
+  {
+    "file": "scripts-voice-mix-regression.mjs",
+    "code": 0,
+    "out": "clean approved-voice mix regression PASS\n"
+  }
+]

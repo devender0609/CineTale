@@ -1,0 +1,15 @@
+import fs from 'node:fs';
+import assert from 'node:assert/strict';
+const app=fs.readFileSync(new URL('./app.js',import.meta.url),'utf8');
+const html=fs.readFileSync(new URL('./index.html',import.meta.url),'utf8');
+const pkg=JSON.parse(fs.readFileSync(new URL('./package.json',import.meta.url),'utf8'));
+assert.equal(pkg.version,'1.12.4','package version');
+assert.ok(app.includes("const APP_VERSION = '1.12.4'"),'app version');
+assert.ok(html.includes('/app.js?v=1.12.4')&&html.includes('/styles.css?v=1.12.4'),'browser cache bust');
+assert.match(app,/if\(speaking&&!isMountedSynced\)[\s\S]{0,1400}scene-source-preview[\s\S]*data-sync-gated=\"1\"/s,'unfinished speaking media remains a clean visual-only video preview');
+assert.match(app,/sceneMediaDecodeShieldMarkup\(art,title\).*<video controls playsinline preload="metadata" class="scene-video-element"/s,'finished synchronized media uses native video controls behind a decode shield until the first frame is ready');
+assert.match(app,/const mediaModeChanged=oldSyncGated!==freshSyncGated\|\|oldNativeControls!==freshNativeControls[\s\S]*if\(mediaModeChanged\)[\s\S]*oldVideo\.replaceWith\(freshVideo\)/,'full Studio reconciliation must replace the player when preview/final semantics change');
+assert.match(app,/if\(scene\.videoUrl\)[\s\S]*sceneVideoMarkup\(scene,art[\s\S]*bindSceneVideoVoicePlayback\(p,ep\)/,'scene-local media completion must rebuild only the changed scene media surface');
+assert.match(app,/mountedAuthoritativeSync[\s\S]*video\.defaultMuted=false;video\.muted=false[\s\S]*video\.volume=1/,'finished synchronized player must explicitly enable embedded audio from authoritative runtime state');
+assert.ok(!/if\(mountedSyncGated!==shouldBeSyncGated\)[\s\S]{0,800}existing\.muted=false/.test(app),'finished handoff must not reuse the old gated node by merely flipping muted');
+console.log('v1.10.9 finished-player handoff regression PASS');

@@ -1,0 +1,10 @@
+import fs from 'node:fs';
+import assert from 'node:assert/strict';
+const app=fs.readFileSync(new URL('./app.js',import.meta.url),'utf8');
+assert.ok(app.includes("const APP_VERSION = '1.12.4'"));
+const accepted=/job=\{requestId:d\.requestId,provider:d\.provider\|\|'',model:d\.model\|\|'',statusUrl:d\.statusUrl\|\|'',responseUrl:d\.responseUrl\|\|'',requestDigest,productionContract\}/;
+assert.match(app,accepted,'freshly accepted lip-sync job must carry requestDigest + productionContract in memory before polling');
+assert.match(app,/liveProject=state\.projects\.find\(x=>x\.id===projectId\)\|\|liveProject;\s*liveScene=sceneAtIdentity\(findEpisodeById\(liveProject,episodeId\),index,sceneId\)\|\|liveScene;/,'live scene must refresh after persisting a newly accepted sync job');
+assert.match(app,/const activeRequestDigest=String\(job\.requestDigest\|\|liveScene\?\.lipSyncRequestDigest\|\|''\)/,'polling identity must prefer the in-memory job digest');
+assert.match(app,/const url=await pollSceneLipSync\(projectId,episodeId,index,job,signature,activeRequestDigest,activeProductionContract,sceneId\)/,'fresh accepted job must enter the status poller with exact identity');
+console.log('v1.10.9 fresh accepted sync job -> polling identity regression PASS');

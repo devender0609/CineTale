@@ -1,0 +1,11 @@
+import fs from 'node:fs';
+import assert from 'node:assert/strict';
+const src=fs.readFileSync(new URL('./app.js',import.meta.url),'utf8');
+assert.match(src,/function sourceVideoProductionShot\(scene=\{\}\)[\s\S]*videoPrimaryShotId[\s\S]*videoPrimarySpeaker[\s\S]*videoPrimarySpokenLine[\s\S]*videoPrimaryStartSec[\s\S]*videoPrimaryEndSec/,'source contract must reconstruct the exact persisted source-shot identity');
+assert.match(src,/function sceneVideoProductionContract[\s\S]*sourceVideoProductionShot\(scene\)/,'source provenance validation must use the persisted source-shot identity, not reselect a current plan primary');
+const contractBlock=src.slice(src.indexOf('function sceneVideoProductionContract'),src.indexOf('function sceneVideoProductionProvenanceValid'));
+assert.doesNotMatch(contractBlock,/primaryCoverageShot\(scene/,'scene production-contract validation must not reselect the current primary coverage shot');
+assert.match(src,/if\(speaking&&!isMountedSynced\)[\s\S]*<video controls playsinline preload="metadata" muted/,'unfinished speaking source remains muted and cannot expose raw provider speech');
+assert.match(src,/mountedAuthoritativeSync[\s\S]*removeAttribute\('data-sync-gated'\)[\s\S]*video\.defaultMuted=false;video\.muted=false[\s\S]*removeAttribute\('muted'\)[\s\S]*video\.volume=1/,'validated synchronized player must explicitly restore embedded audio from live mounted state');
+assert.match(src,/if\(mountedSyncGated!==shouldBeSyncGated\)[\s\S]*existing\.replaceWith\(replacement\)/,'preview-to-finished transition must replace the sync-gated node so permanent mute listeners cannot survive');
+console.log('v1.10.9 authoritative sync adoption regression: PASS');

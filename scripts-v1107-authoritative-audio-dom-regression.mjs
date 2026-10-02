@@ -1,0 +1,10 @@
+import fs from 'node:fs';
+import assert from 'node:assert/strict';
+const app=fs.readFileSync(new URL('./app.js',import.meta.url),'utf8');
+assert.match(app,/const exact=isMountedSynced\?' data-lip-sync-ready="1"'/,'validated player must emit the same data attribute that dataset.lipSyncReady reads');
+assert.doesNotMatch(app,/data-lipsync-ready="1"/,'ambiguous data-lipsync-ready spelling must not remain');
+assert.doesNotMatch(app,/dataset\.lipsyncReady/,'player code must use one canonical dataset key');
+assert.match(app,/const mountedAuthoritativeSync=Boolean\([\s\S]*sceneHasValidatedLipSync[\s\S]*mountedSrc===mountedDesired\)/,'mounted finished state must be derived from live validated scene + actual currentSrc');
+assert.match(app,/if\(mountedAuthoritativeSync\|\|video\.dataset\.lipSyncReady==='1'\)\{[\s\S]*removeAttribute\('data-sync-gated'\)[\s\S]*defaultMuted=false;video\.muted=false;video\.removeAttribute\('muted'\);video\.volume=1/,'authoritative mounted sync must self-correct stale preview mute/gate state');
+assert.match(app,/if\(video\.dataset\.lipSyncReady==='1'\|\|\(desired&&currentSrc===desired\)\)\{[\s\S]*removeAttribute\('data-sync-gated'\)[\s\S]*video\.muted=false[\s\S]*video\.volume=1/,'play handler must self-correct authoritative synchronized playback');
+console.log('v1.10.9 authoritative audio DOM regression PASS');

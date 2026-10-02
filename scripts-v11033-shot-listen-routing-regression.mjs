@@ -1,0 +1,14 @@
+import fs from 'node:fs';
+const app=fs.readFileSync(new URL('./app.js',import.meta.url),'utf8');
+const must=(ok,msg)=>{if(!ok)throw new Error(msg)};
+must(app.includes("const APP_VERSION = '1.12.4'"),'version not bumped');
+must(app.includes('let previewAudioContext=null'),'previewAudioContext is not declared');
+must(app.includes('function selectedShotListenState(scene={})'),'shot-specific listen state missing');
+must(app.includes("if(!shot.speaking)return {label:'No dialogue',disabled:true"),'visual shots can still expose character Listen');
+must(app.includes('async function playSelectedShotAudio'),'selected speaking-shot audio path missing');
+must(app.includes('if(!shot?.speaking)return false'),'visual shot can enter speaking preview path');
+must(app.includes('const spoken=String(shot.spokenLine'),'selected shot does not use its own spoken line');
+must(app.includes('await playSelectedShotAudio(p,s,shot)'),'scene Listen does not route through selected shot');
+must(app.includes('Shot ${shot.order} is visual-only and has no dialogue.'),'visual-shot no-dialogue guard missing');
+must(app.includes('listen.textContent=listenState.label;listen.disabled=listenState.disabled'),'shot selection does not refresh Listen state');
+console.log('v1.11.0 selected-shot Listen routing regression: PASS');

@@ -1,0 +1,28 @@
+import fs from 'node:fs';
+import assert from 'node:assert/strict';
+import vm from 'node:vm';
+const app=fs.readFileSync('app.js','utf8'),html=fs.readFileSync('index.html','utf8'),pkg=JSON.parse(fs.readFileSync('package.json','utf8'));
+assert.equal(pkg.version,'1.12.4');
+assert.ok(app.includes("const APP_VERSION = '1.12.4'"));
+assert.ok(html.includes('/app.js?v=1.12.4')&&html.includes('/styles.css?v=1.12.4'));
+assert.ok(app.includes('lipSyncProviderAudioAuthoritative===true'),'provider-audio readiness gate missing');
+assert.ok(app.includes("lipSyncAudioFinalizeMethod='sync-provider-exact-approved-audio'"),'provider audio provenance missing');
+assert.ok(app.includes("syncDiag('provider-audio-authoritative'"),'provider audio authoritative diagnostic missing');
+assert.ok(app.includes('sceneLipSyncAudioProvenanceValid(x,t)'),'approved-audio provenance guard missing');
+assert.ok(app.includes("['PENDING','PROCESSING','COMPLETED'].includes(providerState)"),'completed paid generations must remain resumable');
+const completedStart=app.indexOf("syncDiag('sync-url-playable'");
+const completedEnd=app.indexOf("syncDiag('sync-authoritative'",completedStart);
+assert.ok(completedStart>=0&&completedEnd>completedStart,'provider completion adoption section missing');
+const completed=app.slice(completedStart,completedEnd);
+assert.ok(completed.includes("persistSceneMediaUrl(projectId,episodeId,index,url,'sync'"),'provider output must be durably persisted directly');
+assert.ok(!completed.includes('finalizeSynchronizedVideoWithApprovedAudio('),'production provider output must not depend on browser MediaRecorder remux');
+// Blob URLs must remain blob URLs; duplicated absolute URLs must normalize deterministically.
+const start=app.indexOf("function canonicalMediaUrl(value=''){");
+const end=app.indexOf('\nfunction normalizeSceneMediaReferences',start);
+assert.ok(start>=0&&end>start,'canonicalMediaUrl source missing');
+const src=app.slice(start,end)+'\nthis.canonicalMediaUrl=canonicalMediaUrl;';
+const ctx={location:{origin:'https://cine-tale.vercel.app'},URL};vm.createContext(ctx);vm.runInContext(src,ctx);
+const blob='blob:https://cine-tale.vercel.app/abc-123';
+assert.equal(ctx.canonicalMediaUrl(blob),blob,'blob runtime URLs must remain intact');
+assert.equal(ctx.canonicalMediaUrl('https://cine-tale.vercel.apphttps://cdn.example.com/file.mp4'),'https://cdn.example.com/file.mp4','glued absolute URLs must normalize to the final URL token');
+console.log('v1.10.20 approved-audio provider adoption regression: PASS');

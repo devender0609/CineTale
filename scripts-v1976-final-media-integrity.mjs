@@ -1,0 +1,18 @@
+import fs from 'node:fs';
+import assert from 'node:assert/strict';
+const app=fs.readFileSync(new URL('./app.js',import.meta.url),'utf8');
+const html=fs.readFileSync(new URL('./index.html',import.meta.url),'utf8');
+assert.ok(app.includes("const APP_VERSION = '1.12.4'"));
+assert.ok(html.includes('/app.js?v=1.12.4')&&html.includes('/styles.css?v=1.12.4'));
+assert.ok(app.includes('async function duplicateFinalMediaConflicts'),'duplicate-media integrity scanner missing');
+assert.ok(app.includes("check('source-url'"),'source URL duplicate check missing');
+assert.ok(app.includes("check('sync-id'"),'sync generation duplicate check missing');
+assert.ok(app.includes("check('sync-url'"),'sync URL duplicate check missing');
+assert.ok(app.includes("check('sync-remote'"),'sync remote duplicate check missing');
+assert.ok(app.includes("crypto.subtle.digest('SHA-256'"),'content fingerprint guard missing');
+assert.ok(app.includes('async function repairDuplicateFinalMedia'),'selective duplicate repair missing');
+assert.ok(app.includes('sceneAuthoritativeFinalVideoEntries(liveScene,liveProject)')&&app.includes('item.entry?.synchronized'),'speaking scene must use authoritative synchronized performance in the deterministic timeline');
+assert.ok(app.includes("durationMode:'auto-edited-planned-shot-story-timeline',pipelineVersion:13"),'pipeline 13 metadata missing');
+assert.ok(app.includes('const projectId=initial.id,episodeId=initialEp.id||initialEp.number'),'video poller must bind to original project/episode');
+assert.ok(app.includes('updateProjectById(projectId'),'video poller must not write to whichever project is currently open');
+console.log('v1.12.4 duplicate-media + atomic synced-scene + project-bound poller regression PASS');

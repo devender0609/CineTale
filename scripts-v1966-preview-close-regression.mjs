@@ -1,0 +1,11 @@
+import fs from 'node:fs';
+const app=fs.readFileSync(new URL('./app.js',import.meta.url),'utf8');
+const start=app.indexOf('async function previewFinalSequence()');
+const end=app.indexOf('function chooseFinalRecordingMime', start);
+if(start<0||end<0)throw new Error('previewFinalSequence not found');
+const block=app.slice(start,end);
+if(/ensureSceneLipSync\s*\(/.test(block))throw new Error('Preview must remain read-only and never call ensureSceneLipSync');
+if(/sequenceClose[^\n]*renderStudio\s*\(/.test(block))throw new Error('Closing Preview must not remount Studio');
+if(/modal[^\n]*hidden[^\n]*renderStudio\s*\(/.test(block))throw new Error('Preview completion must not remount Studio');
+if(!/previewSequenceLocks\.delete\(previewKey\)/.test(block))throw new Error('Preview lock must still be released');
+console.log('v1.9.66 preview-close/no-remount regression: PASS');
