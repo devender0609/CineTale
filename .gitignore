@@ -1,0 +1,14 @@
+# Production repository stays clean when each release folder is pushed directly.
+scripts*.mjs
+QA_REPORT_*.md
+BUILD_NOTES_*.md
+e2e-*.html
+*_SETUP.md
+*.sql
+REFERENCE_*.json
+qa_*.json
+all_scripts_*.json
+syntax_results_*.json
+*.zip
+.vercel/
+node_modules/
