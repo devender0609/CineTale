@@ -1,5 +1,5 @@
 import {ensureSceneCoverage,coverageTargetCount,coverageSummary,coverageLogicAudit,repairCoverageLogic} from './lib/production.js';
-const APP_VERSION = '1.12.64';
+const APP_VERSION = '1.12.66';
 const VOICE_LOCK_AUDIT_TIMEOUT_MS=8000;
 const SCENE_EDIT_PIPELINE_REV = 'v1.10.41-auto-editorial-flow';
 const LIP_SYNC_PIPELINE_REV = 'v1.9.89-end-to-end-speaking-clip';
@@ -150,11 +150,43 @@ async function syncWorkspaceAfterAuth(){
     if(!state.projectNavigation.locked)renderAll();else{renderAccountState();renderStudio()}
   }catch(err){state.cloudSync.applying=false;if(cloudUnavailable(err)){state.cloudSync.status='unavailable';state.cloudSync.lastError='Cloud workspace table not configured.';console.warn('[CineTale cloud] Optional cloud workspace table is not configured.',err)}else{state.cloudSync.status='error';state.cloudSync.lastError=err.message||String(err);console.warn('[CineTale cloud] Workspace sync failed',err)}}finally{state.cloudSync.loading=false;renderAccountState()}
 }
+// Coalesce large workspace snapshots into one ordered writer. Never overlap POSTs:
+// an older response must not arrive after a newer save and overwrite it.
+let cloudWriteInFlight=null,cloudLastCommittedSignature='',cloudLastCommittedUser='';
 async function pushCloudWorkspace(){
   if(state.cloudSync.applying||!authUser()||!state.authConfig?.configured||state.cloudSync.status==='unavailable')return;
-  try{await supabaseWorkspace('cinetale_workspaces?on_conflict=user_id',{method:'POST',prefer:'resolution=merge-duplicates,return=minimal',body:{user_id:authUser().id,payload:cloudPayload(),updated_at:new Date().toISOString()}});state.cloudSync.status='synced';state.cloudSync.lastError='';state.cloudSync.lastSyncedAt=new Date().toISOString();renderAccountState()}catch(err){if(cloudUnavailable(err)){state.cloudSync.status='unavailable';state.cloudSync.lastError='Cloud workspace table not configured.'}else if([401,403].includes(Number(err?.status))){state.cloudSync.status='auth-required';state.cloudSync.lastError='Sign in again to continue cloud recovery. Browser-saved production state remains preserved.'}else{state.cloudSync.status='error';state.cloudSync.lastError=err.message||String(err)}console.warn('[CineTale cloud] Save failed',err);renderAccountState()}
+  if(cloudWriteInFlight)return cloudWriteInFlight;
+  cloudWriteInFlight=(async()=>{
+    // Each pass snapshots the LATEST state. Concurrent local mutations are sent
+    // in the next pass rather than spawning competing network writes.
+    for(let pass=0;pass<8;pass++){
+      if(state.cloudSync.applying||!authUser()||state.cloudSync.status==='unavailable')return;
+      const userId=authUser().id;
+      const payload=cloudPayload();
+      const signature=JSON.stringify(payload);
+      if(cloudLastCommittedUser===userId&&cloudLastCommittedSignature===signature){
+        state.cloudSync.status='synced';renderAccountState();return;
+      }
+      try{
+        await supabaseWorkspace('cinetale_workspaces?on_conflict=user_id',{method:'POST',prefer:'resolution=merge-duplicates,return=minimal',body:{user_id:userId,payload,updated_at:new Date().toISOString()}});
+        if(authUser()?.id!==userId)return;
+        cloudLastCommittedUser=userId;cloudLastCommittedSignature=signature;
+        state.cloudSync.status='synced';state.cloudSync.lastError='';state.cloudSync.lastSyncedAt=new Date().toISOString();renderAccountState();
+        if(JSON.stringify(cloudPayload())===signature)return;
+      }catch(err){
+        if(cloudUnavailable(err)){state.cloudSync.status='unavailable';state.cloudSync.lastError='Cloud workspace table not configured.'}
+        else if([401,403].includes(Number(err?.status))){state.cloudSync.status='auth-required';state.cloudSync.lastError='Sign in again to continue cloud recovery. Browser-saved production state remains preserved.'}
+        else{state.cloudSync.status='error';state.cloudSync.lastError=err.message||String(err)}
+        console.warn('[CineTale cloud] Save failed',err);renderAccountState();return;
+      }
+    }
+    // Very busy projects may change during every POST. Defer the next batch
+    // so the UI stays responsive while autosave still catches up.
+    scheduleCloudSave();
+  })().finally(()=>{cloudWriteInFlight=null});
+  return cloudWriteInFlight;
 }
-function scheduleCloudSave(){if(state.cloudSync.applying||!authUser()||!state.authConfig?.configured||state.cloudSync.status==='unavailable')return;clearTimeout(state.cloudSync.timer);state.cloudSync.status='syncing';state.cloudSync.timer=setTimeout(()=>pushCloudWorkspace(),700)}
+function scheduleCloudSave(){if(state.cloudSync.applying||!authUser()||!state.authConfig?.configured||state.cloudSync.status==='unavailable')return;clearTimeout(state.cloudSync.timer);state.cloudSync.status='syncing';state.cloudSync.timer=setTimeout(()=>{void pushCloudWorkspace()},900)}
 async function fileToReferenceDataUrl(file){
   if(!file?.type?.startsWith('image/'))throw new Error('Choose an image file.');if(file.size>15*1024*1024)throw new Error('Choose a photo smaller than 15 MB.');
   const raw=await new Promise((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve(r.result);r.onerror=()=>reject(new Error('Could not read that photo.'));r.readAsDataURL(file)});
@@ -1574,7 +1606,7 @@ function productionDependencyReadiness(project={},episode=episodeOf(project)){
   else if(timelineReady)add('final','Final episode','attention','All selected story-shot timelines are ready; only final assembly remains.','Create the final file from preserved ready media.','final');
   else add('final','Final episode','blocked','Final assembly is waiting for the authoritative upstream readiness chain.','Use the first highlighted recovery action; completed media will be reused.','final');
   const firstAction=nodes.find(n=>n.state!=='ready'&&n.action)?.action||'';
-  return {revision:'v1.12.64-provider-retrieval-diagnostics',nodes,selectedScenes:selected.length,plannedShots,sourceReady,generating,recovering:recover,waiting,speakingTotal,syncReady,timelineReady,finalPresent,finalStale,firstAction,ready:nodes.every(n=>n.state==='ready')};
+  return {revision:'v1.12.66-provider-retrieval-diagnostics',nodes,selectedScenes:selected.length,plannedShots,sourceReady,generating,recovering:recover,waiting,speakingTotal,syncReady,timelineReady,finalPresent,finalStale,firstAction,ready:nodes.every(n=>n.state==='ready')};
 }
 function dependencyStateLabel(state=''){return ({ready:'Ready',blocked:'Waiting',attention:'Needs attention',producing:'In progress'})[state]||'Pending'}
 function productionActionAuthority(project={},episode=episodeOf(project)){

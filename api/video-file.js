@@ -90,7 +90,16 @@ export default async function handler(req,res){
     try{
       const r=await fetch(`https://generativelanguage.googleapis.com/v1beta/interactions/${encodeURIComponent(interaction)}`,{headers:{'x-goog-api-key':key,'Api-Revision':'2026-05-20'}});
       const d=await r.json().catch(()=>({}));
-      if(!r.ok)return res.status(502).end('Video download unavailable');
+      if(!r.ok){
+        // Retrieval failure is not proof that the paid interaction or its media is gone.
+        // Match video-status recovery semantics; never expose the upstream error to creators.
+        res.setHeader('cache-control','no-store');
+        res.setHeader('x-cinetale-media-state','recovery-needs-review');
+        if(r.status===401||r.status===403)return res.status(409).end('Saved video requires provider access review');
+        if(r.status===400||r.status===404)return res.status(409).end('Saved video recovery needs review');
+        if(r.status===429||r.status>=500)return res.status(503).end('Saved video temporarily unavailable');
+        return res.status(409).end('Saved video recovery needs review');
+      }
       const video=omniVideoContent(d);
       if(!video)return res.status(409).end('Generated video is not ready');
       if(video?.data){

@@ -148,6 +148,18 @@ export default async function handler(req,res){
   const paidAllowed=paidOverride?paidOverride==='true':runtimeMode==='production';
   if(req.method==='POST'&&!paidAllowed)return res.status(423).json({errorCode:'PAID_GENERATION_LOCKED',error:'Paid video generation is locked in this development deployment. Existing provider operations can still be checked and recovered.'});
   if(req.method!=='POST') return res.status(405).json({error:'Method not allowed'});
+  // SECURITY RELEASE GATE: never contact a paid provider before a durable,
+  // user-authorized, atomic reservation exists. This installation has no such
+  // ledger yet. A browser-supplied projectId is not proof of ownership and
+  // an in-memory map cannot prevent cross-session duplicate charges.
+  // Fail closed even if someone toggles ENABLE_LIVE_VIDEO/paid flags in Vercel.
+  if(paidAllowed){
+    return res.status(503).json({
+      errorCode:'DURABLE_OPERATION_LEDGER_REQUIRED',
+      error:'New paid video work is unavailable until authenticated operation reservations and durable recovery are configured. Existing jobs remain recoverable.'
+    });
+  }
+
   const body=req.body||{};
   const scene=body.scene || (body.scenes||[])[0];
   const project=body.project||{};
