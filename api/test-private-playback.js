@@ -35,11 +35,10 @@ export function createTestPrivatePlaybackHandler({env=process.env, fetchImpl=glo
     if(env.CINETALE_ENABLE_PRIVATE_MEDIA_PROBE!=='true'||env.CINETALE_RUNTIME_MODE!=='development'||env.CINETALE_ALLOW_PAID_GENERATION!=='false')return reply(404,'Not found');
     const endpoint=String(env.SUPABASE_URL||'').replace(/\/+$/,'');
     const key=String(env.SUPABASE_ANON_KEY||env.SUPABASE_PUBLISHABLE_KEY||'');
-    const service=String(env.SUPABASE_SERVICE_ROLE_KEY||'');
     const allowedId=String(env.CINETALE_PRIVATE_MEDIA_TEST_USER_ID||'');
     const expectedSha=String(env.CINETALE_PRIVATE_MEDIA_TEST_SHA256||'');
     const bearer=String(req.headers?.authorization||'').match(/^Bearer\s+([^\s]+)$/i)?.[1];
-    if(!/^https:\/\/[^/?#]+$/.test(endpoint)||!key||!service||!/^[0-9a-f-]{36}$/i.test(allowedId)||!/^[a-f0-9]{64}$/i.test(expectedSha))return reply(503,'Probe unavailable');
+    if(!/^https:\/\/[^/?#]+$/.test(endpoint)||!key||!/^[0-9a-f-]{36}$/i.test(allowedId)||!/^[a-f0-9]{64}$/i.test(expectedSha))return reply(503,'Probe unavailable');
     if(!bearer)return reply(401,'Sign in required');
     try {
       const userResponse=await fetchImpl(`${endpoint}/auth/v1/user`,{
@@ -50,9 +49,9 @@ export function createTestPrivatePlaybackHandler({env=process.env, fetchImpl=glo
       if(user?.id!==allowedId)return reply(403,'Not authorized');
       // The only object served is the synthetic test fixture, not user-chosen media.
       const media=await fetchImpl(`${endpoint}/storage/v1/object/cinetale-test-media/assembled.mp4`,{
-        headers:{apikey:service,authorization:`Bearer ${service}`},redirect:'error',signal:AbortSignal.timeout(15000)
+        headers:{apikey:key,authorization:`Bearer ${bearer}`},redirect:'error',signal:AbortSignal.timeout(15000)
       });
-      if(!media.ok)return reply(503,'Test media unavailable');
+      if(!media.ok)return reply(media.status===401||media.status===403?403:503,'Test media unavailable');
       const declared=Number(media.headers.get('content-length'));
       if(Number.isFinite(declared)&&declared>MAX_TEST_MEDIA_BYTES)return reply(413,'Test media too large');
       const buf=await readBoundedMedia(media);

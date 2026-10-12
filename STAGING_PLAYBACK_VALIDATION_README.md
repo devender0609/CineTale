@@ -1,6 +1,6 @@
-# CineTale v1.12.66 — private media staging validation
+# CineTale v1.12.66 — user-scoped private media staging validation
 
-This is **not** an approved production release. Deploy in a separate Vercel *staging project* only, never over the existing CineTale production deployment. No database migrations are required for the playback probe and experimental `db/` migrations MUST NOT be applied to production.
+This is **not** an approved production release. Deploy ONLY as a protected Preview from the staging branch; do not merge into `main` or promote to Production. The branch shares the Vercel project but must not inherit paid-provider credentials. No database migrations are required for the playback probe and experimental `db/` migrations MUST NOT be applied to production.
 
 ## What changed since the earlier staging ZIP
 
@@ -15,7 +15,7 @@ The working tree now contains `api/test-private-playback.js`, a fixed-object, au
 - `CINETALE_PRIVATE_MEDIA_TEST_SHA256=B48865AFB24CBFB3E13EC1083F8AA932DB8411652C5B7207D9DD0BFC3E12D88C` (checksum of the synthetic MP4)
 - `SUPABASE_URL=` (existing project's URL)
 - `SUPABASE_ANON_KEY=` (existing project's publishable/anon key)
-- `SUPABASE_SERVICE_ROLE_KEY=` (**server-only secret**; never expose in NEXT_PUBLIC/VITE variables or browser code)
+- **DO NOT configure `SUPABASE_SERVICE_ROLE_KEY` in Preview.** The probe now sends the authorized user JWT to Supabase Storage, which enforces the fixture-only SELECT RLS policy in `engineering/PRIVATE_TEST_MEDIA_RLS.sql`. Review and manually apply that SQL only after substituting the authorized user UUID. Do not run any other migrations. The policy must be removed after testing.
 
 No real provider keys are required for the playback-probe test. Use the minimal required credentials. Note: connecting a staging deployment to the production Supabase project shares its Auth/users; strictly restrict the probe to the test user. This endpoint is not a general project playback API.
 
@@ -36,3 +36,7 @@ Supported: `HEAD`, `GET`, single byte ranges (`Range: bytes=0-1023`). Expected: 
 - `npm run qa:deep`
 
 Live Vercel-to-Supabase playback **not tested**. Google jobs and full production orchestration **not validated**. New paid generation must stay blocked.
+
+## Revision: RLS-only fixture authorization
+
+This variant uses the same verified bearer JWT for `/auth/v1/user` and `/storage/v1/object/cinetale-test-media/assembled.mp4`. Neither request uses a service-role key. Supabase Storage must be configured with `engineering/PRIVATE_TEST_MEDIA_RLS.sql` for precisely one user and the single synthetic fixture. No application workspace schema changes are needed. Remove the policy and disable the probe after testing. The code has been locally tested with mock HTTP handlers, not live Supabase.
